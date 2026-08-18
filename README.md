@@ -2,6 +2,12 @@
 
 Hey!!! Local AI is not CHEAP at ALL! - **Every AI token carries a COST!** 
 
+Running **local AI** is far from free - it simply shifts the invoice from a cloud vendor to your own balance sheet. 
+
+Between high-end GPU based systems, surging electricity and cooling bills, server maintenance, and the specialized engineering talent required to keep inference pipelines optimized, self-hosting carries in real lafe massive capital and operational expenses.
+
+Metering and billing internal teams by the token is essential: it creates accountability against wasteful compute loops and directly amortizes those upfront infrastructure, pipelines, and staffing investments.
+
 ## So how to measure and bill AI tokens in small AI Lab? 
 
 This is tricky architectural and engineering challenge with lot of tradeoffs, ideal EDU AI LAB material.

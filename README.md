@@ -36,13 +36,13 @@ Usefull quatizations:
 Full LFM2.5-2.6B model is 5.4 GB in bf16, we can easily run 8bit quantizations:
 
  - GGUF [Official LiguidAI (8-bit Q8_0 = 2.87 GB)](https://huggingface.co/LiquidAI/LFM2.5-2.6B-GGUF)
- - W8A16 [AutoRound W8A16 (8-bit weights / fp16 activations = 2.9 GB)] (https://huggingface.co/plavno/LFM2.5-2.6B-AutoRound-W8A16)
+ - W8A16 [AutoRound W8A16 (8-bit weights / fp16 activations = 2.9 GB)](https://huggingface.co/plavno/LFM2.5-2.6B-AutoRound-W8A16)
 
 There are a lot of modified and uncensored variants of LFM2.5-2.6B:
 
  A Little Uncensored:
 
-  - [LFM2.5-2.6B-Uncensored-GGUF](SC117/LFM2.5-2.6B-Uncensored-GGUF)
+  - [LFM2.5-2.6B-Uncensored-GGUF](https://huggingface.co/SC117/LFM2.5-2.6B-Uncensored-GGUF)
   - [LFM2.5-2.6B-Heretic-Abliterated-GGUF](https://huggingface.co/Abiray/LFM2.5-2.6B-Heretic-Abliterated-GGUF)
   - [LFM2.5-2.6B-UNCENSORED-ABLITERATED-PHILADELPHIA-CLASS](https://huggingface.co/KridgeDookie/LFM2.5-2.6B-UNCENSORED-ABLITERATED-PHILADELPHIA-CLASS)
 

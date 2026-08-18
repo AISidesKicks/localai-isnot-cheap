@@ -115,3 +115,6 @@ LiteLLM captures the full usage footprint (prompt, completion, and engine KV-cac
 
 4. **Billing & Wallet Deductions (Lago $\rightarrow$ PostgreSQL & Redis DB 0):**
 Lago processes the event via its **Redis** worker queue, applies discounts for cached tokens, and writes balance deductions to its **PostgreSQL** ledger.
+
+5. **Virtual Credit Topping — Simulated Payments (Lago $\leftarrow$ Users / Teams):**
+Before any request can be served, each team tops up its virtual credit wallet, simulating a real payment — no actual money moves. Lago credits the wallet balance in its PostgreSQL ledger, mirroring prepaid billing. LiteLLM enforces the balance during its quota checks (step 1): once a wallet is exhausted, further requests are rejected until the team tops up again.

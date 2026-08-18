@@ -118,3 +118,7 @@ Lago processes the event via its **Redis** worker queue, applies discounts for c
 
 5. **Virtual Credit Topping — Simulated Payments (Lago $\leftarrow$ Users / Teams):**
 Before any request can be served, each team tops up its virtual credit wallet, simulating a real payment — no actual money moves. Lago credits the wallet balance in its PostgreSQL ledger, mirroring prepaid billing. LiteLLM enforces the balance during its quota checks (step 1): once a wallet is exhausted, further requests are rejected until the team tops up again.
+
+---
+
+*Footnote: I have dyslexia, so from time to time I let the LLMs give my English a power-up — think of it as a GPU-accelerated spellchecker running at a few hundred tokens per second. If any sentence here reads a little too smart, that was the model showing off, not me.*

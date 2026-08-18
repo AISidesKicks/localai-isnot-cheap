@@ -5,17 +5,17 @@ services:
     image: postgres:16-alpine
     container_name: cheap-postgres
     environment:
-      POSTGRES_USER: ${POSTGRES_USER:-litellm}
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-litellm}
-      POSTGRES_DB: ${POSTGRES_DB:-litellm}
-      POSTGRES_MULTIPLE_DATABASES: ${POSTGRES_MULTIPLE_DATABASES:-lago_production}
+      POSTGRES_USER: ${POSTGRES_USER:-cheap}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-secred_pwd}
+      POSTGRES_DB: ${POSTGRES_LITELLM_DB:-litellm_db}
+      POSTGRES_MULTIPLE_DATABASES: ${POSTGRES_LAGO_DATABASE:-lago_db}
     volumes:
       - cheap-postgres-data:/var/lib/postgresql/data
       - ./init-multiple-dbs.sh:/docker-entrypoint-initdb.d/init-multiple-dbs.sh:ro
     ports:
       - "5432:5432"
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-litellm} -d ${POSTGRES_DB:-litellm}"]
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-cheap} -d ${POSTGRES_LITELLM_DB:-litellm_db}"]
       interval: 10s
       timeout: 5s
       retries: 5
@@ -43,13 +43,15 @@ services:
     container_name: cheap-litellm
     command: ["--config", "/app/config.yaml", "--port", "4000"]
     environment:
-      LITELLM_MASTER_KEY: ${LITELLM_MASTER_KEY:-sk-1234}
-      DATABASE_URL: postgresql://${POSTGRES_USER:-litellm}:${POSTGRES_PASSWORD:-litellm}@cheap-postgres:5432/${POSTGRES_DB:-litellm}
+      LITELLM_MASTER_KEY: ${LITELLM_MASTER_KEY:-sk-1234-master-key-4321}
+      DATABASE_URL: postgresql://${POSTGRES_USER:-cheap}:${POSTGRES_PASSWORD:-secred_pwd}@cheap-postgres:5432/${POSTGRES_LITELLM_DB:-litellm_db}
       REDIS_HOST: cheap-redis
       REDIS_PORT: "6379"
       OPENAI_API_KEY: ${OPENAI_API_KEY:-}
       ANTHROPIC_API_KEY: ${ANTHROPIC_API_KEY:-}
       DEEPSEEK_API_KEY: ${DEEPSEEK_API_KEY:-}
+      OPENROUTER_API_KEY: ${OPENROUTER_API_KEY:-}
+      HF_TOKEN: ${HF_TOKEN:-}
     volumes:
       - ./litellm_config.yaml:/app/config.yaml:ro
       - ${HF_CACHE_DIR:-./models/hf-cache}:/root/.cache/huggingface
@@ -81,7 +83,7 @@ services:
   cheap-llamacpp:
     image: ghcr.io/ggml-org/llama.cpp:server-cuda
     container_name: cheap-llamacpp
-    profiles: ["llama-cpp"]
+    profiles: ["llamacpp"]
     runtime: nvidia
     command:
       - "-m"
@@ -119,6 +121,8 @@ services:
       - "0.0.0.0"
       - "--port"
       - "8000"
+    environment:
+      HF_TOKEN: ${HF_TOKEN:-}
     volumes:
       - ${HF_CACHE_DIR:-./models/hf-cache}:/root/.cache/huggingface
     ports:
@@ -129,7 +133,7 @@ services:
       interval: 30s
       timeout: 10s
       retries: 5
-      start_period: 120s
+      start_period: 420s
     networks:
       - cheap-net
 
@@ -150,6 +154,8 @@ services:
       - "0.0.0.0"
       - "--port"
       - "30000"
+    environment:
+      HF_TOKEN: ${HF_TOKEN:-}
     volumes:
       - ${HF_CACHE_DIR:-./models/hf-cache}:/root/.cache/huggingface
     ports:
@@ -160,7 +166,7 @@ services:
       interval: 30s
       timeout: 10s
       retries: 5
-      start_period: 120s
+      start_period: 420s
     networks:
       - cheap-net
 
@@ -168,7 +174,7 @@ services:
     image: getlago/api:latest
     container_name: cheap-lago-api
     environment:
-      DATABASE_URL: postgresql://${POSTGRES_USER:-litellm}:${POSTGRES_PASSWORD:-litellm}@cheap-postgres:5432/lago_production
+      DATABASE_URL: postgresql://${POSTGRES_USER:-cheap}:${POSTGRES_PASSWORD:-secred_pwd}@cheap-postgres:5432/${POSTGRES_LAGO_DATABASE:-lago_db}
       REDIS_URL: redis://cheap-redis:6379/0
       SECRET_KEY_BASE: ${LAGO_SECRET_KEY_BASE:-change-me-in-prod}
       LAGO_DISABLE_SIGNUP: "false"
@@ -194,7 +200,7 @@ services:
     container_name: cheap-lago-worker
     command: ["bundle", "exec", "sidekiq"]
     environment:
-      DATABASE_URL: postgresql://${POSTGRES_USER:-litellm}:${POSTGRES_PASSWORD:-litellm}@cheap-postgres:5432/lago_production
+      DATABASE_URL: postgresql://${POSTGRES_USER:-cheap}:${POSTGRES_PASSWORD:-secred_pwd}@cheap-postgres:5432/${POSTGRES_LAGO_DATABASE:-lago_db}
       REDIS_URL: redis://cheap-redis:6379/0
       SECRET_KEY_BASE: ${LAGO_SECRET_KEY_BASE:-change-me-in-prod}
     depends_on:

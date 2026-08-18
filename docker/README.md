@@ -7,7 +7,7 @@ Full EDU AI LAB stack: LiteLLM gateway, Redis cache, local inference engines
 
 - Docker Engine 24+ and Docker Compose v2
 - NVIDIA GPU + `nvidia-container-toolkit` for the GPU profiles
-  (`--profile vllm`, `--profile llama-cpp`, `--profile sglang`); the core
+  (`--profile vllm`, `--profile llamacpp`, `--profile sglang`); the core
   stack (gateway, cache, billing, postgres, redis) runs without a GPU
 - `docker compose version` to check Compose v2 (no `version:` key needed)
 
@@ -53,7 +53,7 @@ conv_state cache, and a 1024 MiB CUDA IPC pool, at the auto-tuned
 context from `max_position_embeddings` when no length flag is given —
 service at a shorter context (e.g. the model card's recommended 4096) frees
 the rest of the card. Cold CUDA graph capture can take ~5 minutes on first
-start, which can outrun the `start_period 120s` healthcheck before flipping
+start, which can outrun the `start_period 420s` healthcheck before flipping
 healthy.
 
 ## Run
@@ -67,7 +67,7 @@ docker compose -f docker/docker-compose.yml up -d
 With a local inference engine (pick one profile):
 
 ```sh
-docker compose -f docker/docker-compose.yml --profile llama-cpp up -d
+docker compose -f docker/docker-compose.yml --profile llamacpp up -d
 docker compose -f docker/docker-compose.yml --profile vllm up -d
 docker compose -f docker/docker-compose.yml --profile sglang up -d
 ```
@@ -76,7 +76,7 @@ Or set `INFERENCE_PROFILE` in `docker/.env` and use the environment-driven
 `COMPOSE_PROFILES` mechanism:
 
 ```sh
-# INFERENCE_PROFILE=llama-cpp | vllm | sglang
+# INFERENCE_PROFILE=llamacpp | vllm | sglang
 COMPOSE_PROFILES="$INFERENCE_PROFILE" docker compose -f docker/docker-compose.yml up -d
 ```
 
@@ -119,7 +119,7 @@ curl -s http://localhost:30000/v1/chat/completions \
 
 To verify LiteLLM routing instead, hit the gateway on port 4000 with the
 `local-llama` alias and the master key from `docker/.env`
-(`LITELLM_MASTER_KEY`, default `sk-1234`).
+(`LITELLM_MASTER_KEY`, default `sk-1234-master-key-4321`).
 
 ## Port map
 
@@ -128,7 +128,7 @@ To verify LiteLLM routing instead, hit the gateway on port 4000 with the
 | 4000 | LiteLLM        | OpenAI-compatible gateway      |
 | 5432 | PostgreSQL     | LiteLLM + Lago databases       |
 | 6379 | Redis          | cache (DB 1) + Lago queue (DB 0) |
-| 8080 | llama.cpp      | only with `--profile llama-cpp` |
+| 8080 | llama.cpp      | only with `--profile llamacpp` |
 | 8000 | vLLM           | only with `--profile vllm`     |
 | 30000| SGLang         | only with `--profile sglang`   |
 | 3001 | Lago API       | REST + GraphQL billing API     |
@@ -138,7 +138,7 @@ To verify LiteLLM routing instead, hit the gateway on port 4000 with the
 
 | Alias        | Backend        | Engine profile |
 |--------------|----------------|----------------|
-| `local-gguf` | llama.cpp      | `llama-cpp`    |
+| `local-gguf` | llama.cpp      | `llamacpp`   |
 | `local-llama`| vLLM           | `vllm`         |
 | `local-sglang`| SGLang        | `sglang`       |
 | `gpt-4o`     | OpenAI         | external       |

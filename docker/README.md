@@ -57,6 +57,17 @@ the rest of the card. Cold CUDA graph capture can take ~5 minutes on first
 start, which can outrun the `start_period 420s` healthcheck before flipping
 healthy.
 
+### llama.cpp VRAM usage
+
+Same RTX 4070, Q8_0 GGUF checkpoint: 5.0 GiB after load (llama-server, vs
+11.4 GiB vLLM / 9.37 GiB SGLang on the W8A16 quant). Weights take 2.67 GiB
+on the GPU (another 0.26 GiB stays CPU-mapped, off-card), the KV cache
+1.95 GiB, and compute scratch ~0.19 GiB, on top of the 442 MiB idle
+baseline. llama.cpp auto-derives the context from the model card:
+`n_ctx` 128000 split into 4 parallel slots of 32K tokens each, so the KV
+buffer is pre-allocated for the whole 128K regardless of how many slots a
+batch actually uses.
+
 ## Run
 
 Core stack (gateway + cache + billing + postgres + redis, no engines):

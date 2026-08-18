@@ -1,0 +1,47 @@
+model_list:
+  - model_name: local-gguf
+    litellm_params:
+      model: openai/LiquidAI/LFM2.5-2.6B
+      api_base: http://llama-cpp:8080/v1
+      api_key: dummy
+
+  - model_name: local-llama
+    litellm_params:
+      model: openai/LiquidAI/LFM2.5-2.6B
+      api_base: http://vllm:8000/v1
+      api_key: dummy
+
+  - model_name: local-sglang
+    litellm_params:
+      model: openai/LiquidAI/LFM2.5-2.6B
+      api_base: http://sglang:30000/v1
+      api_key: dummy
+
+  - model_name: gpt-4o
+    litellm_params:
+      model: gpt-4o
+      api_key: os.environ["OPENAI_API_KEY"]
+
+  - model_name: claude-sonnet-4-20250514
+    litellm_params:
+      model: anthropic/claude-sonnet-4-20250514
+      api_key: os.environ["ANTHROPIC_API_KEY"]
+
+  - model_name: deepseek-chat
+    litellm_params:
+      model: deepseek/deepseek-chat
+      api_key: os.environ["DEEPSEEK_API_KEY"]
+
+litellm_settings:
+  drop_params: true
+  set_verbose: true
+  cache: true
+  cache_params:
+    type: redis
+    host: os.environ.get("REDIS_HOST", "redis")
+    port: os.environ.get("REDIS_PORT", "6379")
+
+general_settings:
+  master_key: os.environ["LITELLM_MASTER_KEY"]
+  database_url: os.environ["DATABASE_URL"]
+  database_connection_pool_limit: 10

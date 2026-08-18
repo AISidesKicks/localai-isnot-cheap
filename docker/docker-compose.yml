@@ -112,7 +112,7 @@ services:
     runtime: nvidia
     command:
       - "--model"
-      - "LiquidAI/LFM2.5-2.6B"
+      - "plavno/LFM2.5-2.6B-AutoRound-W8A16"
       - "--served-model-name"
       - "LiquidAI/LFM2.5-2.6B"
       - "--host"
@@ -143,6 +143,8 @@ services:
       - "-m"
       - "sglang.launch_server"
       - "--model-path"
+      - "plavno/LFM2.5-2.6B-AutoRound-W8A16"
+      - "--served-model-name"
       - "LiquidAI/LFM2.5-2.6B"
       - "--host"
       - "0.0.0.0"

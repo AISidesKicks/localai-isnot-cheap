@@ -30,8 +30,9 @@ Full EDU AI LAB stack: LiteLLM gateway, Redis cache, local inference engines
      LFM2.5-2.6B-Q8_0.gguf --local-dir docker/models/
    ```
 
-   vLLM and SGLang pull `LiquidAI/LFM2.5-2.6B` from Hugging Face on first
-   start and cache it under `docker/models/hf-cache` (gitignored).
+   vLLM and SGLang pull `plavno/LFM2.5-2.6B-AutoRound-W8A16` (W8A16
+   quantized, ~2.9 GB vs 5.4 GB bf16) from Hugging Face on first start and
+   cache it under `docker/models/hf-cache` (gitignored).
 
 ## Run
 
@@ -91,3 +92,6 @@ docker compose -f docker/docker-compose.yml down -v   # wipes volumes too
 | `gpt-4o`     | OpenAI         | external       |
 | `claude-sonnet-4-20250514` | Anthropic | external |
 | `deepseek-chat` | DeepSeek    | external       |
+
+All three engines serve the same logical model id `LiquidAI/LFM2.5-2.6B`;
+vLLM and SGLang run the AutoRound W8A16 quantization, llama.cpp the Q8_0 GGUF.

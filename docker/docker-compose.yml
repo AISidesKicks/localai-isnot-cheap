@@ -1,16 +1,16 @@
-name: localai-isnot-cheap
+name: cheap-lab
 
 services:
-  postgres:
+  cheap-postgres:
     image: postgres:16-alpine
-    container_name: lfm-postgres
+    container_name: cheap-postgres
     environment:
       POSTGRES_USER: ${POSTGRES_USER:-litellm}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-litellm}
       POSTGRES_DB: ${POSTGRES_DB:-litellm}
       POSTGRES_MULTIPLE_DATABASES: ${POSTGRES_MULTIPLE_DATABASES:-lago_production}
     volumes:
-      - postgres-data:/var/lib/postgresql/data
+      - cheap-postgres-data:/var/lib/postgresql/data
       - ./init-multiple-dbs.sh:/docker-entrypoint-initdb.d/init-multiple-dbs.sh:ro
     ports:
       - "5432:5432"
@@ -19,13 +19,15 @@ services:
       interval: 10s
       timeout: 5s
       retries: 5
+    networks:
+      - cheap-net
 
-  redis:
+  cheap-redis:
     image: redis:7-alpine
-    container_name: lfm-redis
+    container_name: cheap-redis
     command: ["redis-server", "--appendonly", "yes"]
     volumes:
-      - redis-data:/data
+      - cheap-redis-data:/data
     ports:
       - "6379:6379"
     healthcheck:
@@ -33,15 +35,17 @@ services:
       interval: 10s
       timeout: 5s
       retries: 5
+    networks:
+      - cheap-net
 
-  litellm:
+  cheap-litellm:
     image: ghcr.io/berriai/litellm:main-latest
-    container_name: lfm-litellm
+    container_name: cheap-litellm
     command: ["--config", "/app/config.yaml", "--port", "4000"]
     environment:
       LITELLM_MASTER_KEY: ${LITELLM_MASTER_KEY:-sk-1234}
-      DATABASE_URL: postgresql://${POSTGRES_USER:-litellm}:${POSTGRES_PASSWORD:-litellm}@postgres:5432/${POSTGRES_DB:-litellm}
-      REDIS_HOST: redis
+      DATABASE_URL: postgresql://${POSTGRES_USER:-litellm}:${POSTGRES_PASSWORD:-litellm}@cheap-postgres:5432/${POSTGRES_DB:-litellm}
+      REDIS_HOST: cheap-redis
       REDIS_PORT: "6379"
       OPENAI_API_KEY: ${OPENAI_API_KEY:-}
       ANTHROPIC_API_KEY: ${ANTHROPIC_API_KEY:-}
@@ -52,14 +56,16 @@ services:
     ports:
       - "4000:4000"
     depends_on:
-      postgres:
+      cheap-postgres:
         condition: service_healthy
-      redis:
+      cheap-redis:
         condition: service_healthy
+    networks:
+      - cheap-net
 
-  llama-cpp:
+  cheap-llamacpp:
     image: ghcr.io/ggml-org/llama.cpp:server-cuda
-    container_name: lfm-llama-cpp
+    container_name: cheap-llamacpp
     profiles: ["llama-cpp"]
     runtime: nvidia
     command:
@@ -81,10 +87,12 @@ services:
       timeout: 10s
       retries: 5
       start_period: 60s
+    networks:
+      - cheap-net
 
-  vllm:
+  cheap-vllm:
     image: vllm/vllm-openai:latest
-    container_name: lfm-vllm
+    container_name: cheap-vllm
     profiles: ["vllm"]
     runtime: nvidia
     command:
@@ -107,10 +115,12 @@ services:
       timeout: 10s
       retries: 5
       start_period: 120s
+    networks:
+      - cheap-net
 
-  sglang:
+  cheap-sglang:
     image: lmsysorg/sglang:latest
-    container_name: lfm-sglang
+    container_name: cheap-sglang
     profiles: ["sglang"]
     runtime: nvidia
     command:
@@ -134,49 +144,63 @@ services:
       timeout: 10s
       retries: 5
       start_period: 120s
+    networks:
+      - cheap-net
 
-  lago-api:
+  cheap-lago-api:
     image: getlago/api:latest
-    container_name: lfm-lago-api
+    container_name: cheap-lago-api
     environment:
-      DATABASE_URL: postgresql://${POSTGRES_USER:-litellm}:${POSTGRES_PASSWORD:-litellm}@postgres:5432/lago_production
-      REDIS_URL: redis://redis:6379/0
+      DATABASE_URL: postgresql://${POSTGRES_USER:-litellm}:${POSTGRES_PASSWORD:-litellm}@cheap-postgres:5432/lago_production
+      REDIS_URL: redis://cheap-redis:6379/0
       SECRET_KEY_BASE: ${LAGO_SECRET_KEY_BASE:-change-me-in-prod}
       LAGO_DISABLE_SIGNUP: "false"
       API_PORT: "3000"
     ports:
       - "3001:3000"
     depends_on:
-      postgres:
+      cheap-postgres:
         condition: service_healthy
-      redis:
+      cheap-redis:
         condition: service_healthy
+    networks:
+      - cheap-net
 
-  lago-worker:
+  cheap-lago-worker:
     image: getlago/api:latest
-    container_name: lfm-lago-worker
+    container_name: cheap-lago-worker
     command: ["bundle", "exec", "sidekiq"]
     environment:
-      DATABASE_URL: postgresql://${POSTGRES_USER:-litellm}:${POSTGRES_PASSWORD:-litellm}@postgres:5432/lago_production
-      REDIS_URL: redis://redis:6379/0
+      DATABASE_URL: postgresql://${POSTGRES_USER:-litellm}:${POSTGRES_PASSWORD:-litellm}@cheap-postgres:5432/lago_production
+      REDIS_URL: redis://cheap-redis:6379/0
       SECRET_KEY_BASE: ${LAGO_SECRET_KEY_BASE:-change-me-in-prod}
     depends_on:
-      postgres:
+      cheap-postgres:
         condition: service_healthy
-      redis:
+      cheap-redis:
         condition: service_healthy
+    networks:
+      - cheap-net
 
-  lago-web:
+  cheap-lago-web:
     image: getlago/front:v1
-    container_name: lfm-lago-web
+    container_name: cheap-lago-web
     environment:
-      API_URL: http://lago-api:3000
-      APP_GRAPHQL_URL: http://lago-api:3000/graphql
+      API_URL: http://cheap-lago-api:3000
+      APP_GRAPHQL_URL: http://cheap-lago-api:3000/graphql
     ports:
       - "8085:80"
     depends_on:
-      - lago-api
+      - cheap-lago-api
+    networks:
+      - cheap-net
+
+networks:
+  cheap-net:
+    name: cheap-net
 
 volumes:
-  postgres-data:
-  redis-data:
+  cheap-postgres-data:
+    name: cheap-postgres-data
+  cheap-redis-data:
+    name: cheap-redis-data

@@ -2,19 +2,19 @@ model_list:
   - model_name: local-gguf
     litellm_params:
       model: openai/LiquidAI/LFM2.5-2.6B
-      api_base: http://llama-cpp:8080/v1
+      api_base: http://cheap-llamacpp:8080/v1
       api_key: dummy
 
   - model_name: local-llama
     litellm_params:
       model: openai/LiquidAI/LFM2.5-2.6B
-      api_base: http://vllm:8000/v1
+      api_base: http://cheap-vllm:8000/v1
       api_key: dummy
 
   - model_name: local-sglang
     litellm_params:
       model: openai/LiquidAI/LFM2.5-2.6B
-      api_base: http://sglang:30000/v1
+      api_base: http://cheap-sglang:30000/v1
       api_key: dummy
 
   - model_name: gpt-4o
@@ -38,7 +38,7 @@ litellm_settings:
   cache: true
   cache_params:
     type: redis
-    host: os.environ.get("REDIS_HOST", "redis")
+    host: os.environ.get("REDIS_HOST", "cheap-redis")
     port: os.environ.get("REDIS_PORT", "6379")
 
 general_settings:

@@ -28,6 +28,7 @@ htmlcov/
 !.env.example
 *.log
 models/*.gguf
+models/hf-cache/
 pgdata/
 postgres-data/
 redis-data/

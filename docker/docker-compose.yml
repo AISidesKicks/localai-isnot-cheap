@@ -52,7 +52,7 @@ services:
       DEEPSEEK_API_KEY: ${DEEPSEEK_API_KEY:-}
     volumes:
       - ./litellm_config.yaml:/app/config.yaml:ro
-      - ${HF_CACHE_DIR:-${HOME}/.cache/huggingface}:/root/.cache/huggingface
+      - ${HF_CACHE_DIR:-./models/hf-cache}:/root/.cache/huggingface
     ports:
       - "4000:4000"
     depends_on:
@@ -105,7 +105,7 @@ services:
       - "--port"
       - "8000"
     volumes:
-      - ${HF_CACHE_DIR:-${HOME}/.cache/huggingface}:/root/.cache/huggingface
+      - ${HF_CACHE_DIR:-./models/hf-cache}:/root/.cache/huggingface
     ports:
       - "8000:8000"
     shm_size: 1g
@@ -134,7 +134,7 @@ services:
       - "--port"
       - "30000"
     volumes:
-      - ${HF_CACHE_DIR:-${HOME}/.cache/huggingface}:/root/.cache/huggingface
+      - ${HF_CACHE_DIR:-./models/hf-cache}:/root/.cache/huggingface
     ports:
       - "30000:30000"
     shm_size: 1g

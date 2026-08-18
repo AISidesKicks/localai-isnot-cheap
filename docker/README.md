@@ -31,7 +31,7 @@ Full EDU AI LAB stack: LiteLLM gateway, Redis cache, local inference engines
    ```
 
    vLLM and SGLang pull `LiquidAI/LFM2.5-2.6B` from Hugging Face on first
-   start and cache it in `~/.cache/huggingface`.
+   start and cache it under `docker/models/hf-cache` (gitignored).
 
 ## Run
 

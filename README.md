@@ -4,7 +4,7 @@ Hey!!! Local AI is not CHEAP at ALL! - **Every AI token carries a COST!**
 
 ## So how to measure and bill AI tokens in small AI Lab? 
 
-This is tricky architectural and engineering challenge with lot of tradeoffs.
+This is tricky architectural and engineering challenge with lot of tradeoffs, ideal EDU AI LAB material.
 
 I put here minimal setups from large ones I use in enterprise workshops to demonstrate complexity of Local AI Interference Engendering in practice and role of caching. 
 

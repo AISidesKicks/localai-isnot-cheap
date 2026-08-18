@@ -14,7 +14,48 @@ This is tricky architectural and engineering challenge with lot of tradeoffs, id
 
 I put here minimal setups from large ones I use in enterprise workshops to demonstrate complexity of Local AI Interference Engendering in practice and role of caching. 
 
-Setup is prepared to be executed as educational lab on gamming PC with 32GB RAM and Nvidia GPU (12GB VRAM).
+Setup is prepared to be executed as educational lab on gamming PC with 32GB RAM and Nvidia GPU with 12GB VRAM (RTX 4070 in my case).
+
+If you are new to LLM serving aka Interference Engeneering, I am recomnding you to look into EDU sources first ->
+
+## Selecting AI heart for LAB - small, but capable LLM (~3B size will be fine)
+
+Liguid AI relase new [LFM2.5-2.6B: Deploy Agents Everywhere](https://www.liquid.ai/blog/lfm2-5-2-6b) on 4 August 2026!
+
+Small anought LLM with reasoning and tool calling, it's has 128K context so the model can handle the long inputs that agentic workloads - it's hybrid architecture will allow us to utilize full 128K context window.
+
+It has full support in all 3 engines we will use:
+ - llama.cpp — GGUF checkpoints for efficient edge inference
+ - vLLM — GPU-accelerated serving for production throughput
+ - SGLang — GPU-accelerated serving for production throughput
+ - MLX — Optimized inference for Apple Silicon
+ - ONNX — Cross-platform inference across diverse accelerators
+
+Usefull quatizations:
+
+Full LFM2.5-2.6B model is 5.4 GB in bf16, we can easily run 8bit quantizations:
+
+ - GGUF [Official LiguidAI (8-bit Q8_0 = 2.87 GB)](https://huggingface.co/LiquidAI/LFM2.5-2.6B-GGUF)
+ - W8A16 [AutoRound W8A16 (8-bit weights / fp16 activations = 2.9 GB)] (https://huggingface.co/plavno/LFM2.5-2.6B-AutoRound-W8A16)
+
+There are a lot of modified and uncensored variants of LFM2.5-2.6B:
+
+ A Little Uncensored:
+
+  - [LFM2.5-2.6B-Uncensored-GGUF](SC117/LFM2.5-2.6B-Uncensored-GGUF)
+  - [LFM2.5-2.6B-Heretic-Abliterated-GGUF](https://huggingface.co/Abiray/LFM2.5-2.6B-Heretic-Abliterated-GGUF)
+  - [LFM2.5-2.6B-UNCENSORED-ABLITERATED-PHILADELPHIA-CLASS](https://huggingface.co/KridgeDookie/LFM2.5-2.6B-UNCENSORED-ABLITERATED-PHILADELPHIA-CLASS)
+
+ A Little Specilized:
+
+  - [LFM-2.5-Coder-2.6B GGUF](https://huggingface.co/Schnuckade/LFM-2.5-Coder-2.6B)
+  - [LFM2.5-2.6b-fable5-coding-agent](https://huggingface.co/AyoubChLin/lfm2.5-2.6b-fable5-coding-agent) [GGUF](https://huggingface.co/AyoubChLin/LFM2.5-2.6B-fable5-coding-agent-GGUF) 
+  - [LFM2.5-2.6B-Terminal-SFT](https://huggingface.co/jacepark12/LFM2.5-2.6B-Terminal-SFT) [GGUF](https://huggingface.co/mradermacher/LFM2.5-2.6B-Terminal-SFT-GGUF) 
+  - [LFM2.5-2.6B-CyberSec](https://huggingface.co/reaperdoesntknow/LFM2.5-2.6B-CyberSec) [GGUF](https://huggingface.co/mradermacher/LFM2.5-2.6B-Terminal-SFT-GGUF) 
+
+**PS:** *No vision*, this will limit simulated tests, but multimodal pandora box will stay closed.
+
+I recommend you to familiarize yoursef with LFM 2.5 2.6N model in [LM studio](https://lmstudio.ai/).
 
 ## EDU AI LAB "Local AI is not cheap!" OVERVIEW:
 

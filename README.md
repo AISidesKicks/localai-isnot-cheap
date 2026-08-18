@@ -113,5 +113,5 @@ On a gateway cache miss, LiteLLM routes the prompt down to the local engine. The
 3. **Usage Emission to Lago (LiteLLM $\rightarrow$ Lago):**
 LiteLLM captures the full usage footprint (prompt, completion, and engine KV-cached tokens) and dispatches an asynchronous billing event to Lago.
 
-5. **Billing & Wallet Deductions (Lago $\rightarrow$ PostgreSQL & Redis DB 0):**
+4. **Billing & Wallet Deductions (Lago $\rightarrow$ PostgreSQL & Redis DB 0):**
 Lago processes the event via its **Redis** worker queue, applies discounts for cached tokens, and writes balance deductions to its **PostgreSQL** ledger.

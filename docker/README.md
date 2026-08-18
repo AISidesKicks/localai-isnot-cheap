@@ -49,6 +49,18 @@ docker compose -f docker/docker-compose.yml --profile vllm up -d
 docker compose -f docker/docker-compose.yml --profile sglang up -d
 ```
 
+Or set `INFERENCE_PROFILE` in `docker/.env` and use the environment-driven
+`COMPOSE_PROFILES` mechanism:
+
+```sh
+# INFERENCE_PROFILE=llama-cpp | vllm | sglang
+COMPOSE_PROFILES="$INFERENCE_PROFILE" docker compose -f docker/docker-compose.yml up -d
+```
+
+The core stack starts without engines (plain `docker compose up -d`), but when
+a profile is active LiteLLM waits for the selected engine's `/health` before
+starting — activate two profiles at once and it waits for both.
+
 Stop / tear down:
 
 ```sh

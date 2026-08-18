@@ -121,4 +121,4 @@ Before any request can be served, each team tops up its virtual credit wallet, s
 
 ---
 
-*Footnote: I have dyslexia, so from time to time I let the LLMs give my English a power-up — think of it as a GPU-accelerated spellchecker running at a few hundred tokens per second. If any sentence here reads a little too smart, that was the model showing off, not me.*
+*Footnote: I have dyslexia, so from time to time I let the LLMs give my English a power-up — think of it as a GPU-accelerated spellchecker running at a few hundred tokens per second. If any sentence here reads a little too polish, that was the model showing off, not me.*

@@ -34,6 +34,14 @@ Full EDU AI LAB stack: LiteLLM gateway, Redis cache, local inference engines
    quantized, ~2.9 GB vs 5.4 GB bf16) from Hugging Face on first start and
    cache it under `docker/models/hf-cache` (gitignored).
 
+### vLLM VRAM usage
+
+Measured on an RTX 4070 (12 GiB): baseline 442 MiB at idle, 11.4 GiB after
+load. Weights take 3.09 GiB, activations ~0.96 GiB, CUDA graphs 0.42 GiB,
+and the KV cache 6.62 GiB at the default `--gpu-memory-utilization 0.92`
+(roughly 91% of the card). W8A16 keeps the model on a 12 GiB card with
+headroom for a small batch.
+
 ## Run
 
 Core stack (gateway + cache + billing + postgres + redis, no engines):
@@ -68,6 +76,27 @@ Stop / tear down:
 docker compose -f docker/docker-compose.yml down
 docker compose -f docker/docker-compose.yml down -v   # wipes volumes too
 ```
+
+## Test
+
+Smoke-test the vLLM endpoint directly (bypasses LiteLLM). First wait for
+`cheap-vllm` to report healthy:
+
+```sh
+docker compose -f docker/docker-compose.yml --profile vllm ps
+```
+
+Then send a chat completion:
+
+```sh
+curl -s http://localhost:8000/v1/chat/completions \
+  -H "Content-Type: application/json" \
+  -d '{"model":"LiquidAI/LFM2.5-2.6B","messages":[{"role":"user","content":"Give me a short summary about Marvel Cinematic Universe."}]}'
+```
+
+To verify LiteLLM routing instead, hit the gateway on port 4000 with the
+`local-llama` alias and the master key from `docker/.env`
+(`LITELLM_MASTER_KEY`, default `sk-1234`).
 
 ## Port map
 

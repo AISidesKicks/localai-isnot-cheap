@@ -42,6 +42,20 @@ and the KV cache 6.62 GiB at the default `--gpu-memory-utilization 0.92`
 (roughly 91% of the card). W8A16 keeps the model on a 12 GiB card with
 headroom for a small batch.
 
+### SGLang VRAM usage
+
+Same checkpoint, same RTX 4070: 9.37 GiB after load (engine process, vs
+10.9 GiB for vLLM). Weights take 3.44 GiB; with the full 128K context SGLang
+reserves a 134,039-token KV cache (2.04 GiB K+V), a 1.84 GiB Mamba
+conv_state cache, and a 1024 MiB CUDA IPC pool, at the auto-tuned
+`--mem-fraction-static 0.669`. The auto-round quantization is auto-detected
+(`quant=auto-round, bits=8`). Both engines derive the full 131072-token
+context from `max_position_embeddings` when no length flag is given —
+service at a shorter context (e.g. the model card's recommended 4096) frees
+the rest of the card. Cold CUDA graph capture can take ~5 minutes on first
+start, which can outrun the `start_period 120s` healthcheck before flipping
+healthy.
+
 ## Run
 
 Core stack (gateway + cache + billing + postgres + redis, no engines):
@@ -90,6 +104,15 @@ Then send a chat completion:
 
 ```sh
 curl -s http://localhost:8000/v1/chat/completions \
+  -H "Content-Type: application/json" \
+  -d '{"model":"LiquidAI/LFM2.5-2.6B","messages":[{"role":"user","content":"Give me a short summary about Marvel Cinematic Universe."}]}'
+```
+
+Smoke-test the SGLang endpoint the same way (one engine at a time; stop
+`cheap-vllm` first). Wait for `cheap-sglang` to report healthy, then:
+
+```sh
+curl -s http://localhost:30000/v1/chat/completions \
   -H "Content-Type: application/json" \
   -d '{"model":"LiquidAI/LFM2.5-2.6B","messages":[{"role":"user","content":"Give me a short summary about Marvel Cinematic Universe."}]}'
 ```

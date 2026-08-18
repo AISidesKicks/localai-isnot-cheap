@@ -1,4 +1,4 @@
-# localai.isnot.cheap EDU AI LAB
+# EDU AI LAB (localai.isnot.cheap)
 
 Hey!!! Local AI is not CHEAP at ALL! - **Every AI token carries a COST!** 
 

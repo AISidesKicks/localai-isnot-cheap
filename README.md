@@ -10,7 +10,7 @@ I put here minimal setups from large ones I use in enterprise workshops to demon
 
 Setup is prepared to be executed as educational lab on gamming PC with 32GB RAM and Nvidia GPU (12GB VRAM).
 
-## EDU AI LAB localai.isnot.cheap OVERVIEW:
+## EDU AI LAB "Local AI is not cheap!" OVERVIEW:
 
 ```text
 ==================================================================================================

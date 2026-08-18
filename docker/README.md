@@ -22,12 +22,13 @@ Full EDU AI LAB stack: LiteLLM gateway, Redis cache, local inference engines
    The stack runs out of the box with defaults; edit keys only if you want
    the external model fallbacks (gpt-4o / claude / deepseek) to work.
 
-2. Download the GGUF checkpoint into `docker/models/` (llama.cpp profile):
+2. Download the GGUF checkpoint into `docker/models/Q8/` (llama.cpp profile;
+   the container mounts `./models:/models:ro`, so it lands at `/models/Q8/`):
 
    ```sh
    # LiquidAI/LFM2.5-2.6B-GGUF, Q8_0 (2.87 GB)
    huggingface-cli download LiquidAI/LFM2.5-2.6B-GGUF \
-     LFM2.5-2.6B-Q8_0.gguf --local-dir docker/models/
+     LFM2.5-2.6B-Q8_0.gguf --local-dir docker/models/Q8/
    ```
 
    vLLM and SGLang pull `plavno/LFM2.5-2.6B-AutoRound-W8A16` (W8A16

@@ -81,13 +81,13 @@ services:
       - cheap-net
 
   cheap-llamacpp:
-    image: ghcr.io/ggml-org/llama.cpp:server-cuda
+    image: ghcr.io/ggml-org/llama.cpp:server-cuda13
     container_name: cheap-llamacpp
     profiles: ["llamacpp"]
     runtime: nvidia
     command:
       - "-m"
-      - "/models/LFM2.5-2.6B-Q8_0.gguf"
+      - "/models/Q8/LFM2.5-2.6B-Q8_0.gguf"
       - "--host"
       - "0.0.0.0"
       - "--port"

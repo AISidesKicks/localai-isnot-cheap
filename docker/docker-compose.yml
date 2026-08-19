@@ -8,7 +8,7 @@ services:
       POSTGRES_USER: ${POSTGRES_USER:-cheap}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-secred_pwd}
       POSTGRES_DB: ${POSTGRES_LITELLM_DB:-litellm_db}
-      POSTGRES_MULTIPLE_DATABASES: ${POSTGRES_LAGO_DATABASE:-lago_db}
+      POSTGRES_MULTIPLE_DATABASES: ${POSTGRES_LITELLM_DB:-litellm_db},${POSTGRES_PHOENIX_DATABASE:-phoenix_db}
     volumes:
       - cheap-postgres-data:/var/lib/postgresql/data
       - ./init-multiple-dbs.sh:/docker-entrypoint-initdb.d/init-multiple-dbs.sh:ro
@@ -52,6 +52,9 @@ services:
       DEEPSEEK_API_KEY: ${DEEPSEEK_API_KEY:-}
       OPENROUTER_API_KEY: ${OPENROUTER_API_KEY:-}
       HF_TOKEN: ${HF_TOKEN:-}
+      OTEL_EXPORTER_OTLP_ENDPOINT: http://cheap-phoenix:6006/v1/traces
+      OTEL_EXPORTER_OTLP_PROTOCOL: http/protobuf
+      OTEL_SERVICE_NAME: cheap-litellm
     volumes:
       - ./litellm_config.yaml:/app/config.yaml:ro
       - ${HF_CACHE_DIR:-./models/hf-cache}:/root/.cache/huggingface
@@ -61,6 +64,8 @@ services:
       cheap-postgres:
         condition: service_healthy
       cheap-redis:
+        condition: service_healthy
+      cheap-phoenix:
         condition: service_healthy
       cheap-llamacpp:
         condition: service_healthy
@@ -194,70 +199,25 @@ services:
     networks:
       - cheap-net
 
-  cheap-lago-api:
-    image: getlago/api:latest
-    container_name: cheap-lago-api
+  cheap-phoenix:
+    image: arizephoenix/phoenix:latest   # document: >= 19.0 for /mcp
+    container_name: cheap-phoenix
     environment:
-      DATABASE_URL: postgresql://${POSTGRES_USER:-cheap}:${POSTGRES_PASSWORD:-secred_pwd}@cheap-postgres:5432/${POSTGRES_LAGO_DATABASE:-lago_db}
-      REDIS_URL: redis://cheap-redis:6379/0
-      SECRET_KEY_BASE: ${LAGO_SECRET_KEY_BASE:-change-me-in-prod}
-      LAGO_DISABLE_SIGNUP: "false"
-      API_PORT: "3000"
+      PHOENIX_SQL_DATABASE_URL: postgresql://${POSTGRES_USER:-cheap}:${POSTGRES_PASSWORD:-secred_pwd}@cheap-postgres:5432/${POSTGRES_PHOENIX_DATABASE:-phoenix_db}
+      PHOENIX_ENABLE_MCP_SERVER: "true"   # default true; kept explicit
+      PHOENIX_ENABLE_MCP_CODE_MODE: "true" # default true; agents can run sandboxed code
     ports:
-      - "3001:3000"
+      - "6006:6006"   # UI + OTLP HTTP (/v1/traces) + MCP (/mcp)
+      - "4317:4317"   # OTLP gRPC
     depends_on:
       cheap-postgres:
         condition: service_healthy
-      cheap-redis:
-        condition: service_healthy
     healthcheck:
-      test: ["CMD-SHELL", "curl -f http://localhost:3000/health || exit 1"]
+      test: ["CMD", "python3", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:6006/v1/health')"]
       interval: 10s
       timeout: 10s
       retries: 5
       start_period: 30s
-    networks:
-      - cheap-net
-
-  cheap-lago-worker:
-    image: getlago/api:latest
-    container_name: cheap-lago-worker
-    command: ["bundle", "exec", "sidekiq"]
-    environment:
-      DATABASE_URL: postgresql://${POSTGRES_USER:-cheap}:${POSTGRES_PASSWORD:-secred_pwd}@cheap-postgres:5432/${POSTGRES_LAGO_DATABASE:-lago_db}
-      REDIS_URL: redis://cheap-redis:6379/0
-      SECRET_KEY_BASE: ${LAGO_SECRET_KEY_BASE:-change-me-in-prod}
-    depends_on:
-      cheap-postgres:
-        condition: service_healthy
-      cheap-redis:
-        condition: service_healthy
-    healthcheck:
-      test: ["CMD-SHELL", "curl -f http://localhost:8080 || exit 1"]
-      interval: 10s
-      timeout: 10s
-      retries: 5
-      start_period: 30s
-    networks:
-      - cheap-net
-
-  cheap-lago-web:
-    image: getlago/front:v1
-    container_name: cheap-lago-web
-    environment:
-      API_URL: http://cheap-lago-api:3000
-      APP_GRAPHQL_URL: http://cheap-lago-api:3000/graphql
-    ports:
-      - "8085:80"
-    depends_on:
-      cheap-lago-api:
-        condition: service_healthy
-    healthcheck:
-      test: ["CMD-SHELL", "wget -q -O /dev/null http://localhost/ || exit 1"]
-      interval: 10s
-      timeout: 5s
-      retries: 5
-      start_period: 10s
     networks:
       - cheap-net
 

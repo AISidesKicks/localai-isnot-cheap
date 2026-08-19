@@ -105,6 +105,75 @@ docker compose -f docker/docker-compose.yml down
 docker compose -f docker/docker-compose.yml down -v   # wipes volumes too
 ```
 
+## Embeddings
+
+Alongside the GPU chat engines, the stack can serve **text embeddings** — the
+point of this lab is to meter and bill *every* token, and embeddings are just
+another token stream. Routing embeddings through the gateway (4000) meters
+every request, so each one shows up in LiteLLM spend logs and Phoenix just like
+a chat completion.
+
+It serves **nomic-embed-text-v1.5** (768-dim; chunks up to 8192 tokens) on
+**llama.cpp** — both a CPU and a GPU config, started **manually** one at a time,
+sharing host port **8081**. We use llama.cpp for embeddings because the other
+two engines don't cleanly support the nomic model: vLLM's CPU image fights the
+host RAM (`--gpu-memory-utilization`) and SGLang's only CPU image needs Intel
+AMX (SIGILL on non-Xeon CPUs, e.g. AMD), while its GPU image lacks a native
+NomicBert implementation and falls back to a slow transformers loader that
+chokes on `get_input_embeddings`. llama.cpp just works for BERT-style embedders.
+
+Download the two GGUF checkpoints into `docker/models/embeddings/` (F16 for
+CPU, Q8_0 for GPU — see the root README for the F16-on-CPU rationale; the GPU
+config runs the much smaller Q8_0 offloaded to the card):
+
+```sh
+huggingface-cli download nomic-ai/nomic-embed-text-v1.5-GGUF \
+  nomic-embed-text-v1.5.f16.gguf  --local-dir docker/models/embeddings/
+huggingface-cli download nomic-ai/nomic-embed-text-v1.5-GGUF \
+  nomic-embed-text-v1.5.Q8_0.gguf --local-dir docker/models/embeddings/
+```
+
+They land at `/models/embeddings/` (the `./models:/models:ro` mount mirrors
+them), and `docker/models/**/*.gguf` is gitignored.
+
+Both configs are the **same container name `cheap-llamaembed` on port 8081**,
+so LiteLLM's alias `nomic-embed-llama` always points at
+`http://cheap-llamaembed:8081/v1` — start the CPU or GPU one, never both:
+
+```sh
+# CPU: nomic-embed-text-v1.5.f16.gguf, pure CPU (-t 3)
+docker compose -f docker/docker-compose.yml --profile embed-cpu up -d
+
+# GPU: nomic-embed-text-v1.5.Q8_0.gguf, all layers on the GPU (-ngl 99)
+docker compose -f docker/docker-compose.yml --profile embed-gpu up -d
+```
+
+or via the `COMPOSE_PROFILES` mechanism:
+
+```sh
+COMPOSE_PROFILES="embed-cpu" docker compose -f docker/docker-compose.yml up -d   # or embed-gpu
+```
+
+Both use llama.cpp's `server` with `--embedding --pooling mean` and
+`--ctx-size 8192`; the GPU config adds `-ngl 99` and the `nvidia` runtime. They
+share the port, so stop one before starting the other (stop the single service
+by its container name, not the whole stack with a profile — `stop` on a profile
+takes down the core stack too):
+
+```sh
+docker compose -f docker/docker-compose.yml stop cheap-llamaembed
+```
+
+Since the two embed services carry the same `container_name`, never pass both
+profiles at once.
+
+Smoke-test the engine directly on 8081, or verify the whole path plus LiteLLM
+metering with the bundled script (asserts dim 768):
+
+```sh
+./docker/verify-embed.sh
+```
+
 ## Test
 
 Smoke-test the vLLM endpoint directly (bypasses LiteLLM). First wait for
@@ -195,6 +264,7 @@ removed; llama.ui uses it for manual config, so keep it.
 | 8080 | llama.cpp      | API-only (`--no-webui`), only with `--profile llamasrv` |
 | 8000 | vLLM           | only with `--profile vllm`     |
 | 30000| SGLang         | only with `--profile sglang`   |
+| 8081 | llama.cpp embed| nomic-embed, port shared by CPU (F16) & GPU (Q8) configs, manual `--profile embed-cpu` / `embed-gpu` |
 | 6006 | Phoenix        | UI + OTLP HTTP + MCP           |
 | 4317 | Phoenix        | OTLP gRPC                      |
 | 8428 | VictoriaMetrics| metrics UI / query API         |
@@ -262,12 +332,15 @@ the Postgres volume.
 | `local-gguf` | llama.cpp      | `llamasrv`   |
 | `local-llama`| vLLM           | `vllm`         |
 | `local-sglang`| SGLang        | `sglang`       |
+| `nomic-embed-llama` | llama.cpp (nomic-embed, 768-dim) | `embed-cpu` (F16) or `embed-gpu` (Q8) |
 | `gpt-4o`     | OpenAI         | external       |
 | `claude-sonnet-4-20250514` | Anthropic | external |
 | `deepseek-chat` | DeepSeek    | external       |
 
 All three engines serve the same logical model id `LiquidAI/LFM2.5-2.6B`;
 vLLM and SGLang run the AutoRound W8A16 quantization, llama.cpp the Q8_0 GGUF.
+The embed alias instead serves `nomic-embed-text-v1.5` (768-dim) on llama.cpp
+(CPU/F16 or GPU/Q8).
 
 ## Project links
 

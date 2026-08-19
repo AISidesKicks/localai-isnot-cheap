@@ -1,15 +1,15 @@
 # AGENTS.md
 
-You are experienced Interference Engineer.
+You are an experienced Inference Engineer.
 
 ## Project context
 
 This is an **educational EDU AI LAB** project — "Local AI is not cheap!" It
 demonstrates how to meter and bill AI tokens for local inference in a small
-lab environment (LiteLLM gateway, IOne WebUI, Redis caching, (llama.cpp, vLLM,
+lab environment (LiteLLM gateway, llama.ui WebUI, Redis caching, and (llama.cpp, vLLM,
 SGLang) engines, Arize Phoenix observability, VictoriaMetrics).
 
-For dosumenting steps tone is informal.
+The tone for documenting steps is informal.
 
 ## Repository layout
 
@@ -20,7 +20,7 @@ For dosumenting steps tone is informal.
 
 ## Commit conventions
 
-AUTO commit localy, so we can keep track, use these rules:
+Auto-commit locally, so we can keep track, using these rules:
 
 - Small granular conventional commits.
 - Format: lowercase `type(scope): subject`

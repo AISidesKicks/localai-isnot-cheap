@@ -47,3 +47,19 @@ general_settings:
   master_key: os.environ["LITELLM_MASTER_KEY"]
   database_url: os.environ/DATABASE_URL
   database_connection_pool_limit: 10
+
+mcp_servers:
+  phoenix:
+    url: "http://cheap-phoenix:6006/mcp"
+    transport: "http"
+    allow_all_keys: true
+  victoriametrics:
+    url: "http://vm-mcp:8000/mcp"
+    transport: "http"
+    allow_all_keys: true
+  litellm_admin:
+    url: "http://litellm-mcp:8000/mcp"
+    transport: "http"
+    allow_all_keys: true
+    auth_type: "bearer_token"
+    auth_value: os.environ/LITELLM_MASTER_KEY

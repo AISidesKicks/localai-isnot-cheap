@@ -277,7 +277,7 @@ services:
       - ./litellm_mcp_entrypoint.py:/app/litellm_mcp_entrypoint.py:ro
     environment:
       LITELLM_PROXY_URL: http://cheap-litellm:4000
-      LITELLM_API_KEY: ${LITELLM_MASTER_KEY:-sk-1234-master-key-4321}
+      LITELLM_API_KEY: ${LITELLM_ADMIN_KEY:-${LITELLM_MASTER_KEY:-sk-1234-master-key-4321}}
       LITELLM_TRANSPORT: streamable-http   # must override docker default stdio
     ports:
       - "4001:8000"   # admin MCP; FastMCP streamable-http serves on /mcp

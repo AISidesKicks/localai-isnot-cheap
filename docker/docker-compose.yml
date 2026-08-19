@@ -247,6 +247,9 @@ services:
     environment:
       MCP_SERVER_MODE: http
       MCP_LISTEN_ADDR: :8000
+      VM_INSTANCE_ENTRYPOINT: http://cheap-victoriametrics:8428
+      VM_INSTANCE_TYPE: single
+      MCP_DISABLED_TOOLS: "export,flags,metric_relabel_debug,downsampling_filters_debug,retention_filters_debug,test_rules,documentation"
     ports:
       - "8000:8000"
     depends_on:
@@ -262,7 +265,7 @@ services:
       resources:
         limits:
           cpus: '0.50'
-          memory: 256M
+          memory: 512M
     networks:
       - cheap-net
 

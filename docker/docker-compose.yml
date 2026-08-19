@@ -110,6 +110,7 @@ services:
       - "--parallel"
       - "4"
       - "--no-kv-unified"
+      - "--no-webui"
     volumes:
       - ./models:/models:ro
     ports:
@@ -295,6 +296,15 @@ services:
         limits:
           cpus: '0.50'
           memory: 256M
+    networks:
+      - cheap-net
+
+  cheap-llamaui:
+    image: ghcr.io/olegshulyakov/llama.ui:latest
+    container_name: cheap-llamaui
+    restart: unless-stopped
+    ports:
+      - "3333:80"
     networks:
       - cheap-net
 

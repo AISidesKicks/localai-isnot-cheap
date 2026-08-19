@@ -135,14 +135,64 @@ To verify LiteLLM routing instead, hit the gateway on port 4000 with the
 `local-llama` alias and the master key from `docker/.env`
 (`LITELLM_MASTER_KEY`, default `sk-1234-master-key-4321`).
 
+## WebUI (llama.ui)
+
+The stack ships a browser-hosted chat UI at `http://localhost:3333` (llama.ui).
+It stores all state in the browser's IndexedDB, so there is no server volume and
+nothing to back up.
+
+Point llama.ui at the **LiteLLM gateway**, not the engine, or you silently lose
+spend metering. Configure it once in the browser:
+
+- **Provider**: **Llama.cpp** (or **OpenAI Compatible**) — either lets you edit
+  the Base URL and the API key. Skip the cloud providers (OpenAI, etc.); they
+  hard-code their own endpoint and you cannot point them at the gateway.
+- **Base URL**: `http://localhost:4000` — and **do NOT append `/v1`**. llama.ui
+  appends `/v1/...` itself, so entering `.../4000/v1` sends the request to
+  `.../4000/v1/v1/chat/completions` → 404. This is the single most common
+  misconfiguration.
+- **API key**: paste the full `LITELLM_WEBUI_KEY` from `docker/.env`
+  (chat-only key for user `webui`). If you leave it blank, llama.ui sends **no
+  `Authorization` header** and the gateway answers 401. Quoting it is not
+  needed.
+- **Model**: exactly `local-gguf` (llama.cpp / `--profile llamasrv`).
+
+The key and Base URL fields are always visible in **General settings** for the
+Llama.cpp / OpenAI Compatible providers — the `Authorization: Bearer` header is
+only sent when the key field is non-empty.
+
+If llama.ui reports **"Failed to respond from api"**, open the browser's
+DevTools → Network tab and check the failing request:
+`http://localhost:4000/v1/chat/completions` should be the exact URL. Diagnose
+by status:
+
+| Status | Cause | Fix |
+|--------|-------|-----|
+| 404 | Double `/v1` — Base URL entered as `http://localhost:4000/v1` | Set Base URL to `http://localhost:4000` (no trailing `/v1`) |
+| 401 | Missing / wrong API key (blank key sends no `Authorization` header) | Paste the full `LITELLM_WEBUI_KEY` into the API key field |
+| 403 | Wrong model name (not exactly `local-gguf`) | Set model to `local-gguf` |
+| 404 / connection refused | Llama.cpp provider defaulted to `localhost:8080` (engine, no metering) | Point Base URL at the gateway `http://localhost:4000` (see below) |
+
+Routing chat through the gateway (4000) meters every request — you get a row in
+LiteLLM spend logs and a trace in Phoenix. Hitting the engine directly at
+`localhost:8080` bypasses the gateway entirely and shows up nowhere in billing.
+
+The llama.cpp engine itself runs with `--no-webui`: it exposes only the OpenAI
+compatible API (`/health`, `/v1/models`, `/v1/chat/completions`) on 8080, with no
+built-in UI. This is fine — the WebUI lives in llama.ui on 3333 instead.
+
+`LITELLM_WEBUI_KEY` is still defined in `.env`/compose even though Open WebUI was
+removed; llama.ui uses it for manual config, so keep it.
+
 ## Port map
 
 | Port | Service        | Notes                          |
 |------|----------------|--------------------------------|
 | 4000 | LiteLLM        | OpenAI-compatible gateway + MCP gateway (`/mcp`) |
+| 3333 | llama.ui       | browser-hosted WebUI (data in IndexedDB, no volume) |
 | 5432 | PostgreSQL     | LiteLLM + Phoenix databases    |
 | 6379 | Redis          | LiteLLM cache                  |
-| 8080 | llama.cpp      | only with `--profile llamasrv` |
+| 8080 | llama.cpp      | API-only (`--no-webui`), only with `--profile llamasrv` |
 | 8000 | vLLM           | only with `--profile vllm`     |
 | 30000| SGLang         | only with `--profile sglang`   |
 | 6006 | Phoenix        | UI + OTLP HTTP + MCP           |
@@ -229,6 +279,7 @@ vLLM and SGLang run the AutoRound W8A16 quantization, llama.cpp the Q8_0 GGUF.
 | VictoriaMetrics | metrics storage and querying | https://github.com/VictoriaMetrics/VictoriaMetrics |
 | VictoriaMetrics MCP | MCP server for VictoriaMetrics | https://github.com/VictoriaMetrics/mcp-victoriametrics |
 | llama.cpp | local inference engine (GGUF) | https://github.com/ggml-org/llama.cpp |
+| llama.ui | browser-hosted WebUI (chat) | https://github.com/olegshulyakov/llama.ui |
 | vLLM | local inference engine (W8A16) | https://github.com/vllm-project/vllm |
 | SGLang | local inference engine (W8A16) | https://github.com/sgl-project/sglang |
 | PostgreSQL | LiteLLM + Phoenix databases | https://www.postgresql.org |

@@ -111,7 +111,7 @@ I recommend you to familiarize yoursef with LFM 2.5 2.6N model in [LM studio](ht
 
 ### How it Flows
 
-1. **Gateway Caching & Fast-Path Return (LiteLLM $\leftrightarrow$ Redis DB 1):**
+1. **Gateway Caching & Fast-Path Return (LiteLLM $\leftrightarrow$ Redis DB 0):**
 When a request arrives, LiteLLM first checks **Redis** for an exact-match or semantic response. If found, it immediately serves the response from memory in sub-5ms with **zero compute cost** and bypasses the GPU backend entirely.
 
 2. **Inference Execution (LiteLLM $\rightarrow$ llama.cpp / vLLM / SGLang):**

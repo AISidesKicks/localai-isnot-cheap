@@ -2,7 +2,7 @@ model_list:
   - model_name: local-gguf
     litellm_params:
       model: openai/LiquidAI/LFM2.5-2.6B
-      api_base: http://cheap-llamacpp:8080/v1
+      api_base: http://cheap-llamasrv:8080/v1
       api_key: dummy
 
   - model_name: local-llama

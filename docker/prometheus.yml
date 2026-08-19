@@ -9,6 +9,6 @@ scrape_configs:
       - targets: ['cheap-sglang:30000']
         labels:
           engine_type: 'sglang'
-      - targets: ['cheap-llamacpp:8080']
+      - targets: ['cheap-llamasrv:8080']
         labels:
-          engine_type: 'llama_cpp'
+          engine_type: 'llamasrv'

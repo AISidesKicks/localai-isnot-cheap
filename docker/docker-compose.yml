@@ -67,7 +67,7 @@ services:
         condition: service_healthy
       cheap-phoenix:
         condition: service_healthy
-      cheap-llamacpp:
+      cheap-llamasrv:
         condition: service_healthy
         required: false
       cheap-vllm:
@@ -85,10 +85,10 @@ services:
     networks:
       - cheap-net
 
-  cheap-llamacpp:
+  cheap-llamasrv:
     image: ghcr.io/ggml-org/llama.cpp:server-cuda13
-    container_name: cheap-llamacpp
-    profiles: ["llamacpp"]
+    container_name: cheap-llamasrv
+    profiles: ["llamasrv"]
     runtime: nvidia
     command:
       - "-m"

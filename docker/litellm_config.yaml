@@ -17,6 +17,12 @@ model_list:
       api_base: http://cheap-sglang:30000/v1
       api_key: dummy
 
+  - model_name: nomic-embed-llama
+    litellm_params:
+      model: openai/nomic-embed-text-v1.5
+      api_base: http://cheap-llamaembed:8081/v1
+      api_key: dummy
+
   - model_name: gpt-4o
     litellm_params:
       model: gpt-4o

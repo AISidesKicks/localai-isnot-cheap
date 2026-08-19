@@ -100,6 +100,11 @@ services:
       - "deepseek"
       - "--reasoning-preserve"
       - "--metrics"
+      - "--ctx-size"
+      - "128000"
+      - "--parallel"
+      - "4"
+      - "--no-kv-unified"
     volumes:
       - ./models:/models:ro
     ports:
@@ -129,6 +134,10 @@ services:
       - "8000"
       - "--reasoning-parser"
       - "olmo3"
+      - "--max-model-len"
+      - "128000"
+      - "--max-num-seqs"
+      - "4"
     environment:
       HF_TOKEN: ${HF_TOKEN:-}
     volumes:
@@ -165,6 +174,10 @@ services:
       - "--reasoning-parser"
       - "deepseek-r1"
       - "--enable-metrics"
+      - "--context-length"
+      - "128000"
+      - "--max-running-requests"
+      - "4"
     environment:
       HF_TOKEN: ${HF_TOKEN:-}
     volumes:

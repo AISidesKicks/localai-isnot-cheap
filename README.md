@@ -77,18 +77,19 @@ I recommend you to familiarize yoursef with LFM 2.5 2.6N model in [LM studio](ht
 │  • Cache Layer: Exact / Semantic Response Matching                                             │
 │  • Rate Limiting (TPM/RPM) & Dynamic Cost Calculation                                          │
 │  • OTLP Trace Export to Phoenix                                                                │
-└───────┬───────────────────────────────────┬────────────────────────────────────┬───────────────┘
-        │                                   │                                    │
-        │ (2. Cache Lookup /                │ (3. Cache Miss:                    │ (4. OTLP Trace &
-        │     Auth Key Checks)              │     Inference Request)             │     Usage Events)
-        ▼                                   ▼                                    ▼
-┌───────────────────────┐   ┌───────────────────────────────┐   ┌────────────────────────────────┐
-│    REDIS (SHARED)     │   │    LOCAL INFERENCE ENGINE     │   │    PHOENIX (OBSERVABILITY)     │
-│ [DB 1] LiteLLM Cache: │   │ [ llama.cpp | vLLM | SGLang ] │   │ • OTLP Trace Ingestion         │
-│ • Response Cache Hit  │   │ • GPU / CPU Acceleration      │   │ • Token Counting & Model Costs │
-│   (Bypasses Engine!)  │   │ • Model Prefill & Decode      │   │ • Runtime / Latency Metrics    │
-│ • Auth Key Validation │   │ • Prefix / KV-Cache Hit       │   │ • Remote MCP Server            │
-│ • TPM / RPM Counters  │   └───────────────┬───────────────┘   └───────────────┬────────────────┘
+│  • MCP Gateway: admin tools (/mcp)                                                             │
+└───────┬───────────────────────────────────┬────────────────────────────────────┬──────────────────────────────────────────┬───────────────────────┘
+        │                                   │                                    │                                          │
+        │ (2. Cache Lookup /                │ (3. Cache Miss:                    │ (4. OTLP Trace &                         │ (8. MCP Tools)
+        │     Auth Key Checks)              │     Inference Request)             │     Usage Events)                        │
+        ▼                                   ▼                                    ▼                                          ▼
+┌───────────────────────┐   ┌───────────────────────────────┐   ┌────────────────────────────────┐   ┌──────────────────────────────────────────────┐
+│    REDIS (SHARED)     │   │    LOCAL INFERENCE ENGINE     │   │    PHOENIX (OBSERVABILITY)     │   │              ADMIN MCP SERVERS               │
+│ [DB 1] LiteLLM Cache: │   │ [ llama.cpp | vLLM | SGLang ] │   │ • OTLP Trace Ingestion         │   │ • Phoenix MCP (6006 /mcp)                    │
+│ • Response Cache Hit  │   │ • GPU / CPU Acceleration      │   │ • Token Counting & Model Costs │   │ • VictoriaMetrics MCP (8000)                 │
+│   (Bypasses Engine!)  │   │ • Model Prefill & Decode      │   │ • Runtime / Latency Metrics    │   │ • LiteLLM MCP (4001 /mcp)                    │
+│ • Auth Key Validation │   │ • Prefix / KV-Cache Hit       │   │ • MCP Server (/mcp)            │   │ • aggregates at 4000/mcp (namespaced tools)  │
+│ • TPM / RPM Counters  │   └───────────────┬───────────────┘   └───────────────┬────────────────┘   └──────────────────────────────────────────────┘
 └───────────────────────┘                   │ (5. Prometheus                    │ (6. Spans, Token
                                             │     /metrics Scrape)              │     Counts & Costs)
                                             ▼                                   ▼

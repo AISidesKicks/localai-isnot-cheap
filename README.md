@@ -81,8 +81,8 @@ I recommend you to familiarize yoursef with LFM 2.5 2.6N model in [LM studio](ht
 └───────┬────────────────────────────────┬───────────────────────────────┬───────────────────┘
         │                                │                               │
         │ (2. Cache Lookup               │ (3. Cache Miss:               │ (4. OTLP Trace &)
-        │     Auth Key Check)            │     Inference Request)        │     Usage Events)                        │
-        ▼                                ▼                               ▼                                          ▼
+        │     Auth Key Check)            │     Inference Request)        │     Usage Events)
+        ▼                                ▼                               ▼
 ┌───────────────────────┐ ┌───────────────────────────────┐ ┌────────────────────────────────┐
 │        REDIS          │ │   LOCAL AI INFERENCE ENGINE   │ │    PHOENIX (OBSERVABILITY)     │
 │ LiteLLM Cache:        │ │ [ llama.cpp | vLLM | SGLang ] │ │ • OTLP Trace Ingestion         │
@@ -98,7 +98,7 @@ I recommend you to familiarize yoursef with LFM 2.5 2.6N model in [LM studio](ht
 │   ADMIN MCP SERVERS   │ │     VICTORIAMETRICS       │ │         POSTGRESQL (SHARED)        │
 │ • LiteLLM Admin MCP   │ │ • Engine Metrics Store    │ │ • LiteLLM DB: Spend Logs, Budgets  │
 │ • VictoriaMetrics MCP │ │ • GPU / Host Utilization  │ │ • Phoenix DB: Traces, Spans, Cost  │
-│ • Phoenix MCP         │ └───────────────┬───────────┘ └───────────────────┬────────────────┘                                                                               │ 
+│ • Phoenix MCP         │ └───────────────┬───────────┘ └───────────────────┬────────────────┘
 │                       │                 │                                 │
 │  LiteLLM  MCP Gateway │                 │       (7. Query & Insights)     │
 │ • all Admin MCPs      │                 ▼                                 ▼

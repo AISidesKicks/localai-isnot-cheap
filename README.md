@@ -63,48 +63,49 @@ I recommend you to familiarize yoursef with LFM 2.5 2.6N model in [LM studio](ht
 ## EDU AI LAB "Local AI is not cheap!" OVERVIEW:
 
 ```text
-==================================================================================================
-                 EDU LAB: localai.isnot.cheap  —  "Every AI token carries a COST!"
-==================================================================================================
+=============================================================================================
+         EDU AI LAB: localai.isnot.cheap  —  "Every AI token carries a COST!"
+=============================================================================================
 
                                   [ Users / Teams / Apps ]
                                              │
                                              │ (1. API Request + Virtual Key)
                                              ▼
-┌────────────────────────────────────────────────────────────────────────────────────────────────┐
-│                                     LITELLM (AI GATEWAY)                                       │
-│  • Request Interception & Quota Checks                                                         │
-│  • Cache Layer: Exact / Semantic Response Matching                                             │
-│  • Rate Limiting (TPM/RPM) & Dynamic Cost Calculation                                          │
-│  • OTLP Trace Export to Phoenix                                                                │
-│  • MCP Gateway: admin tools (/mcp)                                                             │
-└───────┬───────────────────────────────────┬────────────────────────────────────┬──────────────────────────────────────────┬───────────────────────┘
-        │                                   │                                    │                                          │
-        │ (2. Cache Lookup /                │ (3. Cache Miss:                    │ (4. OTLP Trace &                         │ (8. MCP Tools)
-        │     Auth Key Checks)              │     Inference Request)             │     Usage Events)                        │
-        ▼                                   ▼                                    ▼                                          ▼
-┌───────────────────────┐   ┌───────────────────────────────┐   ┌────────────────────────────────┐   ┌──────────────────────────────────────────────┐
-│    REDIS (SHARED)     │   │    LOCAL INFERENCE ENGINE     │   │    PHOENIX (OBSERVABILITY)     │   │              ADMIN MCP SERVERS               │
-│ [DB 1] LiteLLM Cache: │   │ [ llama.cpp | vLLM | SGLang ] │   │ • OTLP Trace Ingestion         │   │ • Phoenix MCP (6006 /mcp)                    │
-│ • Response Cache Hit  │   │ • GPU / CPU Acceleration      │   │ • Token Counting & Model Costs │   │ • VictoriaMetrics MCP (8000)                 │
-│   (Bypasses Engine!)  │   │ • Model Prefill & Decode      │   │ • Runtime / Latency Metrics    │   │ • LiteLLM MCP (4001 /mcp)                    │
-│ • Auth Key Validation │   │ • Prefix / KV-Cache Hit       │   │ • MCP Server (/mcp)            │   │ • aggregates at 4000/mcp (namespaced tools)  │
-│ • TPM / RPM Counters  │   └───────────────┬───────────────┘   └───────────────┬────────────────┘   └──────────────────────────────────────────────┘
-└───────────────────────┘                   │ (5. Prometheus                    │ (6. Spans, Token
-                                            │     /metrics Scrape)              │     Counts & Costs)
-                                            ▼                                   ▼
-                           ┌───────────────────────────┐   ┌────────────────────────────────────┐
-                           │  VICTORIAMETRICS          │   │         POSTGRESQL (SHARED)        │
-                           │ • Engine Metrics Store    │   │ • LiteLLM DB: Spend Logs, Budgets   │
-                           │ • GPU / Host Utilization  │   │ • Phoenix DB: Traces, Spans, Costs  │
-                           └───────────────────────────┘   └───────────────────┬────────────────┘
-                                                                               │ (7. Query & Insights)
-                                                                               ▼
-                                                  ┌────────────────────────────────────────────┐
-                                                  │        CUSTOM REPORT SCRIPTS              │
-                                                  │ (per-team cost / size / latency reports)   │
-                                                  └────────────────────────────────────────────┘
-
+┌───────────────────────────────────────────────────────────── ──────────────────────────────┐
+│                                     LITELLM (AI GATEWAY)                                   │
+│                    • Request Interception & Quota Checks (Users/Teams/Apps)                │
+│                    • Cache Layer: Exact / Semantic Response Matching                       │
+│                    • Rate Limiting (TPM/RPM) & Dynamic Cost Calculation                    │
+│                    • OTLP Trace Export to Phoenix                                          │
+│                    • MCP Gateway: MCP and namespaced tools                                 │
+└───────┬────────────────────────────────┬───────────────────────────────┬───────────────────┘
+        │                                │                               │
+        │ (2. Cache Lookup               │ (3. Cache Miss:               │ (4. OTLP Trace &)
+        │     Auth Key Check)            │     Inference Request)        │     Usage Events)                        │
+        ▼                                ▼                               ▼                                          ▼
+┌───────────────────────┐ ┌───────────────────────────────┐ ┌────────────────────────────────┐
+│        REDIS          │ │   LOCAL AI INFERENCE ENGINE   │ │    PHOENIX (OBSERVABILITY)     │
+│ LiteLLM Cache:        │ │ [ llama.cpp | vLLM | SGLang ] │ │ • OTLP Trace Ingestion         │
+│ • Response Cache Hit  │ │ • GPU / CPU Acceleration      │ │ • Token Counting & Model Costs │
+│ • Auth Key Validation │ │ • Model Prefill & Decode      │ │ • Runtime / Latency Metrics    │
+│ • TPM / RPM Counters  │ │ • Prefix / KV-Cache Hit       │ │ • MCP Server (/mcp)            │
+└───────────────────────┘ └────────────┬──────────────────┘ └────────┬───────────────────────┘
+                                       │                             │
+    (8. MCP Tools)                     │ (5. Prometheus              │ (6. Spans, Token
+                                       │     /metrics Scrape)        │     Counts & Costs)
+                                       ▼                             ▼
+┌───────────────────────┐ ┌───────────────────────────┐ ┌────────────────────────────────────┐
+│   ADMIN MCP SERVERS   │ │     VICTORIAMETRICS       │ │         POSTGRESQL (SHARED)        │
+│ • LiteLLM Admin MCP   │ │ • Engine Metrics Store    │ │ • LiteLLM DB: Spend Logs, Budgets  │
+│ • VictoriaMetrics MCP │ │ • GPU / Host Utilization  │ │ • Phoenix DB: Traces, Spans, Cost  │
+│ • Phoenix MCP         │ └───────────────┬───────────┘ └───────────────────┬────────────────┘                                                                               │ 
+│                       │                 │                                 │
+│  LitelLLM MCP Gateway │                 │       (7. Query & Insights)     │
+│ • all Admin MCPs      │                 ▼                                 ▼
+│                       │         ┌─────────────────────────────────────────────────────┐
+│  LitelLLM MCP custom  │         │            CUSTOM REPORT SCRIPTS (API/MCP)          │
+│ • NameSpaced tools    │         │       (per-team cost / size / latency reports)      │
+└───────────────────────┘         └─────────────────────────────────────────────────────┘
 ```
 ---
 

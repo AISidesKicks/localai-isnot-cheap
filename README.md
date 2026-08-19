@@ -111,20 +111,32 @@ I recommend you to familiarize yoursef with LFM 2.5 2.6N model in [LM studio](ht
 
 ### How it Flows
 
-1. **Gateway Caching & Fast-Path Return (LiteLLM $\leftrightarrow$ Redis DB 0):**
-When a request arrives, LiteLLM first checks **Redis** for an exact-match or semantic response. If found, it immediately serves the response from memory in sub-5ms with **zero compute cost** and bypasses the GPU backend entirely.
+1. **API Request with a Virtual Key (Users/Teams/Apps $\rightarrow$ LiteLLM):**
+Every call enters through the gateway carrying a **virtual key** that identifies the user, team, or app behind it. LiteLLM intercepts the request, runs its quota and budget checks, and enforces **TPM/RPM** rate limits before anything heavy happens.
 
-2. **Inference Execution (LiteLLM $\rightarrow$ llama.cpp / vLLM / SGLang):**
-On a gateway cache miss, LiteLLM routes the prompt down to the local engine. The engine processes it using its own internal **KV/prefix cache** and streams back the generated tokens.
+2. **Cache Lookup & Fast-Path Return (LiteLLM $\leftrightarrow$ Redis):**
+LiteLLM checks **Redis** for an exact-match or semantic response first. On a hit, it serves the answer in sub-5ms with **zero compute cost** — the GPU never even wakes up.
 
-3. **Observability Emission (LiteLLM $\rightarrow$ Phoenix):**
-LiteLLM captures the full usage footprint (prompt, completion, and engine KV-cached tokens) and exports an OTLP trace to Phoenix for token counting, model costs, and runtime metrics.
+3. **Inference Execution (LiteLLM $\rightarrow$ llama.cpp / vLLM / SGLang):**
+On a cache miss, LiteLLM routes the prompt down to the local engine. The engine processes it using its own internal **KV/prefix cache** and streams back the generated tokens.
 
-4. **Persistence & Insights (Phoenix $\rightarrow$ PostgreSQL):**
-Phoenix stores the ingested spans, token counts, and cost attributes in its database inside the shared **PostgreSQL**, making the whole lab's usage queryable.
+4. **Observability Emission (LiteLLM $\rightarrow$ Phoenix):**
+LiteLLM exports an OTLP trace to Phoenix carrying the full usage footprint — prompt, completion, and **KV-cached** token counts — so every call can be priced and timed.
 
-5. **Executing Custom Report Scripts (PostgreSQL $\leftarrow$ Reports):**
-Report scripts query the persisted trace and spend data to build per-team cost, size, and latency reports — the raw materials for the team accountability story.
+5. **Engine Metrics Collection (Engines $\rightarrow$ VictoriaMetrics):**
+The engines and hosts expose their own metrics, which **VictoriaMetrics** scrapes and stores as GPU and host utilization data.
+
+6. **Persistence & Insights (Phoenix $\rightarrow$ PostgreSQL):**
+Phoenix persists the ingested spans, token counts, and cost attributes into the shared **PostgreSQL**, making the whole lab's usage queryable.
+
+7. **Query & Insights (PostgreSQL $\leftarrow$ Report Scripts):**
+Custom report scripts query the persisted trace and spend data to build per-team cost, size, and latency reports — the raw materials for the team accountability story.
+
+8. **Agentic Access via MCP Tools (Agents $\rightarrow$ LiteLLM MCP Gateway $\rightarrow$ Admin MCPs):**
+Agents don't touch raw infrastructure. Instead they reach it through governed MCP access, three ways:
+   - **Direct (Admin MCPs):** agents talk straight to an individual admin MCP server — Phoenix, VictoriaMetrics, or the LiteLLM admin MCP.
+   - **Aggregated (MCP Gateway):** all three admin MCPs surface behind the gateway's single MCP endpoint, tools namespaced per server (`phoenix-*`, `victoriametrics-*`, `litellm_admin-*`).
+   - **Managed (Toolsets):** curated, named subsets of tools pulled from across the servers, so each team only gets the slice of the lab they're meant to see.
 
 ---
 

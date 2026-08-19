@@ -100,10 +100,10 @@ I recommend you to familiarize yoursef with LFM 2.5 2.6N model in [LM studio](ht
 │ • VictoriaMetrics MCP │ │ • GPU / Host Utilization  │ │ • Phoenix DB: Traces, Spans, Cost  │
 │ • Phoenix MCP         │ └───────────────┬───────────┘ └───────────────────┬────────────────┘                                                                               │ 
 │                       │                 │                                 │
-│  LitelLLM MCP Gateway │                 │       (7. Query & Insights)     │
+│  LiteLLM  MCP Gateway │                 │       (7. Query & Insights)     │
 │ • all Admin MCPs      │                 ▼                                 ▼
 │                       │         ┌─────────────────────────────────────────────────────┐
-│  LitelLLM MCP custom  │         │            CUSTOM REPORT SCRIPTS (API/MCP)          │
+│  LiteLLM  MCP custom  │         │            CUSTOM REPORT SCRIPTS (API/MCP)          │
 │ • NameSpaced tools    │         │       (per-team cost / size / latency reports)      │
 └───────────────────────┘         └─────────────────────────────────────────────────────┘
 ```

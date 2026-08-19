@@ -1,0 +1,17 @@
+{
+  "$schema": "https://app.kilo.ai/config.json",
+  "mcp": {
+    "phoenix": {
+      "type": "remote",
+      "url": "http://localhost:6006/mcp",
+      "enabled": true,
+      "timeout": 15000
+    },
+    "victoriametrics": {
+      "type": "remote",
+      "url": "http://localhost:8000/mcp",
+      "enabled": true,
+      "timeout": 15000
+    }
+  }
+}

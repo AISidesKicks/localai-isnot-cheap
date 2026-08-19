@@ -1,0 +1,14 @@
+global:
+  scrape_interval: 10s
+scrape_configs:
+  - job_name: 'llm-inference-engines'
+    static_configs:
+      - targets: ['cheap-vllm:8000']
+        labels:
+          engine_type: 'vllm'
+      - targets: ['cheap-sglang:30000']
+        labels:
+          engine_type: 'sglang'
+      - targets: ['cheap-llamacpp:8080']
+        labels:
+          engine_type: 'llama_cpp'

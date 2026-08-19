@@ -99,6 +99,7 @@ services:
       - "--reasoning-format"
       - "deepseek"
       - "--reasoning-preserve"
+      - "--metrics"
     volumes:
       - ./models:/models:ro
     ports:
@@ -163,6 +164,7 @@ services:
       - "30000"
       - "--reasoning-parser"
       - "deepseek-r1"
+      - "--enable-metrics"
     environment:
       HF_TOKEN: ${HF_TOKEN:-}
     volumes:
@@ -246,6 +248,26 @@ services:
     networks:
       - cheap-net
 
+  cheap-victoriametrics:
+    image: victoriametrics/victoria-metrics:latest
+    container_name: cheap-victoriametrics
+    command:
+      - "-storageDataPath=/victoria-metrics-data"
+      - "-retentionPeriod=1M"
+      - "-promscrape.config=/etc/prometheus/prometheus.yml"
+    volumes:
+      - cheap-vmdata:/victoria-metrics-data
+      - ./prometheus.yml:/etc/prometheus/prometheus.yml:ro
+    ports:
+      - "8428:8428"
+    deploy:
+      resources:
+        limits:
+          cpus: '0.50'
+          memory: 256M
+    networks:
+      - cheap-net
+
 networks:
   cheap-net:
     name: cheap-net
@@ -255,3 +277,5 @@ volumes:
     name: cheap-postgres-data
   cheap-redis-data:
     name: cheap-redis-data
+  cheap-vmdata:
+    name: cheap-vmdata

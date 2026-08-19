@@ -44,7 +44,7 @@ litellm_settings:
     port: 6379
 
 general_settings:
-  master_key: os.environ["LITELLM_MASTER_KEY"]
+  master_key: os.environ/LITELLM_MASTER_KEY
   database_url: os.environ/DATABASE_URL
   database_connection_pool_limit: 10
 

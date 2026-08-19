@@ -146,6 +146,7 @@ To verify LiteLLM routing instead, hit the gateway on port 4000 with the
 | 6006 | Phoenix        | UI + OTLP HTTP + MCP           |
 | 4317 | Phoenix        | OTLP gRPC                      |
 | 8428 | VictoriaMetrics| metrics UI / query API         |
+| 8000 | VM MCP         | MCP server for VictoriaMetrics (conflicts with vllm profile) |
 
 ## Model aliases in LiteLLM
 

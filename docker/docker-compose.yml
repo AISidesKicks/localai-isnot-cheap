@@ -241,6 +241,31 @@ services:
     networks:
       - cheap-net
 
+  vm-mcp:
+    image: ghcr.io/victoriametrics/mcp-victoriametrics:latest
+    container_name: vm-mcp
+    environment:
+      MCP_SERVER_MODE: http
+      MCP_LISTEN_ADDR: :8000
+    ports:
+      - "8000:8000"
+    depends_on:
+      cheap-victoriametrics:
+        condition: service_started
+    healthcheck:
+      test: ["CMD-SHELL", "wget -q -O /dev/null http://localhost:8000/health/readiness || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 15s
+    deploy:
+      resources:
+        limits:
+          cpus: '0.50'
+          memory: 256M
+    networks:
+      - cheap-net
+
 networks:
   cheap-net:
     name: cheap-net

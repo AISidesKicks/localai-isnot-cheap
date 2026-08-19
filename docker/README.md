@@ -2,7 +2,8 @@
 
 Full EDU AI LAB stack: LiteLLM gateway, Redis cache, local inference engines
 (llama.cpp / vLLM / SGLang), PostgreSQL, Phoenix observability, VictoriaMetrics,
-and a LiteLLM admin MCP server.
+and a LiteLLM admin MCP server. LiteLLM also aggregates all three admin MCP
+servers behind a single MCP gateway at `http://localhost:4000/mcp`.
 
 ## Prerequisites
 
@@ -138,7 +139,7 @@ To verify LiteLLM routing instead, hit the gateway on port 4000 with the
 
 | Port | Service        | Notes                          |
 |------|----------------|--------------------------------|
-| 4000 | LiteLLM        | OpenAI-compatible gateway      |
+| 4000 | LiteLLM        | OpenAI-compatible gateway + MCP gateway (`/mcp`) |
 | 5432 | PostgreSQL     | LiteLLM + Phoenix databases    |
 | 6379 | Redis          | LiteLLM cache                  |
 | 8080 | llama.cpp      | only with `--profile llamacpp` |
@@ -149,6 +150,14 @@ To verify LiteLLM routing instead, hit the gateway on port 4000 with the
 | 8428 | VictoriaMetrics| metrics UI / query API         |
 | 8000 | VM MCP         | MCP server for VictoriaMetrics (conflicts with vllm profile) |
 | 4001 | LiteLLM MCP    | MCP admin tools for LiteLLM (external server) |
+
+All admin MCP servers (Phoenix, VictoriaMetrics, LiteLLM) also aggregate behind
+the LiteLLM MCP gateway at `http://localhost:4000/mcp` — one endpoint, tools
+namespaced per server (`phoenix-*`, `victoriametrics-*`, `litellm_admin-*`).
+Authenticate with the master key header
+(`x-litellm-api-key: Bearer <LITELLM_MASTER_KEY>`). The `litellm-gateway` entry
+in `opencode.json.example` hard-codes the default demo key — substitute your
+real `LITELLM_MASTER_KEY` from `docker/.env` in a local copy.
 
 ## Model aliases in LiteLLM
 

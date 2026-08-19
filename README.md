@@ -4,38 +4,38 @@ Hey!!! Local AI is not CHEAP at ALL! - **Every AI token carries a COST!**
 
 Running **local AI** is far from free - it simply shifts the invoice from a cloud vendor to your own balance sheet. 
 
-Between high-end GPU based systems, surging electricity and cooling bills, server maintenance, and the specialized engineering talent required to keep inference pipelines optimized, self-hosting carries in real lafe massive capital and operational expenses.
+Between high-end GPU based systems, surging electricity and cooling bills, server maintenance, and the specialized engineering talent required to keep inference pipelines optimized, self-hosting brings massive real-life capital and operational expenses.
 
 Metering and tracking internal teams by the token is essential: it creates accountability against wasteful compute loops and directly amortizes those upfront infrastructure, pipelines, and staffing investments.
 
-## So how to measure and track AI tokens in small AI Lab? 
+## So how to measure and track AI tokens in a small AI lab? 
 
-This is tricky architectural and engineering challenge with lot of tradeoffs, ideal EDU AI LAB material.
+This is tricky architectural and engineering challenge with plenty of tradeoffs, ideal EDU AI LAB material.
 
-I put here minimal setups from large ones I use in enterprise workshops to demonstrate complexity of Local AI Interference Engendering in practice and role of caching. 
+I put here minimal setups from large ones I use in enterprise workshops to demonstrate complexity of Local AI Inference Engineering in practice and role of caching. 
 
-Setup is prepared to be executed as educational lab on gamming PC with 32GB RAM and Nvidia GPU with 12GB VRAM (RTX 4070 in my case).
+Setup is prepared to be executed as educational lab on gaming PC with 32GB RAM and Nvidia GPU with 12GB VRAM (RTX 4070 in my case).
 
-If you are new to LLM serving aka Interference Engeneering, I am recomnding you to look into EDU sources first ->
+If you are new to LLM serving aka Inference Engineering, I recommend you to look into EDU sources first ->
 
-## Selecting AI heart for LAB - small, but capable LLM (~3B size will be fine)
+## Selecting AI heart for LAB - small, but capable LLM (~3B)
 
-Liguid AI relase new [LFM2.5-2.6B: Deploy Agents Everywhere](https://www.liquid.ai/blog/lfm2-5-2-6b) on 4 August 2026!
+Liquid AI released a new [LFM2.5-2.6B: Deploy Agents Everywhere](https://www.liquid.ai/blog/lfm2-5-2-6b) on 4 August 2026!
 
-Small anought LLM with reasoning and tool calling, it's has 128K context so the model can handle the long inputs that agentic workloads - it's hybrid architecture will allow us to utilize full 128K context window.
+It's a third-generation sub-3B model with a hybrid architecture, small enough for reasoning and tool calling, with a full 128K context window to handle the long inputs that agentic workloads require.
 
-It has full support in all 3 engines we will use:
+It has full support in all three engines we will use:
  - llama.cpp — GGUF checkpoints for efficient edge inference
  - vLLM — GPU-accelerated serving for production throughput
  - SGLang — GPU-accelerated serving for production throughput
  - MLX — Optimized inference for Apple Silicon
  - ONNX — Cross-platform inference across diverse accelerators
 
-Usefull quatizations:
+Useful quantizations:
 
 Full LFM2.5-2.6B model is 5.4 GB in bf16, we can easily run 8bit quantizations:
 
- - GGUF [Official LiguidAI (8-bit Q8_0 = 2.87 GB)](https://huggingface.co/LiquidAI/LFM2.5-2.6B-GGUF)
+ - GGUF [Official LiquidAI (8-bit Q8_0 = 2.87 GB)](https://huggingface.co/LiquidAI/LFM2.5-2.6B-GGUF)
  - W8A16 [AutoRound W8A16 (8-bit weights / fp16 activations = 2.9 GB)](https://huggingface.co/plavno/LFM2.5-2.6B-AutoRound-W8A16)
 
 The lab's vLLM and SGLang profiles run the AutoRound W8A16 checkpoint, while
@@ -49,7 +49,7 @@ There are a lot of modified and uncensored variants of LFM2.5-2.6B:
   - [LFM2.5-2.6B-Heretic-Abliterated-GGUF](https://huggingface.co/Abiray/LFM2.5-2.6B-Heretic-Abliterated-GGUF)
   - [LFM2.5-2.6B-UNCENSORED-ABLITERATED-PHILADELPHIA-CLASS](https://huggingface.co/KridgeDookie/LFM2.5-2.6B-UNCENSORED-ABLITERATED-PHILADELPHIA-CLASS)
 
- A Little Specilized:
+ A Little Specialized:
 
   - [LFM-2.5-Coder-2.6B GGUF](https://huggingface.co/Schnuckade/LFM-2.5-Coder-2.6B)
   - [LFM2.5-2.6b-fable5-coding-agent](https://huggingface.co/AyoubChLin/lfm2.5-2.6b-fable5-coding-agent) [GGUF](https://huggingface.co/AyoubChLin/LFM2.5-2.6B-fable5-coding-agent-GGUF) 
@@ -58,27 +58,44 @@ There are a lot of modified and uncensored variants of LFM2.5-2.6B:
 
 **PS:** *No vision*, this will limit simulated tests, but multimodal pandora box will stay closed.
 
-I recommend you to familiarize yoursef with LFM 2.5 2.6N model in [LM studio](https://lmstudio.ai/).
+I recommend you to familiarize yourself with LFM 2.5 2.6B model in [LM studio](https://lmstudio.ai/).
 
-## EDU AI LAB "Local AI is not cheap!" OVERVIEW:
+## Selecting embedding models for the LAB - a matryoshka-capable embedder
+
+Embeddings are language-specific; we go with an English-focused model from Nomic.
+
+We use CPU cores for embeddings, so we use the F16 format.
+
+[matryoshka - multi-dimensional embeddings](https://huggingface.co/blog/matryoshka)
+
+ nomic-embed-text-v1.5
+  - **Max chunk size:** 8192
+  - **Dimensions:** 768, 512, 256, 128, 64 (trade-off between size & performance)
+
+[nomic-ai/nomic-embed-text-v1.5 GGUF F16](https://huggingface.co/nomic-ai/nomic-embed-text-v1.5-GGUF)
+[nomic-ai/nomic-embed-text-v1.5 SF F16](https://huggingface.co/nomic-ai/nomic-embed-text-v1.5)
+
+You can also try IBM's ~300M multilingual granite-embedding-311m-multilingual-r2 (chunks up to 32K) or the new nomic-embed-text-v2-moe.
+
+## EDU AI LAB OVERVIEW:
 
 ```text
 =============================================================================================
          EDU AI LAB: localai.isnot.cheap  —  "Every AI token carries a COST!"
 =============================================================================================
 
-                                  [ Users / Teams / Apps ]
-                                             │
-                                             │ (1. API Request + Virtual Key)
-                                             ▼
-┌───────────────────────────────────────────────────────────── ──────────────────────────────┐
-│                                     LITELLM (AI GATEWAY)                                   │
-│                    • Request Interception & Quota Checks (Users/Teams/Apps)                │
-│                    • Cache Layer: Exact / Semantic Response Matching                       │
-│                    • Rate Limiting (TPM/RPM) & Dynamic Cost Calculation                    │
-│                    • OTLP Trace Export to Phoenix                                          │
-│                    • MCP Gateway: MCP and namespaced tools                                 │
-└───────┬────────────────────────────────┬───────────────────────────────┬───────────────────┘
+                           [ Users / Teams / Apps ]
+                                      │
+                                      │ (1. API Request + Virtual Key)
+                                      ▼
+┌───────────────────────────────────────────────────────────────────────────┐ ┌─────────────┐
+│                           LITELLM (AI GATEWAY)                            │ │  LLAMA.UI   │
+│     • Request Interception & Quota Checks (Users/Teams/Apps)              │ │             │
+│     • Cache Layer: Exact / Semantic Response Matching                     │ │ • manual    │
+│     • Rate Limiting (TPM/RPM) & Dynamic Cost Calculation                  │ │  debugging  │
+│     • OTLP Trace Export to Phoenix                                        │ │  (point to  │
+│     • MCP Gateway: MCP and namespaced tools                               │ │   srv API)  │
+└───────┬────────────────────────────────┬───────────────────────────────┬──┘ └─────────────┘
         │                                │                               │
         │ (2. Cache Lookup               │ (3. Cache Miss:               │ (4. OTLP Trace &)
         │     Auth Key Check)            │     Inference Request)        │     Usage Events)

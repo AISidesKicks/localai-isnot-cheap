@@ -9,7 +9,7 @@ servers behind a single MCP gateway at `http://localhost:4000/mcp`.
 
 - Docker Engine 24+ and Docker Compose v2
 - NVIDIA GPU + `nvidia-container-toolkit` for the GPU profiles
-  (`--profile vllm`, `--profile llamacpp`, `--profile sglang`); the core
+  (`--profile vllm`, `--profile llamasrv`, `--profile sglang`); the core
   stack (gateway, cache, observability, postgres, redis) runs without a GPU
 - `docker compose version` to check Compose v2 (no `version:` key needed)
 
@@ -24,7 +24,7 @@ servers behind a single MCP gateway at `http://localhost:4000/mcp`.
    The stack runs out of the box with defaults; edit keys only if you want
    the external model fallbacks (gpt-4o / claude / deepseek) to work.
 
-2. Download the GGUF checkpoint into `docker/models/Q8/` (llama.cpp profile;
+2. Download the GGUF checkpoint into `docker/models/Q8/` (llamasrv profile;
    the container mounts `./models:/models:ro`, so it lands at `/models/Q8/`):
 
    ```sh
@@ -81,7 +81,7 @@ docker compose -f docker/docker-compose.yml up -d
 With a local inference engine (pick one profile):
 
 ```sh
-docker compose -f docker/docker-compose.yml --profile llamacpp up -d
+docker compose -f docker/docker-compose.yml --profile llamasrv up -d
 docker compose -f docker/docker-compose.yml --profile vllm up -d
 docker compose -f docker/docker-compose.yml --profile sglang up -d
 ```
@@ -90,7 +90,7 @@ Or set `INFERENCE_PROFILE` in `docker/.env` and use the environment-driven
 `COMPOSE_PROFILES` mechanism:
 
 ```sh
-# INFERENCE_PROFILE=llamacpp | vllm | sglang
+# INFERENCE_PROFILE=llamasrv | vllm | sglang
 COMPOSE_PROFILES="$INFERENCE_PROFILE" docker compose -f docker/docker-compose.yml up -d
 ```
 
@@ -142,7 +142,7 @@ To verify LiteLLM routing instead, hit the gateway on port 4000 with the
 | 4000 | LiteLLM        | OpenAI-compatible gateway + MCP gateway (`/mcp`) |
 | 5432 | PostgreSQL     | LiteLLM + Phoenix databases    |
 | 6379 | Redis          | LiteLLM cache                  |
-| 8080 | llama.cpp      | only with `--profile llamacpp` |
+| 8080 | llama.cpp      | only with `--profile llamasrv` |
 | 8000 | vLLM           | only with `--profile vllm`     |
 | 30000| SGLang         | only with `--profile sglang`   |
 | 6006 | Phoenix        | UI + OTLP HTTP + MCP           |
@@ -209,7 +209,7 @@ the Postgres volume.
 
 | Alias        | Backend        | Engine profile |
 |--------------|----------------|----------------|
-| `local-gguf` | llama.cpp      | `llamacpp`   |
+| `local-gguf` | llama.cpp      | `llamasrv`   |
 | `local-llama`| vLLM           | `vllm`         |
 | `local-sglang`| SGLang        | `sglang`       |
 | `gpt-4o`     | OpenAI         | external       |

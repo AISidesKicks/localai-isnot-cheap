@@ -159,6 +159,52 @@ Authenticate with the master key header
 in `opencode.json.example` hard-codes the default demo key — substitute your
 real `LITELLM_MASTER_KEY` from `docker/.env` in a local copy.
 
+## MCP Toolsets
+
+A toolset is a curated, named subset of tools pulled from across the three
+upstream admin MCP servers (Phoenix, VictoriaMetrics, LiteLLM). Granting toolsets
+instead of whole servers means agents see fewer tokens (only the tools you want)
+and lets you scope per-team access to a specific slice of the aggregate gateway.
+
+Create the sample `monitoring` toolset (10 tools, idempotent — skips if it
+already exists):
+
+```sh
+./docker/mcp_toolset.sh
+```
+
+The script authenticates with `LITELLM_ADMIN_KEY` from `docker/.env` — a
+dedicated `proxy_admin` user (`litellmadm`) provisioned on first boot so toolset
+creation works without exposing the raw master key. The raw master key only
+resolves as proxy_admin after `litellm_config.yaml` sets it as
+`general_settings: master_key: os.environ/LITELLM_MASTER_KEY` (the
+`os.environ/...` prefix that LiteLLM actually resolves).
+
+Verify the toolset:
+
+```sh
+curl -s http://localhost:4000/v1/mcp/toolset \
+  -H "Authorization: Bearer $LITELLM_ADMIN_KEY"
+```
+
+An agent uses the toolset through the Responses/Chat API as an MCP reference — a
+LiteLLM-internal route (no public URL), so `require_approval` is `never`:
+
+```json
+{"type": "mcp", "server_label": "monitoring",
+ "server_url": "litellm_proxy/mcp/monitoring", "require_approval": "never"}
+```
+
+Toolsets are stored in LiteLLM's database (not `litellm_config.yaml`), so they
+persist across restarts but are instance-per-DB — re-run the script if you wipe
+the Postgres volume.
+
+| Server | Toolset role | Tools in `monitoring` |
+|--------|--------------|----------------------|
+| Phoenix | observability | `search`, `list_tools` |
+| VictoriaMetrics | metrics / alerts | `query`, `query_range`, `metrics`, `alerts` |
+| LiteLLM admin | gateway admin | `list_spend_logs`, `list_keys`, `check_health`, `get_global_spend_report` |
+
 ## Model aliases in LiteLLM
 
 | Alias        | Backend        | Engine profile |

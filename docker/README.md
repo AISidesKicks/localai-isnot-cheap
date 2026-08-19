@@ -172,3 +172,18 @@ real `LITELLM_MASTER_KEY` from `docker/.env` in a local copy.
 
 All three engines serve the same logical model id `LiquidAI/LFM2.5-2.6B`;
 vLLM and SGLang run the AutoRound W8A16 quantization, llama.cpp the Q8_0 GGUF.
+
+## Project links
+
+| Product | Used for | Upstream |
+|---------|----------|----------|
+| LiteLLM | OpenAI-compatible gateway + MCP gateway | https://github.com/BerriAI/litellm |
+| LiteLLM MCP | MCP admin tools for LiteLLM | https://github.com/TETRA-2023/litellm-mcp |
+| Phoenix (Arize) | LLM observability, traces, evals | https://github.com/Arize-ai/phoenix |
+| VictoriaMetrics | metrics storage and querying | https://github.com/VictoriaMetrics/VictoriaMetrics |
+| VictoriaMetrics MCP | MCP server for VictoriaMetrics | https://github.com/VictoriaMetrics/mcp-victoriametrics |
+| llama.cpp | local inference engine (GGUF) | https://github.com/ggml-org/llama.cpp |
+| vLLM | local inference engine (W8A16) | https://github.com/vllm-project/vllm |
+| SGLang | local inference engine (W8A16) | https://github.com/sgl-project/sglang |
+| PostgreSQL | LiteLLM + Phoenix databases | https://www.postgresql.org |
+| Redis | LiteLLM cache | https://redis.io |

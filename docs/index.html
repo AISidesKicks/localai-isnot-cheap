@@ -59,6 +59,67 @@
         a:hover {
             text-decoration: underline;
         }
+        .divider {
+            border-top: 6px double #d35400;
+            margin: 2.5rem 0;
+        }
+        .selfstudy {
+            font-weight: 700;
+            color: #2c3e50;
+            font-size: 1.15rem;
+            margin: 1.5rem 0 1rem;
+        }
+        .big-question {
+            font-size: 1.3rem;
+            font-weight: 700;
+            color: #2c3e50;
+            margin: 1.25rem 0;
+        }
+        .duo {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1.5rem;
+            margin: 1.5rem 0;
+        }
+        .duo > .card {
+            flex: 1 1 300px;
+        }
+        .card {
+            background: #fff;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            padding: 1.25rem;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+        }
+        .card img {
+            display: block;
+            max-width: 100%;
+            height: auto;
+            border-radius: 8px;
+            margin: 0 auto;
+        }
+        .video-frame {
+            position: relative;
+            width: 100%;
+            padding-top: 56.25%;
+            margin-top: 1rem;
+        }
+        .video-frame iframe {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            border: 0;
+            border-radius: 8px;
+        }
+        .topics ol {
+            margin: 1rem 0 1.5rem;
+            padding-left: 1.5rem;
+        }
+        .topics li {
+            margin-bottom: 0.75rem;
+        }
     </style>
 </head>
 <body>
@@ -75,16 +136,113 @@
     <p><strong>So how to measure and bill AI tokens in small AI Lab?</strong><br>
     This is tricky architectural and engineering challenge with lot of tradeoffs, ideal EDU AI LAB material.</p>
 
-    <p>I put here minimal setups from large ones I use in enterprise workshops to demonstrate complexity of Local AI Inference Engineering in practice and role of caching.</p>
+    <p>Here I share minimal setups distilled from the larger ones I use in enterprise workshops, to demonstrate the complexity of local AI inference engineering in practice and the role of caching.</p>
 
-  <div style="margin: 2rem 0; text-align: center;">
-    <img 
-        src="overview.jpeg" 
-        alt="Architecture overview of LiteLLM, local inference engines, Arize Phoenix observability, VictoriaMetrics, Redis, and PostgreSQL" 
-        style="max-width: 100%; height: auto; border-radius: 8px; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);"
-        loading="lazy"
-    >
+    <p><strong>Tokenomics</strong> - cost is more than just tokens. It spans hardware and power, pipeline complexity, observability (can you find and debug it?), reproducibility, and manageability. Every form of spend needs to be <strong>metered</strong> at the end.</p>
+
+    <p><strong>Agentic Infrastructure</strong> - the AI evolution beyond IaaS: agents and harnesses are directly exposed to infrastructure through MCP servers and skills following dynamic rules (not fixed templates), turning infra access into governed, tool-based operations.</p>
+
+    <div style="margin: 2rem 0; text-align: center;">
+        <img
+            src="theme.jpeg"
+            alt="EDU AI LAB"
+            style="max-width: 100%; height: auto; border-radius: 8px; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);"
+            loading="lazy"
+        >
     </div>
+    <p><strong>Architecture</strong> - LiteLLM meter-and-bill gateway in front of local engines, with Redis caching, Phoenix observability, VictoriaMetrics metrics, and shared PostgreSQL under one roof.</p>
+    <div style="margin: 2rem 0; text-align: center;">
+        <img
+            src="overvew.jpeg"
+            alt="Architecture overview of LiteLLM, local inference engines, Arize Phoenix observability, VictoriaMetrics, Redis, and PostgreSQL"
+            style="max-width: 100%; height: auto; border-radius: 8px; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);"
+            loading="lazy"
+        >
+    </div>
+    <p><strong>How it works</strong> - Every token carries a cost so we cache wherever we can!!! </p>
+    <div style="margin: 2rem 0; text-align: center;">
+        <img
+            src="scheme.jpeg"
+            alt="Schematic overview of LiteLLM, local inference engines, Arize Phoenix observability, VictoriaMetrics, Redis, and PostgreSQL"
+            style="max-width: 100%; height: auto; border-radius: 8px; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);"
+            loading="lazy"
+        >
+    </div>
+
+
+    <p><strong>Mission</strong> - inference engineering is emerging as its own specialization. Just like you cannot learn programming by watching videos, you cannot learn this field from tutorials alone: you need infrastructure you can touch, feel, and explore, where tradeoffs and side effects show up for real. The EDU AI LAB is a single node, but it carries enough complexity to demonstrate most inference-engineering principles from a systems-thinking perspective - turning reading into practice and letting you safely explore the tradeoffs of the field. You get the idea. <a href="https://github.com/AISidesKicks/localai-isnot-cheap" target="_blank"> Local AI is not CHEAP (GitHub Repository)</a></p>
+
+    <div class="divider"></div>
+
+    <p class="selfstudy">Deep dive materials about Inference Engineering - for self study.</p>
+
+    <div class="duo">
+        <div class="card">
+            <img src="iebook.avif" alt="Inference Engineering by Philip Kiely (Baseten) book cover" loading="lazy">
+        </div>
+        <div class="card">
+            <p><strong>Inference Engineering</strong> - by Philip Kiely (Baseten). Now in its <strong>3rd edition</strong> and free as a PDF.</p>
+            <p>A book for engineers who want to understand the technologies that power every AI company and application in the world.</p>
+            <p>Covers the inference stack end to end - GPU kernels and the memory wall, KV-cache and prefix caching, quantization, batching, and serving in production - the same tradeoffs the EDU AI LAB demonstrates live.</p>
+            <p><a href="https://www.baseten.co/inference-engineering/" target="_blank">https://www.baseten.co/inference-engineering/</a></p>
+        </div>
+    </div>
+
+    <div class="duo">
+        <div class="card">
+            <p><strong>What is Prompt Caching?</strong> Optimize LLM Latency with AI Transformers</p>
+            <div class="video-frame">
+                <iframe src="https://www.youtube.com/embed/u57EnkQaUTY" title="What is Prompt Caching? Optimize LLM Latency with AI Transformers" loading="lazy" allowfullscreen></iframe>
+            </div>
+        </div>
+        <div class="card">
+            <p><strong>How KV Cache Speeds Up LLMs</strong> for Faster AI Models on GPUs</p>
+            <div class="video-frame">
+                <iframe src="https://www.youtube.com/embed/o0gkdZBtwEg" title="How KV Cache Speeds Up LLMs for Faster AI Models on GPUs" loading="lazy" allowfullscreen></iframe>
+            </div>
+        </div>
+    </div>
+
+    <div class="divider"></div>
+
+    <p class="selfstudy">First Principles</p>
+
+    <div style="margin: 1.5rem 0; text-align: center;">
+        <img src="firstprinciples.jpeg" alt="The Engineering Behind LLM Inference - From First Principles" style="max-width: 100%; height: auto; border-radius: 8px; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);" loading="lazy">
+    </div>
+
+    <p class="highlight">The Engineering Behind LLM Inference - From First Principles</p>
+    <p>Must-study before serving any AI model to really grasp the tradeoffs.</p>
+    <p>PY (@thecommitlog) has excellent deep-dive videos (with sources) which can help you better understand the tradeoffs in Inference Engineering - they are great companions to the book by Philip Kiely.</p>
+
+    <div class="topics">
+        <ol>
+            <li><strong>The Memory Wall:</strong> Examines the bandwidth bottleneck between high-speed compute cores and memory during prefill and autoregressive token generation.</li>
+            <li><strong>Inside the GPU:</strong> Explores hardware-level architectural components-such as streaming multiprocessors, registers, and cache hierarchies-that power modern parallel execution.</li>
+            <li><strong>Kernels and Memory:</strong> Covers low-level GPU kernel design and optimization strategies to minimize memory access overhead and maximize tensor arithmetic throughput.</li>
+            <li><strong>Quantization:</strong> Details techniques for compressing model weights and activations into lower-bit precision (FP16, FP8, FP4) to reduce memory footprint while preserving accuracy.</li>
+            <li><strong>Parallelism:</strong> Breaks down multi-GPU scaling methods, including tensor, pipeline, and data parallelism, required to partition models too large for a single device.</li>
+            <li><strong>Mixture of Experts (MoE):</strong> Analyzes dynamic routing architectures that activate sparse parameter subsets per token to increase model capacity without proportional compute costs.</li>
+            <li><strong>Speculative Decoding and Long Context:</strong> Focuses on draft-and-verify decoding algorithms alongside specialized attention mechanisms designed to accelerate generation and handle expansive context windows.</li>
+            <li><strong>Serving in Production:</strong> Addresses end-to-end deployment engineering, dynamic request batching, KV-cache orchestration, and system reliability for low-latency production APIs.</li>
+            <li><strong>The Whole Stack:</strong> as wrapping bonus.</li>
+        </ol>
+    </div>
+
+    <p><strong>The Engineering Behind LLM Inference From First Principles - YouTube playlist:</strong></p>
+    <div class="video-frame">
+        <iframe src="https://www.youtube.com/embed/3OmPtWuT9VA" title="The Engineering Behind LLM Inference From First Principles" loading="lazy" allowfullscreen></iframe>
+    </div>
+
+    <div class="divider"></div>
+
+    <p class="selfstudy">Agentic Infrastructure</p>
+    <p class="big-question">How will your future job look?</p>
+    <p><strong>Infrastructure as Agents</strong> - Autonomous AI Agents behind your Infrastructure as Code!</p>
+    <div class="video-frame">
+        <iframe src="https://www.youtube.com/embed/JRM6PQClt8E" title="Infrastructure as Agents - Autonomous AI Agents Behind Your Infrastructure as Code!" loading="lazy" allowfullscreen></iframe>
+    </div>
+
     <footer>
         <span>EDU AI LAB</span>
         <a href="https://github.com/AISidesKicks/localai-isnot-cheap" target="_blank"> Local AI is not CHEAP (GitHub Repository)</a>

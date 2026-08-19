@@ -1,14 +1,14 @@
 # Docker stack
 
 Full EDU AI LAB stack: LiteLLM gateway, Redis cache, local inference engines
-(llama.cpp / vLLM / SGLang), PostgreSQL, and the Lago billing trio.
+(llama.cpp / vLLM / SGLang), PostgreSQL, Phoenix observability, and VictoriaMetrics.
 
 ## Prerequisites
 
 - Docker Engine 24+ and Docker Compose v2
 - NVIDIA GPU + `nvidia-container-toolkit` for the GPU profiles
   (`--profile vllm`, `--profile llamacpp`, `--profile sglang`); the core
-  stack (gateway, cache, billing, postgres, redis) runs without a GPU
+  stack (gateway, cache, observability, postgres, redis) runs without a GPU
 - `docker compose version` to check Compose v2 (no `version:` key needed)
 
 ## Setup
@@ -70,7 +70,7 @@ batch actually uses.
 
 ## Run
 
-Core stack (gateway + cache + billing + postgres + redis, no engines):
+Core stack (gateway + cache + observability + postgres + redis, no engines):
 
 ```sh
 docker compose -f docker/docker-compose.yml up -d
@@ -138,13 +138,14 @@ To verify LiteLLM routing instead, hit the gateway on port 4000 with the
 | Port | Service        | Notes                          |
 |------|----------------|--------------------------------|
 | 4000 | LiteLLM        | OpenAI-compatible gateway      |
-| 5432 | PostgreSQL     | LiteLLM + Lago databases       |
-| 6379 | Redis          | cache (DB 1) + Lago queue (DB 0) |
+| 5432 | PostgreSQL     | LiteLLM + Phoenix databases    |
+| 6379 | Redis          | LiteLLM cache                  |
 | 8080 | llama.cpp      | only with `--profile llamacpp` |
 | 8000 | vLLM           | only with `--profile vllm`     |
 | 30000| SGLang         | only with `--profile sglang`   |
-| 3001 | Lago API       | REST + GraphQL billing API     |
-| 8085 | Lago web       | billing dashboard UI           |
+| 6006 | Phoenix        | UI + OTLP HTTP + MCP           |
+| 4317 | Phoenix        | OTLP gRPC                      |
+| 8428 | VictoriaMetrics| metrics UI / query API         |
 
 ## Model aliases in LiteLLM
 

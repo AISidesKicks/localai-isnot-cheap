@@ -6,9 +6,9 @@ Running **local AI** is far from free - it simply shifts the invoice from a clou
 
 Between high-end GPU based systems, surging electricity and cooling bills, server maintenance, and the specialized engineering talent required to keep inference pipelines optimized, self-hosting carries in real lafe massive capital and operational expenses.
 
-Metering and billing internal teams by the token is essential: it creates accountability against wasteful compute loops and directly amortizes those upfront infrastructure, pipelines, and staffing investments.
+Metering and tracking internal teams by the token is essential: it creates accountability against wasteful compute loops and directly amortizes those upfront infrastructure, pipelines, and staffing investments.
 
-## So how to measure and bill AI tokens in small AI Lab? 
+## So how to measure and track AI tokens in small AI Lab? 
 
 This is tricky architectural and engineering challenge with lot of tradeoffs, ideal EDU AI LAB material.
 
@@ -76,31 +76,33 @@ I recommend you to familiarize yoursef with LFM 2.5 2.6N model in [LM studio](ht
 │  • Request Interception & Quota Checks                                                         │
 │  • Cache Layer: Exact / Semantic Response Matching                                             │
 │  • Rate Limiting (TPM/RPM) & Dynamic Cost Calculation                                          │
+│  • OTLP Trace Export to Phoenix                                                                │
 └───────┬───────────────────────────────────┬────────────────────────────────────┬───────────────┘
         │                                   │                                    │
-        │ (2a. Direct Cache Lookup/Store    │ (2b. Cache Miss:                   │ (4. Async Usage
-        │      & Auth Key Checks)           │      Inference Request)            │     Events & Costs)
+        │ (2. Cache Lookup /                │ (3. Cache Miss:                    │ (4. OTLP Trace &
+        │     Auth Key Checks)              │     Inference Request)             │     Usage Events)
         ▼                                   ▼                                    ▼
 ┌───────────────────────┐   ┌───────────────────────────────┐   ┌────────────────────────────────┐
-│   REDIS (SHARED)      │   │    LOCAL INFERENCE ENGINE     │   │     LAGO (BILLING ENGINE)      │
-│                       │   │ [ llama.cpp | vLLM | SGLang ] │   │                                │
-│ [DB 1] LiteLLM Cache: │   │ • GPU / CPU Acceleration      │   │ • Virtual Credit Wallets       │
-│ • Response Cache Hit  │   │ • Model Prefill & Decode      │   │ • Pricing Rules & Tier Rating  │
-│   (Bypasses Engine!)  │   │ • Prefix / KV-Cache Hit       │   │ • Internal Team Chargeback     │
-│ • Auth Key Validation │   │   Reporting                   │   │                                │
+│    REDIS (SHARED)     │   │    LOCAL INFERENCE ENGINE     │   │    PHOENIX (OBSERVABILITY)     │
+│ [DB 1] LiteLLM Cache: │   │ [ llama.cpp | vLLM | SGLang ] │   │ • OTLP Trace Ingestion         │
+│ • Response Cache Hit  │   │ • GPU / CPU Acceleration      │   │ • Token Counting & Model Costs │
+│   (Bypasses Engine!)  │   │ • Model Prefill & Decode      │   │ • Runtime / Latency Metrics    │
+│ • Auth Key Validation │   │ • Prefix / KV-Cache Hit       │   │ • Remote MCP Server            │
 │ • TPM / RPM Counters  │   └───────────────┬───────────────┘   └───────────────┬────────────────┘
-│                       │                   │                                   │
-│ [DB 0] Lago Queue:    │                   │ (3. Tokens &                      │ (5. Wallet
-│ • Async Job Worker    │                   │     KV-Cache Stats)               │     Ledger Updates)
-│   (Sidekiq)           │                   └───────────────┬───────────────────┘
-└───────────────────────┘                                   │
-        ▲                                                   │
-        │ (Background Jobs)                                 ▼
-        │                                   ┌────────────────────────────────────────────────────┐
-        └───────────────────────────────────┤                POSTGRESQL (SHARED)                 │
-                                            │ • LiteLLM DB: Spend Logs, Virtual Keys, Budgets    │
-                                            │ • Lago DB: Ledgers, Invoices, Customer Balances    │
-                                            └────────────────────────────────────────────────────┘
+└───────────────────────┘                   │ (5. Prometheus                    │ (6. Spans, Token
+                                            │     /metrics Scrape)              │     Counts & Costs)
+                                            ▼                                   ▼
+                           ┌───────────────────────────┐   ┌────────────────────────────────────┐
+                           │  VICTORIAMETRICS          │   │         POSTGRESQL (SHARED)        │
+                           │ • Engine Metrics Store    │   │ • LiteLLM DB: Spend Logs, Budgets   │
+                           │ • GPU / Host Utilization  │   │ • Phoenix DB: Traces, Spans, Costs  │
+                           └───────────────────────────┘   └───────────────────┬────────────────┘
+                                                                               │ (7. Query & Insights)
+                                                                               ▼
+                                                  ┌────────────────────────────────────────────┐
+                                                  │        CUSTOM REPORT SCRIPTS              │
+                                                  │ (per-team cost / size / latency reports)   │
+                                                  └────────────────────────────────────────────┘
 
 ```
 ---
@@ -113,14 +115,14 @@ When a request arrives, LiteLLM first checks **Redis** for an exact-match or sem
 2. **Inference Execution (LiteLLM $\rightarrow$ llama.cpp / vLLM / SGLang):**
 On a gateway cache miss, LiteLLM routes the prompt down to the local engine. The engine processes it using its own internal **KV/prefix cache** and streams back the generated tokens.
 
-3. **Usage Emission to Lago (LiteLLM $\rightarrow$ Lago):**
-LiteLLM captures the full usage footprint (prompt, completion, and engine KV-cached tokens) and dispatches an asynchronous billing event to Lago.
+3. **Observability Emission (LiteLLM $\rightarrow$ Phoenix):**
+LiteLLM captures the full usage footprint (prompt, completion, and engine KV-cached tokens) and exports an OTLP trace to Phoenix for token counting, model costs, and runtime metrics.
 
-4. **Billing & Wallet Deductions (Lago $\rightarrow$ PostgreSQL & Redis DB 0):**
-Lago processes the event via its **Redis** worker queue, applies discounts for cached tokens, and writes balance deductions to its **PostgreSQL** ledger.
+4. **Persistence & Insights (Phoenix $\rightarrow$ PostgreSQL):**
+Phoenix stores the ingested spans, token counts, and cost attributes in its database inside the shared **PostgreSQL**, making the whole lab's usage queryable.
 
-5. **Virtual Credit Topping — Simulated Payments (Lago $\leftarrow$ Users / Teams):**
-Before any request can be served, each team tops up its virtual credit wallet, simulating a real payment — no actual money moves. Lago credits the wallet balance in its PostgreSQL ledger, mirroring prepaid billing. LiteLLM enforces the balance during its quota checks (step 1): once a wallet is exhausted, further requests are rejected until the team tops up again.
+5. **Executing Custom Report Scripts (PostgreSQL $\leftarrow$ Reports):**
+Report scripts query the persisted trace and spend data to build per-team cost, size, and latency reports — the raw materials for the team accountability story.
 
 ---
 

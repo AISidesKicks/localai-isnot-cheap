@@ -5,7 +5,7 @@
 This is an **educational EDU AI LAB** project — "Local AI is not cheap!" It
 demonstrates how to meter and bill AI tokens for local inference in a small
 lab environment (LiteLLM gateway, Redis caching, llama.cpp / vLLM / SGLang
-engines, Arize Phoenix observability).
+engines, Arize Phoenix observability, VictoriaMetrics).
 
 Tone is informal. The README contains pre-existing typos and informal wording
 that are intentionally left alone — do not "fix" them.

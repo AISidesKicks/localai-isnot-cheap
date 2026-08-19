@@ -266,6 +266,35 @@ services:
     networks:
       - cheap-net
 
+  litellm-mcp:
+    image: ghcr.io/tetra-2023/litellm-mcp:latest
+    container_name: litellm-mcp
+    entrypoint: ["/app/.venv/bin/python", "/app/litellm_mcp_entrypoint.py"]  # FastMCP defaults to 127.0.0.1; wrapper forces 0.0.0.0
+    volumes:
+      - ./litellm_mcp_entrypoint.py:/app/litellm_mcp_entrypoint.py:ro
+    environment:
+      LITELLM_PROXY_URL: http://cheap-litellm:4000
+      LITELLM_API_KEY: ${LITELLM_MASTER_KEY:-sk-1234-master-key-4321}
+      LITELLM_TRANSPORT: streamable-http   # must override docker default stdio
+    ports:
+      - "4001:8000"   # admin MCP; FastMCP streamable-http serves on /mcp
+    depends_on:
+      cheap-litellm:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "/app/.venv/bin/python", "-c", "import socket; socket.create_connection(('127.0.0.1', 8000), timeout=5)"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 15s
+    deploy:
+      resources:
+        limits:
+          cpus: '0.50'
+          memory: 256M
+    networks:
+      - cheap-net
+
 networks:
   cheap-net:
     name: cheap-net

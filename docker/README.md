@@ -1,7 +1,8 @@
 # Docker stack
 
 Full EDU AI LAB stack: LiteLLM gateway, Redis cache, local inference engines
-(llama.cpp / vLLM / SGLang), PostgreSQL, Phoenix observability, and VictoriaMetrics.
+(llama.cpp / vLLM / SGLang), PostgreSQL, Phoenix observability, VictoriaMetrics,
+and a LiteLLM admin MCP server.
 
 ## Prerequisites
 
@@ -147,6 +148,7 @@ To verify LiteLLM routing instead, hit the gateway on port 4000 with the
 | 4317 | Phoenix        | OTLP gRPC                      |
 | 8428 | VictoriaMetrics| metrics UI / query API         |
 | 8000 | VM MCP         | MCP server for VictoriaMetrics (conflicts with vllm profile) |
+| 4001 | LiteLLM MCP    | MCP admin tools for LiteLLM (external server) |
 
 ## Model aliases in LiteLLM
 

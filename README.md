@@ -20,6 +20,8 @@ If you are new to LLM serving aka Inference Engineering, I recommend you to look
 
 ## Selecting AI heart for LAB - small, but capable LLM (~3B SLM)
 
+Everybody is starting in AI by tinkering with models, not with architecture - so we will **follow the crowd** here:
+
 **PS:** *No embedded vision* — we focus primarily on text-only LLM (SLM) models; this limits simulated tests, but the multimodal Pandora's box will be another chapter.
 
 ### Open-weight champion - The Swiss army knife

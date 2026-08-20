@@ -65,22 +65,42 @@ I recommend familiarizing yourself with the LFM 2.5 2.6B model in [LM Studio](ht
 
 ## Selecting embedding models for the LAB - a matryoshka-capable embedder
 
-Embeddings are language-specific; we go with an English-focused model from Nomic.
+ - we can also use CPU cores for embeddings with F16 format, Q8_0 for GPU.
+ - we will use modern [matryoshka - multi-dimensional embeddings](https://huggingface.co/blog/matryoshka)
+- we will primarily focus on English - embeddings are domain-specific, larger models can do:
+   - other human languages (some better than others)
+ - code (programming languages)
+ - have fine-tuned variants for special domains
 
-We use CPU cores for embeddings, so we use the F16 format.
+### Primary embedder
 
-[matryoshka - multi-dimensional embeddings](https://huggingface.co/blog/matryoshka)
+ nomic-embed-text-v1.5 by Nomic
+    - **Max chunk size:** 8192
+    - **Dimensions:** 768, 512, 256, 128, 64 (trade-off between size & performance)
+    - **Languages:** Primary language is English (fully optimized and benchmarked)
 
- nomic-embed-text-v1.5
-  - **Max chunk size:** 8192
-  - **Dimensions:** 768, 512, 256, 128, 64 (trade-off between size & performance)
+ [nomic-ai/nomic-embed-text-v1.5 GGUF F16](https://huggingface.co/nomic-ai/nomic-embed-text-v1.5-GGUF)
+ [nomic-ai/nomic-embed-text-v1.5 GGUF Q8_0](https://huggingface.co/nomic-ai/nomic-embed-text-v1.5-GGUF)
+ [nomic-ai/nomic-embed-text-v1.5 SF F16](https://huggingface.co/nomic-ai/nomic-embed-text-v1.5)
 
-[nomic-ai/nomic-embed-text-v1.5 GGUF F16](https://huggingface.co/nomic-ai/nomic-embed-text-v1.5-GGUF)
-[nomic-ai/nomic-embed-text-v1.5 SF F16](https://huggingface.co/nomic-ai/nomic-embed-text-v1.5)
+### Alternative embedders around 300M
 
-We can also try IBM's ~300M multilingual granite-embedding-311m-multilingual-r2 (chunks up to 32K) or Google's embeddinggemma.
+ We can also try Google's [embeddinggemma](https://ai.google.dev/gemma/docs/embeddinggemma) or IBM's [granite-embedding-311m-multilingual-r2](https://huggingface.co/ibm-granite/granite-embedding-311m-multilingual-r2).
 
-pre-trained on roughly 34 trillion tokens
+ embeddinggemma by Google
+    - **Model size:** 300M (mentioning 200M RAM profile with quantization - Q4 to test)
+    - **Max chunk size:** 2048
+    - **Dimensions:** 768, 512, 256, 128 (trade-off between size & performance)
+    - **Languages:** Wide linguistic data understanding, trained in over 100 languages.
+
+[unsloth/embeddinggemma-300m-GGUF (BF16)](https://huggingface.co/unsloth/embeddinggemma-300m-GGUF)
+ [unsloth/embeddinggemma-300m-GGUF (Q8_0)](https://huggingface.co/unsloth/embeddinggemma-300m-GGUF)
+ [unsloth/embeddinggemma-300m-GGUF (Q4_0)](https://huggingface.co/unsloth/embeddinggemma-300m-GGUF)
+
+ granite-embedding-311m-multilingual-r2 by IBM
+- **Max chunk size:** 32768
+   - **Dimensions:** 768, 512, 384, 256, 128 (trade-off between size & performance)
+    - **Languages:** 200+ languages + enhanced support for 52 languages and programming code
 
 ## EDU AI LAB OVERVIEW:
 

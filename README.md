@@ -18,7 +18,11 @@ Setup is prepared to be executed as educational lab on gaming PC with 32GB RAM a
 
 If you are new to LLM serving aka Inference Engineering, I recommend you to look into EDU sources first ->
 
-## Selecting AI heart for LAB - small, but capable LLM (~3B)
+## Selecting AI heart for LAB - small, but capable LLM (~3B SLM)
+
+**PS:** *No embedded vision* — we focus primarily on text-only LLM (SLM) models; this limits simulated tests, but the multimodal Pandora's box will be another chapter.
+
+### Open-weight champion - The Swiss army knife
 
 Liquid AI released a new [LFM2.5-2.6B: Deploy Agents Everywhere](https://www.liquid.ai/blog/lfm2-5-2-6b) on 4 August 2026!
 
@@ -38,8 +42,7 @@ Full LFM2.5-2.6B model is 5.4 GB in bf16, we can easily run 8bit quantizations:
  - GGUF [Official LiquidAI (8-bit Q8_0 = 2.87 GB)](https://huggingface.co/LiquidAI/LFM2.5-2.6B-GGUF)
  - W8A16 [AutoRound W8A16 (8-bit weights / fp16 activations = 2.9 GB)](https://huggingface.co/plavno/LFM2.5-2.6B-AutoRound-W8A16)
 
-The lab's vLLM and SGLang profiles run the AutoRound W8A16 checkpoint, while
-llama.cpp serves the Q8_0 GGUF.
+The lab's vLLM and SGLang profiles run the AutoRound W8A16 checkpoint, while llama.cpp serves the Q8_0 GGUF.
 
 There are a lot of modified and uncensored variants of LFM2.5-2.6B:
 
@@ -56,9 +59,7 @@ There are a lot of modified and uncensored variants of LFM2.5-2.6B:
   - [LFM2.5-2.6B-Terminal-SFT](https://huggingface.co/jacepark12/LFM2.5-2.6B-Terminal-SFT) [GGUF](https://huggingface.co/mradermacher/LFM2.5-2.6B-Terminal-SFT-GGUF) 
   - [LFM2.5-2.6B-CyberSec](https://huggingface.co/reaperdoesntknow/LFM2.5-2.6B-CyberSec) [GGUF](https://huggingface.co/mradermacher/LFM2.5-2.6B-Terminal-SFT-GGUF) 
 
-**PS:** *No vision*, this will limit simulated tests, but multimodal pandora box will stay closed.
-
-I recommend you to familiarize yourself with LFM 2.5 2.6B model in [LM studio](https://lmstudio.ai/).
+I recommend familiarizing yourself with the LFM 2.5 2.6B model in [LM Studio](https://lmstudio.ai/). It is trained on a whopping ~34 trillion tokens, so we generated and tested diverse topic sets.
 
 ## Selecting embedding models for the LAB - a matryoshka-capable embedder
 
@@ -75,7 +76,9 @@ We use CPU cores for embeddings, so we use the F16 format.
 [nomic-ai/nomic-embed-text-v1.5 GGUF F16](https://huggingface.co/nomic-ai/nomic-embed-text-v1.5-GGUF)
 [nomic-ai/nomic-embed-text-v1.5 SF F16](https://huggingface.co/nomic-ai/nomic-embed-text-v1.5)
 
-You can also try IBM's ~300M multilingual granite-embedding-311m-multilingual-r2 (chunks up to 32K) or the new nomic-embed-text-v2-moe.
+We can also try IBM's ~300M multilingual granite-embedding-311m-multilingual-r2 (chunks up to 32K) or Google's embeddinggemma.
+
+
 
 ## EDU AI LAB OVERVIEW:
 
@@ -95,6 +98,7 @@ You can also try IBM's ~300M multilingual granite-embedding-311m-multilingual-r2
 │     • Rate Limiting (TPM/RPM) & Dynamic Cost Calculation                  │ │  debugging  │
 │     • OTLP Trace Export to Phoenix                                        │ │  (point to  │
 │     • MCP Gateway: MCP and namespaced tools                               │ │   srv API)  │
+│     • Skills HUB: Set of useful skills                                    │ │             │
 └───────┬────────────────────────────────┬───────────────────────────────┬──┘ └─────────────┘
         │                                │                               │
         │ (2. Cache Lookup               │ (3. Cache Miss:               │ (4. OTLP Trace &)
@@ -154,7 +158,6 @@ Custom report scripts query the persisted trace and spend data to build per-team
    - **Governed (MCP Gateway / Toolsets):** ideally agents don't touch raw infrastructure; they reach it through governed MCP access:
       - **Aggregated (MCP Gateway):** all three admin MCPs surface behind the gateway's single MCP endpoint, tools namespaced per server (`phoenix-*`, `victoriametrics-*`, `litellm_admin-*`).
       - **Managed (Toolsets):** curated, named subsets of tools pulled from across the servers, so each team only gets the slice of the lab they're meant to see.
-
 ---
 
-*Footnote: I have dyslexia, so from time to time I let the LLMs give my English a power-up — think of it as a GPU-accelerated spellchecker running at a few hundred tokens per second. If any sentence here reads a little too polish, that was the model showing off, not me.*
+*Footnote: I have dyslexia and I am not a native English speaker, so from time to time I let the LLMs give my English a power-up — think of it as a GPU-accelerated spellchecker running at a few hundred tokens per second. If any sentence here reads a little too polished, that was the model showing off, not me.*

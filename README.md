@@ -80,7 +80,7 @@ We use CPU cores for embeddings, so we use the F16 format.
 
 We can also try IBM's ~300M multilingual granite-embedding-311m-multilingual-r2 (chunks up to 32K) or Google's embeddinggemma.
 
-
+pre-trained on roughly 34 trillion tokens
 
 ## EDU AI LAB OVERVIEW:
 

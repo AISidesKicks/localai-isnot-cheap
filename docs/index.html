@@ -52,6 +52,19 @@
             font-size: 0.9rem;
             color: #64748b;
         }
+        .footer-repo {
+            font-size: 1.15rem;
+            font-weight: 700;
+        }
+        .footer-projects {
+            margin: 0.25rem 0 0;
+            padding-left: 1.25rem;
+            color: #64748b;
+        }
+        .footer-projects li {
+            display: inline;
+            margin-right: 1rem;
+        }
         a {
             color: #2563eb;
             text-decoration: none;
@@ -262,7 +275,17 @@
 
     <footer>
         <span>EDU AI LAB</span>
-        <a href="https://github.com/AISidesKicks/localai-isnot-cheap" target="_blank"> Local AI is not CHEAP (GitHub Repository)</a>
+        <a href="https://github.com/AISidesKicks/localai-isnot-cheap" target="_blank" class="footer-repo">Local AI is not CHEAP (GitHub Repository)</a>
+        <div>
+            <strong>Local AI is not CHEAP</strong> project si leveraged in these related projects:
+            <ul class="footer-projects">
+                <li><a href="https://how.chimps.work" target="_blank">how.chimps.work</a> - AI benchamrking in REAL production</li>
+                <li><a href="https://how.evals.work" target="_blank">how.evals.work</a> - AI evals in REAL production</li>
+                <li><a href="https://my.pietra.dev" target="_blank">my.pietra.dev</a> - AI harness for Interation Engineers based PI (https://pi.dev)</li>
+                <li><a href="https://my.taufiq.dev" target="_blank">my.taufiq.dev</a> - AI harness for Inteference Engineers based TAU (https://twotimespi.dev)</li>
+            </ul>
+        </div>
+
     </footer>
 
 </body>

@@ -16,7 +16,7 @@ I put here minimal setups from large ones I use in enterprise workshops to demon
 
 Setup is prepared to be executed as educational lab on gaming PC with 32GB RAM and Nvidia GPU with 12GB VRAM (RTX 4070 in my case).
 
-If you are new to LLM serving aka Inference Engineering, I recommend you to look into EDU sources first ->
+If you are new to LLM serving aka Inference Engineering, I recommend you to look into EDU sources first at [localai.isnot.cheap](https://localai.isnot.cheap).
 
 ## Selecting AI heart for LAB - small, but capable LLM (~3B SLM)
 

@@ -63,6 +63,21 @@ There are a lot of modified and uncensored variants of LFM2.5-2.6B:
 
 I recommend familiarizing yourself with the LFM 2.5 2.6B model in [LM Studio](https://lmstudio.ai/). It is trained on a whopping ~34 trillion tokens, so we generated and tested diverse topic sets.
 
+### Open-source champion - The king of Open Science
+
+Hugging Face created the 3B model [SmolLM3: smol, multilingual, long-context reasoner](https://huggingface.co/blog/smollm3)
+
+It's built on top of 11T tokens and the full recipe is open (including datasets), so we can more easily generate synthetic tests.
+
+It's a dual reasoner - reasoning can be switched off/on and it has a 64K context window, context scaling in SmolLM3 is not fully linear so 64K is more realistic (128K is stretched and will not FIT!).
+
+Useful quantizations:
+
+Full SmolLM3-3B model is 6.17 GB in bf16, we can easily run 8bit quantizations:
+
+ - GGUF [SmolLM3-3B-GGUF (8-bit Q8_0 = 3.28 GB)](https://huggingface.co/unsloth/SmolLM3-3B-GGUF)
+ - FP8 [FP8 Dynamic (8-bit FP8 = 3.4 GB)](https://huggingface.co/RedHatAI/SmolLM3-3B-FP8-dynamic)
+
 ## Selecting embedding models for the LAB - a matryoshka-capable embedder
 
 - we can also use CPU cores for embeddings with F16 format, Q8_0 for GPU.

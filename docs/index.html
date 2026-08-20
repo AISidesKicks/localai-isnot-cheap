@@ -60,6 +60,11 @@
             gap: 0.5rem;
             width: 100%;
         }
+        .footer-links {
+            display: flex;
+            gap: 1rem;
+            align-items: center;
+        }
         .footer-repo {
             font-size: 1.15rem;
             font-weight: 700;
@@ -157,6 +162,15 @@
 
     <p class="highlight">Metering and billing internal teams by the token is essential: it creates accountability against wasteful compute loops and directly amortizes those upfront infrastructure, pipelines, and staffing investments.</p>
 
+    <div style="margin: 2rem 0; text-align: center;">
+        <img
+            src="theme.jpeg"
+            alt="EDU AI LAB"
+            style="max-width: 100%; height: auto; border-radius: 8px; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);"
+            loading="lazy"
+        >
+    </div>
+
     <p><strong>So how to measure and bill AI tokens in small AI Lab?</strong><br>
     This is tricky architectural and engineering challenge with lot of tradeoffs, ideal EDU AI LAB material.</p>
 
@@ -168,14 +182,6 @@
 
     <p><strong>Agentic Infrastructure</strong> - the AI evolution beyond IaaS: agents and harnesses are directly exposed to infrastructure through MCP servers and skills following dynamic rules (not fixed templates), turning infra access into governed, tool-based operations.</p>
 
-    <div style="margin: 2rem 0; text-align: center;">
-        <img
-            src="theme.jpeg"
-            alt="EDU AI LAB"
-            style="max-width: 100%; height: auto; border-radius: 8px; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);"
-            loading="lazy"
-        >
-    </div>
     <p><strong>Architecture</strong> - LiteLLM meter-and-bill gateway in front of local engines, with Redis caching, Phoenix observability, VictoriaMetrics metrics, and shared PostgreSQL under one roof.</p>
     <div style="margin: 2rem 0; text-align: center;">
         <img
@@ -195,8 +201,15 @@
         >
     </div>
 
-
     <p><strong>Mission</strong> - inference engineering is emerging as its own specialization. Just like you cannot learn programming by watching videos, you cannot learn this field from tutorials alone: you need infrastructure you can touch, feel, and explore, where tradeoffs and side effects show up for real. The EDU AI LAB is a single node, but it is Docker-container based — everything runs in containers on one machine — and it still carries enough complexity to demonstrate most inference-engineering principles from a systems-thinking perspective - turning reading into practice and letting you safely explore the tradeoffs of the field. You get the idea. <a href="https://github.com/AISidesKicks/localai-isnot-cheap" target="_blank"> Local AI is not CHEAP (GitHub Repository)</a></p>
+
+    <p class="footer-powered"><strong>Local AI is not CHEAP</strong> project si leveraged in these related projects:</p>
+    <ul class="footer-projects">
+        <li><a href="https://how.chimps.work" target="_blank">how.chimps.work</a> - AI benchmarking in REAL production (executable book style)</li>
+        <li><a href="https://how.evals.work" target="_blank">how.evals.work</a> - AI evals in REAL production (executable book style)</li>
+        <li><a href="https://my.pietra.dev" target="_blank">my.pietra.dev</a> - AI harness for Interaction Engineers based <a href="https://pi.dev" target="_blank">PI</a></li>
+        <li><a href="https://my.taufiq.dev" target="_blank">my.taufiq.dev</a> - AI harness for Inference Engineers based <a href="https://twotimespi.dev" target="_blank">TAU</a></li>
+    </ul>
 
     <div class="divider"></div>
 
@@ -287,15 +300,11 @@
     <footer>
         <div class="footer-top">
             <span>EDU AI LAB</span>
-            <a href="https://github.com/AISidesKicks/localai-isnot-cheap" target="_blank" class="footer-repo">Local AI is not CHEAP (GitHub Repository)</a>
+            <div class="footer-links">
+                <a href="https://github.com/AISidesKicks/localai-isnot-cheap" target="_blank" class="footer-repo">Local AI is not CHEAP (GitHub Repository)</a>
+                <a href="https://linkedin.com/in/rudolfkutina" target="_blank" class="footer-repo">My LinkedIn</a>
+            </div>
         </div>
-        <p class="footer-powered"><strong>Local AI is not CHEAP</strong> project si leveraged in these related projects:</p>
-        <ul class="footer-projects">
-            <li><a href="https://how.chimps.work" target="_blank">how.chimps.work</a> - AI benchmarking in REAL production (executable book style)</li>
-            <li><a href="https://how.evals.work" target="_blank">how.evals.work</a> - AI evals in REAL production (executable book style)</li>
-            <li><a href="https://my.pietra.dev" target="_blank">my.pietra.dev</a> - AI harness for Interaction Engineers based <a href="https://pi.dev" target="_blank">PI</a></li>
-            <li><a href="https://my.taufiq.dev" target="_blank">my.taufiq.dev</a> - AI harness for Inference Engineers based <a href="https://twotimespi.dev" target="_blank">TAU</a></li>
-        </ul>
     </footer>
 
 </body>

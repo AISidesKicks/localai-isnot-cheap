@@ -202,6 +202,18 @@ Custom report scripts query the persisted trace and spend data to build per-team
       - **Managed (Toolsets):** curated, named subsets of tools pulled from across the servers, so each team only gets the slice of the lab they're meant to see.
 ---
 
-### Will it fit considerations
+### Will it RUN considerations
+
+**Nvidia + CUDA is a MUST** — it's the primary environment in the enterprise and the neoclouds.
+
+**AI EDU LAB limitation:** home gaming/workstation hardware is NOT the same as datacenter (DC) hardware. They differ at the hardware level — **CUDA + kernels + architecture (x86 vs ARM)** — so a solution finely tuned for the DC will not simply run on our home lab.
+
+![Nvidia Blackwell family — Fathers vs Sons](eduailab/blackwell.jpg)
+
+See the full technical deep-dive: [nn-nvidia-hw-deepdive.md](eduailab/nn-nvidia-hw-deepdive.md)
+
+---
+
+### Will it FIT considerations
 
 *Footnote: I have dyslexia and I am not a native English speaker, so from time to time I let the LLMs give my English a power-up — think of it as a GPU-accelerated spellchecker running at a few hundred tokens per second. If any sentence here reads a little too polished, that was the model showing off, not me.*

@@ -16,11 +16,12 @@ CUDA toolkit versions gate which compute capabilities you can target, and choosi
 |---|---|---|---|---|
 | Ada | RTX 4070 (sm_89) | - | - | - |
 | Hopper  | - | - | - | H100/H200 (sm_90) |
-| Blackwell | RTX 5070 (sm_120/121) | RTX PRO 6000 (sm_120/121) | - | -  |
+| Hopper  | - | - | - | GH100/GH200 (sm_90) |
+| Blackwell | RTX 5070 (sm_120) | RTX PRO 6000 (sm_120) | - | -  |
 | Blackwell | - | - |  | B200/B300 (sm_100)  |
 | Blackwell | - | - | sparc (sm_121) | GB200/BB300 (sm_100)  |
 
-### Multi-version CUDA in Docker
+### Multi-version CUDA in Docker vs HOST
 
 Our lab already runs CUDA 13.x in Docker: `ghcr.io/ggml-org/llama.cpp:server-cuda13` is pinned for the GPU chat service and the GPU embed service in `docker-compose.yml`. For a Blackwell-era lab, 13.x is the right pick. When you mix GPU generations, pin 12.9.x instead — a 12.9.x image spans hosts and drivers from 12.9 up through 13.x.
 

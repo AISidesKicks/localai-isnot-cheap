@@ -19,11 +19,15 @@ CUDA toolkit versions gate which compute capabilities you can target, and choosi
 | Hopper  | - | - | - | GH100/GH200 (sm_90) |
 | Blackwell | RTX 5070 (sm_120) | RTX PRO 6000 (sm_120) | - | -  |
 | Blackwell | - | - |  | B200/B300 (sm_100)  |
-| Blackwell | - | - | sparc (sm_121) | GB200/BB300 (sm_100)  |
+| Blackwell | - | - | DGX Sparc (sm_121) | GB200/BB300 (sm_100)  |
 
 ### Multi-version CUDA in Docker vs HOST
 
 Our lab already runs CUDA 13.x in Docker: `ghcr.io/ggml-org/llama.cpp:server-cuda13` is pinned for the GPU chat service and the GPU embed service in `docker-compose.yml`. For a Blackwell-era lab, 13.x is the right pick. When you mix GPU generations, pin 12.9.x instead — a 12.9.x image spans hosts and drivers from 12.9 up through 13.x.
+
+**Docker image vs host CUDA.** The CUDA toolkit inside a container (compilers like `nvcc`, runtime libs, and cuBLAS/cuDNN baked into the engine image) is fully self-contained — a container never needs a host CUDA toolkit installed. What it *does* consume from the host is the **NVIDIA driver** (kernel module + user-space `libnvidia-*`), exposed through `nvidia-container-toolkit` (`runtime: nvidia`). So the single compatibility gate for any CUDA container is the host driver version: each CUDA release requires a minimum driver, and a *newer* driver always runs *older* CUDA images.
+
+**General recommendation:** bump the host to CUDA 13.x wherever possible — a 13.x toolkit plus a host driver in the 570-series range or newer. That one driver then serves 12.9.x *and* 13.x images side by side, and the 13.x `nvcc` is the right tool for `-arch=sm_100` / `sm_120` Blackwell targets. Reserve 12.9.x for hosts whose GPU generation or driver branch cannot take 13.x.
 
 So the Ada–Hopper generation split the compute-capability namespace in two: the consumer/datacenter Ada parts (`sm_89`, e.g. our RTX 4070) used the `mma.sync` path, while Hopper (`sm_90`, e.g. H100/H200) introduced the newer WGMMA path. You can already guess where this is going: the Blackwell generation does the same trick, with the son-and-father split deep-dived below.
 

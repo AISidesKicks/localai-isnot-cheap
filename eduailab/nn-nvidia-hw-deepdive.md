@@ -8,15 +8,20 @@ Nvidia + CUDA is the primary environment not only in the enterprise but also in 
 
 To talk about CUDA and Nvidia hardware precisely, you need three related but distinct things: the **CUDA toolkit version** (the software you install), the **compute capability** (what the hardware reports), and the **SM ID** (the internal architecture family name).
 
-**Compute capability** uses the `sm_XY` scheme: `X` is the major generation (7 = Volta, 8 = Ampere, 9 = Ada/Hopper, 10 = Blackwell) and `Y` is the minor feature set. The `sm_XY` string is exactly what you pass to `nvcc` via `-arch=sm_XY` when cross-compiling for a specific GPU family.
+**Compute capability** uses the `sm_XY` scheme: `X` is the major generation (9 = Ada/Hopper, 10 = Blackwell) and `Y` is the minor feature set. The `sm_XY` string is exactly what you pass to `nvcc` via `-arch=sm_XY` when cross-compiling for a specific GPU family.
 
-CUDA toolkit versions gate which compute capabilities you can target — newer toolkits drop support for old architectures, and the newest GPUs require recent toolkits:
+CUDA toolkit versions gate which compute capabilities you can target, and choosing one is a trade-off. **CUDA 13.x** is the most Blackwell-optimized release line — the one to run for Blackwell-era GPUs. The **latest 12.9.x** is the multi-generational compatibility pick: it still targets Ada and Hopper, and 12.9.x Docker images run on hosts and drivers from 12.9 up through 13.x.
 
-| CUDA version | Compute capabilities |
-|---|---|
-| 11.8 | Ada (`sm_89`) and Hopper (`sm_90`) |
-| 12.8 | Blackwell (`sm_100`, `sm_120/121`) |
-| 13.0 | Drops pre-Volta support |
+| Class | Ada/Hopper era | Blackwell era | Compute capability |
+|---|---|---|---|
+| Gaming | RTX 4070, `mma.sync` path | RTX 5090 — Son, no TMEM | sm_89 → sm_120/121 |
+| Workstation | — | RTX PRO 6000 — Son, no TMEM | sm_89 → sm_120/121 |
+| DGX Spark (fully integrated system) | — | compact-edge Son, ARM SoC | sm_121 |
+| Datacenter | H100/H200 — Hopper, WGMMA | B200/B300 — Father, TMEM + WGMMA | sm_90 → sm_100 |
+
+### Multi-version CUDA in Docker
+
+Our lab already runs CUDA 13.x in Docker: `ghcr.io/ggml-org/llama.cpp:server-cuda13` is pinned for the GPU chat service and the GPU embed service in `docker-compose.yml`. For a Blackwell-era lab, 13.x is the right pick. When you mix GPU generations, pin 12.9.x instead — a 12.9.x image spans hosts and drivers from 12.9 up through 13.x.
 
 So the Ada–Hopper generation split the compute-capability namespace in two: the consumer/datacenter Ada parts (`sm_89`, e.g. our RTX 4070) used the `mma.sync` path, while Hopper (`sm_90`, e.g. H100/H200) introduced the newer WGMMA path. You can already guess where this is going: the Blackwell generation does the same trick, with the son-and-father split deep-dived below.
 

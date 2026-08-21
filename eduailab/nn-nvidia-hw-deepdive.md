@@ -4,7 +4,21 @@
 
 Nvidia + CUDA is the primary environment not only in the enterprise but also in the neoclouds. When people talk about "the" AI stack, they are almost always talking about Nvidia hardware running CUDA. If you want your solution to run where the industry runs, CUDA compatibility is effectively a requirement.
 
+## CUDA versions, compute capabilities and SM IDs
 
+To talk about CUDA and Nvidia hardware precisely, you need three related but distinct things: the **CUDA toolkit version** (the software you install), the **compute capability** (what the hardware reports), and the **SM ID** (the internal architecture family name).
+
+**Compute capability** uses the `sm_XY` scheme: `X` is the major generation (7 = Volta, 8 = Ampere, 9 = Ada/Hopper, 10 = Blackwell) and `Y` is the minor feature set. The `sm_XY` string is exactly what you pass to `nvcc` via `-arch=sm_XY` when cross-compiling for a specific GPU family.
+
+CUDA toolkit versions gate which compute capabilities you can target — newer toolkits drop support for old architectures, and the newest GPUs require recent toolkits:
+
+| CUDA version | Compute capabilities |
+|---|---|
+| 11.8 | Ada (`sm_89`) and Hopper (`sm_90`) |
+| 12.8 | Blackwell (`sm_100`, `sm_120/121`) |
+| 13.0 | Drops pre-Volta support |
+
+So the Ada–Hopper generation split the compute-capability namespace in two: the consumer/datacenter Ada parts (`sm_89`, e.g. our RTX 4070) used the `mma.sync` path, while Hopper (`sm_90`, e.g. H100/H200) introduced the newer WGMMA path. You can already guess where this is going: the Blackwell generation does the same trick, with the son-and-father split deep-dived below.
 
 ## Deep dive example for Blackwell generation
 

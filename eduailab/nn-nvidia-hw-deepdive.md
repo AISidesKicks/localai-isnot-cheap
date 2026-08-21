@@ -1,10 +1,12 @@
 # Nvidia + CUDA Hardware Deep-Dive
 
-![Blackwell family](blackwell.jpg)
-
 ## Intro: Nvidia + CUDA is a MUST
 
 Nvidia + CUDA is the primary environment not only in the enterprise but also in the neoclouds. When people talk about "the" AI stack, they are almost always talking about Nvidia hardware running CUDA. If you want your solution to run where the industry runs, CUDA compatibility is effectively a requirement.
+
+
+
+## Deep dive example for Blackwell generation
 
 ## HybridAI: Large Blackwell family — Father and Son with Spark
 
@@ -22,6 +24,8 @@ The Blackwell generation is not a single chip. It splits into two families that 
 - Compact edge: DGX Spark (a small form-factor SoC)
 
 The twist is that the "Fathers" and the "Sons" do **not** fully share the same underlying chip architecture (ISA). They diverge at the instruction-set level, which has huge consequences for software (see "Why kernels cannot run unmodified outside the Father" below).
+
+![Blackwell family](blackwell.jpg)
 
 ### The two main optimizations
 
@@ -57,7 +61,3 @@ Because of these hardware-level differences, when a new capability lands on Blac
 - B200 / B300 (Fathers) → RTX 6000 (workstation Son) → DGX Spark (edge Son)
 
 There is one more wrinkle for a home lab: the **DGX Spark is ARM** (not x86). So even within the "Son" family, x86 vs ARM means the DGX Spark software is **not interoperable at home** with the x86 workstation RTX parts. That's the final reason the "Fathers" datacenter-world software doesn't simply drop onto our local AI EDU lab.
-
-## Appendix
-
-![Blackwell family](blackwell.jpg)

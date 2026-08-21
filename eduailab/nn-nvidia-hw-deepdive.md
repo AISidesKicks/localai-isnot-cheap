@@ -12,11 +12,13 @@ To talk about CUDA and Nvidia hardware precisely, you need three related but dis
 
 CUDA toolkit versions gate which compute capabilities you can target, and choosing one is a trade-off. **CUDA 13.x** is the most Blackwell-optimized release line — the one to run for Blackwell-era GPUs. The **latest 12.9.x** is the multi-generational compatibility pick: it still targets Ada and Hopper, and 12.9.x Docker images run on hosts and drivers from 12.9 up through 13.x.
 
-| | Gaming | Workstation | DGX Spark (fully integrated system) | Datacenter |
+| | Gaming | Workstation | DEV | Datacenter |
 |---|---|---|---|---|
-| Ada/Hopper era | RTX 4070, `mma.sync` path | — | — | H100/H200 — Hopper, WGMMA |
-| Blackwell era | RTX 5090 — Son, no TMEM | RTX PRO 6000 — Son, no TMEM | compact-edge Son, ARM SoC | B200/B300 — Father, TMEM + WGMMA |
-| sm | sm_89 → sm_120/121 | sm_89 → sm_120/121 | sm_121 | sm_90 → sm_100 |
+| Ada | RTX 4070 (sm_89) | - | - | - |
+| Hopper  | - | - | - | H100/H200 (sm_90) |
+| Blackwell | RTX 5070 (sm_120/121) | RTX PRO 6000 (sm_120/121) | - | -  |
+| Blackwell | - | - |  | B200/B300 (sm_100)  |
+| Blackwell | - | - | sparc (sm_121) | GB200/BB300 (sm_100)  |
 
 ### Multi-version CUDA in Docker
 

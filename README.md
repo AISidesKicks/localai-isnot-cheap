@@ -204,13 +204,11 @@ Custom report scripts query the persisted trace and spend data to build per-team
 
 ### Will it RUN considerations
 
-**Nvidia + CUDA is a MUST** — it's the primary environment in the enterprise and the neoclouds.
+**Nvidia + CUDA is a MUST** — it's the primary environment in the enterprise and the neoclouds. Part of this lab is an experiment: we want to learn whether Inference Engineering is a realistic career path for us, so we work the way the industry does. And here, almost everything speaks CUDA — Nvidia's language for telling the GPU what to do. If a tool can't do that, it's a non-starter in the field, so our home lab should line up with that world from day one.
 
-**AI EDU LAB limitation:** home gaming/workstation hardware is NOT the same as datacenter (DC) hardware. They differ at the hardware level — **CUDA + kernels + architecture (x86 vs ARM)** — so a solution finely tuned for the DC will not simply run on our home lab.
+**AI EDU LAB limitation:** home gaming/workstation hardware is NOT the same as datacenter (DC) hardware — even when they share the same architecture name. Today's Nvidia parts all answer to "Blackwell", but the datacenter B200/B300 (the "Fathers") and the home RTX 5090 / RTX PRO 6000 (the "Sons") are genuinely different machines under the hood: different chips, different CUDA capabilities, and different software instructions (kernels). Because the chips differ, each needs its own **kernel optimizations** — tuning that works great on the big DC chips simply doesn't transfer. They differ at the hardware level — **CUDA + kernels + architecture (x86 vs ARM)** — so a solution finely tuned for the DC mostly won't run on our home card as-is; at best it falls back to a much slower version.
 
-![Nvidia Blackwell family — Fathers vs Sons](eduailab/blackwell.jpg)
-
-See the full technical deep-dive: [nn-nvidia-hw-deepdive.md](eduailab/nn-nvidia-hw-deepdive.md)
+See the Nvidia HW pitfalls deep-dive: [nn-nvidia-hw-deepdive.md](eduailab/nn-nvidia-hw-deepdive.md)
 
 ---
 

@@ -86,3 +86,5 @@ Because of these hardware-level differences, when a new capability lands on Blac
 - B200 / B300 (Fathers) → RTX 6000 (workstation Son) → DGX Spark (edge Son)
 
 There is one more wrinkle for a home lab: the **DGX Spark is ARM** (not x86). So even within the "Son" family, x86 vs ARM means the DGX Spark software is **not interoperable at home** with the x86 workstation RTX parts. That's the final reason the "Fathers" datacenter-world software doesn't simply drop onto our local AI EDU lab.
+
+Note: because these ARM parts need fully recompiled `linux/arm64` images (multi-arch builds, not emulation), that work is tracked in our `freearm.md` doc elsewhere.

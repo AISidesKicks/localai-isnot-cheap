@@ -12,9 +12,9 @@ Metering and tracking internal teams by the token is essential: it creates accou
 
 This is tricky architectural and engineering challenge with plenty of tradeoffs, ideal EDU AI LAB material.
 
-I put here minimal setups from large ones I use in enterprise workshops to demonstrate complexity of Local AI Inference Engineering in practice and role of caching. 
+Here I put a minimal single-node setup distilled from the large ones I use in enterprise workshops, to demonstrate the complexity of Local AI Inference Engineering in practice and the role of caching.
 
-Setup is prepared to be executed as educational lab on gaming PC with 32GB RAM and Nvidia GPU with 12GB VRAM (RTX 4070 in my case).
+This single-node setup is built to run as an educational lab on a home gaming PC with an Nvidia GPU with 12GB of VRAM. See more in the "Will it fit considerations" section below.
 
 If you are new to LLM serving aka Inference Engineering, I recommend you to look into EDU sources first at [localai.isnot.cheap](https://localai.isnot.cheap).
 
@@ -201,5 +201,7 @@ Custom report scripts query the persisted trace and spend data to build per-team
       - **Aggregated (MCP Gateway):** all three admin MCPs surface behind the gateway's single MCP endpoint, tools namespaced per server (`phoenix-*`, `victoriametrics-*`, `litellm_admin-*`).
       - **Managed (Toolsets):** curated, named subsets of tools pulled from across the servers, so each team only gets the slice of the lab they're meant to see.
 ---
+
+### Will it fit considerations
 
 *Footnote: I have dyslexia and I am not a native English speaker, so from time to time I let the LLMs give my English a power-up — think of it as a GPU-accelerated spellchecker running at a few hundred tokens per second. If any sentence here reads a little too polished, that was the model showing off, not me.*

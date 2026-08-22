@@ -31,6 +31,11 @@ Python env has a preinstalled set of tools — suggest set expansion, if needed.
 All project related containers, volumes, networks and so on must have 'cheap-' prefix, even test and temp ones!
 Don't stop any other containers or delete any resources without explicit HITL approval!
 
+## For temporal work always use $SCRATCH and $TMPDIR
+
+- `$SCRATCH` — scratch disk dir for logs and artifacts that must persist crash (`$PIXI_PROJECT_ROOT/scratch`, gitignored except `.gitkeep`)
+- `$TMPDIR` — tmpfs dir at `/run/user/$UID/pixi_tmp/$PIXI_PROJECT_NAME` (created by pixi `default` task)
+
 ## Commit conventions
 
 Auto-commit locally, so we can keep track, using these rules:

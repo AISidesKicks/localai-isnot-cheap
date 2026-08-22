@@ -214,4 +214,36 @@ See the Nvidia HW pitfalls deep-dive: [nn-nvidia-hw-deepdive.md](eduailab/nn-nvi
 
 ### Will it FIT considerations
 
+Lab is carefully designed to fit to gaming PC with Windows/Linux dual boot - lab is running on the latest Ubuntu 24.04 LTS + HWE Kernel 7.x (Latest Nvidia driver + CUDA 13.x)
+
+All functinal components in this LAB was sected to FIT as whole stack on 12GB VRAM and 32GB of RAM - some have more functinoal limitations then I like it, but this exaclty resouce tradeoff we see in real production too.
+
+Full is enabling maximum hand on experinece with Systens Thninkig and End 2 End view to maximise learing efects and is enabling to feel hiden inherit complexity of **Interfernce Engeneerig**
+
+**Hardware requirements:**
+
+| Needed HW     | Minimum (General)                | Advanced (nvfp4 + build)         |
+|---------------|----------------------------------|----------------------------------|
+| GPU arch      | Nvidia Ada                       | Nvidia Blackwell                 |
+| GPU type      | RTX 4070 12 GB VRAM              | RTX 5070 Ti 16 GB VRAM           |
+| CPU           | AM4 6 cores (12 threads)         | 8 cores (16 threads)             |
+| RAM           | 32 GB DDR4                       | 64 GB DDR5                       |
+| Storage       | ~60 GB NVMe SSD                  | ~140 GB NVMe SSD                 |
+
+ - CPU will affect interactivity and compile times — I run lab FINE on AM4 AMD Ryzen 5 5600XT (64W) in ECO 35W mode
+ - **Advanced storage = 60 GB lab footprint + 80 GB build headroom** - that's where the 140 GB comes from: the lab itself (images + models + volumes) sits around 60 GB, and Docker build cache (custom multi-arch builds) can eat up to ~80 GB more
+ - **2-4 TB NVMe SSD is still the tip** - better speed and wear protection, so big models and heavy cache grind don't kill the drive
+ - Faster internet — huge docker images — I recommend 1GB internet connection or pull them overnight.
+ - Faster internet upload — for some advanced scenarios we will push back 40 GB images, symmetric 1 GB/s up/down
+
+### Will it MATCH considerations
+
+Some will like to have lab more tuned toward **real job** skill and even **job interview practice** - have most used enterprice version of componnets in stack. 
+
+**SURE SURE SURE** Learn princeiples first on this carefuly selecetd simple stack! You will not be ablet to troubelshut bigger one without it!!!
+
+You can later replace yourself some componets with bigger guns "propmeteus + grahana", "langfuse", "lago" - keep in mind then they all need much more resouces. 
+
+**Hint:** You can rum big montirong stack on second computer - like gamming PC (gateway + interference engine) + laptop (monitoring) booted live Linux from USB disk
+
 *Footnote: I have dyslexia and I am not a native English speaker, so from time to time I let the LLMs give my English a power-up — think of it as a GPU-accelerated spellchecker running at a few hundred tokens per second. If any sentence here reads a little too polished, that was the model showing off, not me.*

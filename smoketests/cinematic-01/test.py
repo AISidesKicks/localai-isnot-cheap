@@ -28,7 +28,6 @@ from deepeval.metrics.exact_match.exact_match import ExactMatchMetric
 from deepeval.test_case import LLMTestCase
 from llm import (
     DEFAULT_BASE_URL,
-    DEFAULT_MAX_TOKENS,
     MODEL,
     StudioList,
     YearAnswer,
@@ -43,6 +42,8 @@ from llm import (
 
 YEAR_TOLERANCE = 2
 REMINDER = "Please answer again:"
+RETRY_SUFFIX = " (2nd try)"
+MAX_TRIES = 3
 
 BASE_PROMPT = "Give me a short summary about Marvel Cinematic Universe."
 Q3_SUFFIX = " - 3rd repeat"
@@ -65,6 +66,28 @@ def parse_model(text, schema):
         return schema.model_validate_json(text)
     except Exception:  # noqa: BLE001 - malformed answers count as misses
         return None
+
+
+def query_schema(content, schema, max_tokens):
+    """Schema answer with retries; returns (model, text, seconds, resp).
+
+    Retries append a suffix to the prompt so a cached empty/truncated answer for
+    the original prompt is bypassed, not replayed.
+    """
+    last_resp = None
+    seconds = 0.0
+    for attempt in range(1, MAX_TRIES + 1):
+        payload = content + (RETRY_SUFFIX if attempt > 1 else "")
+        resp, seconds = chat(
+            payload,
+            max_tokens=max_tokens,
+            response_format=schema,
+        )
+        last_resp = resp
+        parsed = parse_model(completion_text(resp), schema)
+        if parsed is not None:
+            return parsed, completion_text(resp), seconds, resp
+    return None, completion_text(last_resp), seconds, last_resp
 
 
 def load_rows(path):
@@ -109,13 +132,7 @@ def scenario_studio_recall(sample, args):
             f'Which studio produced the movie "{row["film"]}"? Reply with a '
             "JSON object listing one studio name."
         )
-        resp, seconds = chat(
-            prompt,
-            max_tokens=args.max_tokens,
-            response_format=StudioList,
-        )
-        text = completion_text(resp)
-        parsed = parse_model(text, StudioList)
+        parsed, text, seconds, resp = query_schema(prompt, StudioList, args.max_tokens)
         guess = parsed.studios[0] if parsed else None
         correct = guess is not None and normalize(guess) == normalize(row["studio"])
         rows.append(
@@ -149,13 +166,7 @@ def scenario_year_match(sample, args):
             f'In what year was the movie "{row["film"]}" released? Reply with '
             "a JSON object with the title and the year."
         )
-        resp, seconds = chat(
-            prompt,
-            max_tokens=args.max_tokens,
-            response_format=YearAnswer,
-        )
-        text = completion_text(resp)
-        parsed = parse_model(text, YearAnswer)
+        parsed, text, seconds, resp = query_schema(prompt, YearAnswer, args.max_tokens)
         year = parsed.year if parsed else None
         ok = year is not None and abs(year - row["year"]) <= YEAR_TOLERANCE
         rows.append(
@@ -191,13 +202,7 @@ def scenario_year_repeat(sample, args, threshold):
             f'{REMINDER} what year was the movie "{row["film"]}" released? '
             "Reply with a JSON object with the title and the year."
         )
-        resp, seconds = chat(
-            prompt,
-            max_tokens=args.max_tokens,
-            response_format=YearAnswer,
-        )
-        text = completion_text(resp)
-        parsed = parse_model(text, YearAnswer)
+        parsed, text, seconds, resp = query_schema(prompt, YearAnswer, args.max_tokens)
         year = parsed.year if parsed else None
         predicted = str(year) if year is not None else ""
         metric.measure(
@@ -266,7 +271,7 @@ def main():
         default=20,
         help="films to probe per scenario (default 20)",
     )
-    parser.add_argument("--max-tokens", type=int, default=DEFAULT_MAX_TOKENS)
+    parser.add_argument("--max-tokens", type=int, default=512)
     parser.add_argument(
         "--threshold", type=float, default=0.8, help="ExactMatchMetric threshold"
     )

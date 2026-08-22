@@ -59,7 +59,8 @@ STUDIOS = [
 
 YEAR_MIN = 1900
 YEAR_MAX = 2023
-MAX_TRIES = 3
+MAX_TRIES = 4
+RETRY_SUFFIX = " Please answer again."
 
 DEFAULT_CSV = os.path.join(get_repo_root(), "datasets", "cinematic-01-dataset.csv")
 DEFAULT_LOG = os.path.join(get_repo_root(), "datasets", "cinematic-01-generate.json")
@@ -86,12 +87,17 @@ def year_prompt(title):
 
 
 def ask_json(content, schema, max_tokens, reasoning):
-    """Schema-validated completion, retried; returns (model, text, seconds, resp)."""
+    """Schema-validated completion, retried; returns (model, text, seconds, resp).
+
+    Retries vary the prompt (suffix) so they skip any Redis entry that cached a
+    failed empty/truncated answer for the original prompt.
+    """
     last_err = None
     for attempt in range(1, MAX_TRIES + 1):
+        payload = content + (RETRY_SUFFIX if attempt > 1 else "")
         try:
             resp, seconds = chat(
-                content,
+                payload,
                 max_tokens=max_tokens,
                 response_format=schema,
                 reasoning=reasoning,
@@ -177,7 +183,7 @@ def main():
         action="store_true",
         help="don't ask for release years (fast smoke run)",
     )
-    parser.add_argument("--max-tokens", type=int, default=512)
+    parser.add_argument("--max-tokens", type=int, default=1536)
     parser.add_argument(
         "--reasoning", action="store_true", help="let the model reason first (slower)"
     )
@@ -255,10 +261,11 @@ def main():
             year_ok = bool(ya) and YEAR_MIN <= ya.year <= YEAR_MAX
             details = {
                 "ok": bool(ya),
+                "error": yresp if not ya else None,
                 "year_seconds": round(y_seconds, 3),
-                "year_cache_regime": cache_regime(yresp) if yresp else None,
-                "year_timings": timings(yresp) if yresp else {},
-                "year_usage": usage_fields(yresp) if yresp else {},
+                "year_cache_regime": cache_regime(yresp) if ya else None,
+                "year_timings": timings(yresp) if ya else {},
+                "year_usage": usage_fields(yresp) if ya else {},
                 **fl_details,
             }
             entries.append(

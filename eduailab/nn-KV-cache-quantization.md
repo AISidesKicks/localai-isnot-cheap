@@ -88,12 +88,16 @@ VRAM baseline in docker/README.md (KV 6.62 GiB of 11.4 GiB at the default fp16).
 ### SGLang
 
 ```sh
---kv-cache-dtype fp8_e4m3       # 8-bit (also fp8_e5m2)
+--kv-cache-dtype fp8_e4m3                    # 8-bit (also fp8_e5m2)
+--quantization-param-path kv_scales.json     # per-layer KV-cache scaling factors
 ```
 
-SGLang also runs a separate **scale path** for the quantized cache — verify the scale
-tensors are present, otherwise the dtype flag is a no-op. Measure: `sglang:kv_cache_memory_usage_gb`
-and `sglang:cache_hit_rate`. Baselines: 2.04 GiB K+V + 1.84 GiB Mamba conv_state.
+SGLang runs a separate **scale path** for the quantized cache — verify the scale
+tensors are present, otherwise the dtype flag is a no-op. Point the path at a JSON of
+per-layer KV-cache scaling factors (`kv_scales.json` above); without it SGLang
+defaults those scales to `1.0`, which `server_args` warns "may cause accuracy issues".
+Measure: `sglang:kv_cache_memory_usage_gb` and `sglang:cache_hit_rate`. Baselines:
+2.04 GiB K+V + 1.84 GiB Mamba conv_state.
 Note the Mamba **conv_state and SSM state are *not* covered by `--kv-cache-dtype`** —
 they live in their own buffers (`--mamba-ssm-dtype` controls the SSM state) — so a
 hybrid model keeps a chunk of cache in high precision no matter what you ask for.
@@ -107,10 +111,51 @@ hybrid model keeps a chunk of cache in high precision no matter what you ask for
 - Full cache-model context for each engine: [llama.cpp](nn-llamacpp-caching.md),
   [vLLM](nn-vLLM-caching.md), [SGLang](nn-SGLang-caching.md).
 
+### LFM2.5-2.6B specifics: does Q8/FP8 KV actually work?
+
+Don't assume the model is KV-quant optimized just because the engines can do it. Our
+LFM2.5-2.6B is **not** — all official quantization is weight-side (Q8_0/W8A16 GGUF
+families and the QAD-Q4_0 quantization-aware-distillation checkpoint); the model card,
+GGUF repo README, Liquid blog, and the LFM2 technical report
+([arXiv:2511.23404](https://arxiv.org/abs/2511.23404)) never mention KV-cache
+quantization, and the LEAP configs ship weight-quant only. What "works" here is
+engine-level support, with per-engine caveats:
+
+- **Architecture split dictates where KV even lives**: 30 layers = 22 `conv` + 8
+  full-attention GQA layers (`head_dim` 64, 8 KV heads, 128K ctx) — so KV exists for
+  **8 of 30 layers only**; the conv layers keep SSM/conv state instead of K/V.
+- **llama.cpp q8_0 works.** Quantized V requires FlashAttention — auto-enabled under
+  `--flash-attn auto`, hard error if FA is disabled — and llama.cpp auto-applies a
+  Walsh-Hadamard rotation to quantized K/V whenever `head_dim % 64 == 0`
+  (`src/llama-kv-cache.cpp`), which LFM's `head_dim` 64 ticks. Block-size check also
+  passes (q8_0 block 32 divides 64).
+- **vLLM fp8 works on hybrids only with per-layer-type scale calibration** that skips
+  the recurrent layers — vLLM issue #52793 explicitly "unblocks" fp8 KV on hybrids.
+  Warning sign: issue #52475 (repetition collapse with `turboquant_*` KV) happened on
+  a *different* hybrid, so calibrate, don't just flip the flag.
+- **SGLang fp8 needs the scale-path JSON** (see the SGLang sample above): without
+  `--quantization-param-path`, scales default to `1.0` and `server_args` warns this
+  may cause accuracy issues. SGLang issue #35938 additionally notes quantized KV can
+  break deterministic inference.
+- **Quantization ceiling — about half the cache is out of reach**: `--kv-cache-dtype`
+  covers only the K+V buffers (measured 2.04 GiB). The 1.84 GiB **conv_state is a
+  separate buffer** and is NOT covered — only `--mamba-ssm-dtype` (SSM state) moves
+  with this flag's siblings. So ~53% of cached state is quantizable: at 8-bit you save
+  **~1 GiB, not 2x everything**, and the unquantized conv/SSM buffers stay fp16
+  regardless.
+
 ## Sources
 
 - llama.cpp server manual, `-ctk` / `-ctv` flags: https://github.com/ggml-org/llama.cpp/blob/master/tools/server/README.md
 - vLLM KV-cache dtype args: https://github.com/vllm-project/vllm/blob/main/vllm/engine/arg_utils.py
-- SGLang `--kv-cache-dtype` args: https://github.com/sgl-project/sglang/blob/main/python/sglang/srt/server_args.py
+- SGLang `--kv-cache-dtype` args + `--quantization-param-path` help text: https://github.com/sgl-project/sglang/blob/main/python/sglang/srt/server_args.py
 - Measured baselines: docker/README.md (this repo)
+- LFM2 model card (weights, no KV-quant):
+  https://huggingface.co/LiquidAI/LFM2.5-2.6B
+- Official GGUF repo (weight-quant only): https://huggingface.co/LiquidAI/LFM2.5-2.6B-GGUF
+- LFM2 technical report: https://arxiv.org/abs/2511.23404
+- llama.cpp quantized-V/FV requirements (`src/llama-context.cpp`) and Hadamard
+  rotation (`src/llama-kv-cache.cpp`): https://github.com/ggml-org/llama.cpp
+- vLLM hybrid fp8 KV: issue #52793; repetition-collapse warning on a hybrid: https://github.com/vllm-project/vllm/issues/52475
+- SGLang quantized-KV determinism issue #35938: https://github.com/sgl-project/sglang/issues/35938
 - KIVI and KVQuant papers — further reading on per-channel / per-head KV quantization design

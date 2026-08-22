@@ -157,7 +157,7 @@ is the approved squeeze.
 | L1 prefix cache | per-slot KV, `--cache-prompt` (default on), `--cache-reuse` (min chunk to reuse, default 0), `--slot-prompt-similarity` 0.10 | PagedAttention + `--enable-prefix-caching` (LRU blocks, global) | RadixAttention (default on; LRU leaf eviction) |
 | L2 CPU RAM | unified KV spill (`--kv-offload` on) + `--cache-ram` prompt cache (8192 MiB default) | `--kv-transfer-config` OffloadingConnector, `cpu_bytes_to_use` (pinned host RAM, async DMA) | HiCache `--enable-hierarchical-cache` + `--hicache-ratio/-size` |
 | L3 disk | `--slot-save-path` + `POST /slots/{id}?action=save\|restore` (persistent gguf; cold-restart demo) | TieringOffloadingSpec + `fs` tier `root_dir` (persists, shareable across instances) | HiCache `--hicache-storage-backend file` → dir (persists) |
-| KV dtype flags | `-ctk/-ctv q8_0\|q4_0\|f16…` | `--kv-cache-dtype fp8_e5m2\|fp8_e4m3` + `--kv-cache-dtype-skip-layers` | `--kv-cache-dtype fp8_e4m3\|fp8_e5m2` (+ scale path) |
+| KV dtype flags | `-ctk/-ctv q8_0\|q4_0\|f16…` | `--kv-cache-dtype fp8_e5m2\|fp8_e4m3` + `--kv-cache-dtype-skip-layers` | `--kv-cache-dtype fp8_e4m3\|fp8_e5m2` (+ scale path via `--quantization-param-path`) |
 | Hybrid note | GGUF conv-state cached too | hybrid KV cache manager | LFM = FULL/SWA/MAMBA in one radix tree (`SGLANG_ENABLE_UNIFIED_RADIX_TREE=1`), `--mamba-full-memory-ratio` |
 
 Quantization tradeoffs and engine flags: [nn-KV-cache-quantization.md](nn-KV-cache-quantization.md).

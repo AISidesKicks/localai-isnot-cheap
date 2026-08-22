@@ -87,13 +87,14 @@ def chat(
     max_tokens=DEFAULT_MAX_TOKENS,
     response_format=None,
     reasoning=None,
+    retries=3,
     **kv,
 ):
     """Cache-enabled completion via the LiteLLM SDK; returns (resp, seconds).
 
-    `api_key` comes from get_master_key() on every call. Passing
-    `response_format` (a Pydantic model) turns on schema-validated JSON output.
-    Pass reasoning={"enabled": True} to let the R1-style model think first.
+    On schema validation errors (empty/truncated completions), re-asks with a
+    prefixed prompt and a higher generation budget until retries are spent,
+    backing off between attempts so the small GGUF produces a full answer.
     """
     kwargs = {
         "model": MODEL,
@@ -111,8 +112,28 @@ def chat(
         kwargs["enable_json_schema_validation"] = True
     kwargs.update(kv)
     t0 = time.perf_counter()
-    resp = litellm.completion(**kwargs)
-    return resp, time.perf_counter() - t0
+    for attempt in range(1, retries + 1):
+        if attempt > 1:
+            time.sleep(0.5 * attempt)
+            kwargs["messages"] = [
+                {
+                    "role": "user",
+                    "content": "Please answer again: " + content,
+                }
+            ]
+            kwargs["max_tokens"] = max(1024, max_tokens)
+        try:
+            resp = litellm.completion(**kwargs)
+            return resp, time.perf_counter() - t0
+        except litellm.exceptions.JSONSchemaValidationError:
+            if attempt == retries:
+                print(
+                    "chat: validation still failing, last attempt",
+                    repr(content)[:160],
+                    file=sys.stderr,
+                )
+                return None, time.perf_counter() - t0
+    raise RuntimeError("unreachable")
 
 
 def completion_text(resp):

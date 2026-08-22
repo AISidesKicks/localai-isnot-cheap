@@ -48,7 +48,6 @@ from llm import (
 
 YEAR_TOLERANCE = 2
 REMINDER = "Please answer again:"
-RETRY_SUFFIX = " (2nd try)"
 MAX_TRIES = 3
 
 BASE_PROMPT = "Give me a short summary about Marvel Cinematic Universe."
@@ -78,19 +77,22 @@ def parse_model(text, schema):
 def query_schema(content, schema, max_tokens, reasoning):
     """Schema answer with retries; returns (model, text, seconds, resp).
 
-    Retries append a suffix to the prompt so a cached empty/truncated answer for
-    the original prompt is bypassed, not replayed.
+    Retries prepend a reminder so a cached empty/truncated answer for the
+    original prompt is bypassed, not replayed. Empty completions degrade to a
+    miss instead of failing the run.
     """
     last_resp = None
     seconds = 0.0
     for attempt in range(1, MAX_TRIES + 1):
-        payload = content + (RETRY_SUFFIX if attempt > 1 else "")
+        payload = (REMINDER + " " + content) if attempt > 1 else content
         resp, seconds = chat(
             payload,
             max_tokens=max_tokens,
             response_format=schema,
             reasoning=reasoning,
         )
+        if resp is None:
+            continue
         last_resp = resp
         parsed = parse_model(completion_text(resp), schema)
         if parsed is not None:

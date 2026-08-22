@@ -1,0 +1,161 @@
+#!/usr/bin/env python3
+"""Shared LiteLLM helper for the cinematic-01 smoke lab.
+
+Resolves the gateway master key at runtime (env var, then docker/.env, else a
+demo placeholder that is never the real key), wraps the verified
+`litellm.completion` call against the `local-gguf` alias, and defines the
+Pydantic response schemas the generator and the test both use: StudioList,
+FilmList, YearAnswer.
+"""
+
+import os
+import sys
+import time
+import urllib.error
+import urllib.request
+
+import litellm
+from pydantic import BaseModel
+
+MODEL = "local-gguf"
+DEFAULT_BASE_URL = "http://localhost:4000"
+DEFAULT_MAX_TOKENS = 256
+DEFAULT_REASONING = {"enabled": False}
+CACHE_PARAM = {}  # LiteLLM Redis caching; boolean True regresses with 400s
+DEMO_KEY = "sk-1234-master-key-4321"
+TIMEOUT_S = 120
+
+
+class StudioList(BaseModel):
+    """Answer naming one or more studios."""
+
+    studios: list[str]
+
+
+class FilmList(BaseModel):
+    """Answer naming the films a studio is credited with."""
+
+    films: list[str]
+
+
+class YearAnswer(BaseModel):
+    """Answer naming a single film's release year."""
+
+    title: str
+    year: int
+
+
+def get_repo_root():
+    """Repo root: three levels up from smoketests/cinematic-01/llm.py."""
+    return os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+
+
+def get_master_key():
+    """Runtime master key: env var, then docker/.env, then a demo placeholder.
+
+    The real key never lands in source; the placeholder is used only so failing
+    calls fail loudly against the gateway instead of crash on an empty key.
+    """
+    key = os.environ.get("LITELLM_MASTER_KEY")
+    if key:
+        return key.strip().strip("\"'")
+    env_file = os.path.join(get_repo_root(), "docker", ".env")
+    try:
+        with open(env_file, encoding="utf-8") as fh:
+            for line in fh:
+                if line.startswith("LITELLM_MASTER_KEY="):
+                    return line.split("=", 1)[1].strip().strip("\"'")
+    except OSError:
+        pass
+    print("WARNING: LITELLM_MASTER_KEY not found, using demo default", file=sys.stderr)
+    return DEMO_KEY
+
+
+def health(url):
+    """Probe an endpoint; True on HTTP 200."""
+    try:
+        with urllib.request.urlopen(url, timeout=10) as resp:
+            return resp.status == 200
+    except (OSError, urllib.error.URLError):
+        return False
+
+
+def chat(
+    content,
+    *,
+    base_url=DEFAULT_BASE_URL,
+    max_tokens=DEFAULT_MAX_TOKENS,
+    response_format=None,
+    reasoning=None,
+    **kv,
+):
+    """Cache-enabled completion via the LiteLLM SDK; returns (resp, seconds).
+
+    `api_key` comes from get_master_key() on every call. Passing
+    `response_format` (a Pydantic model) turns on schema-validated JSON output.
+    Pass reasoning={"enabled": True} to let the R1-style model think first.
+    """
+    kwargs = {
+        "model": MODEL,
+        "base_url": base_url,
+        "custom_llm_provider": "openai",
+        "api_key": get_master_key(),
+        "cache": CACHE_PARAM,
+        "messages": [{"role": "user", "content": content}],
+        "max_tokens": max_tokens,
+    }
+    if reasoning is not None:
+        kwargs["reasoning"] = reasoning
+    if response_format is not None:
+        kwargs["response_format"] = response_format
+        kwargs["enable_json_schema_validation"] = True
+    kwargs.update(kv)
+    t0 = time.perf_counter()
+    resp = litellm.completion(**kwargs)
+    return resp, time.perf_counter() - t0
+
+
+def completion_text(resp):
+    """Primary answer text from a completion response."""
+    try:
+        return (resp.choices[0].message.content or "").strip()
+    except (AttributeError, IndexError):
+        return ""
+
+
+def cache_regime(resp):
+    """litellm-redis-hit iff hidden params carry the x-litellm-cache-key header."""
+    hidden = getattr(resp, "_hidden_params", None) or {}
+    headers = hidden.get("additional_headers") or {}
+    items = headers.items() if isinstance(headers, dict) else headers
+    for key, _ in items:
+        if "x-litellm-cache-key" in str(key).lower():
+            return "litellm-redis-hit"
+    return "litellm-redis-miss"
+
+
+def usage_fields(resp):
+    """Token counts from the response usage block."""
+    usage = getattr(resp, "usage", None)
+    if usage is None:
+        return {}
+    return {
+        "prompt_tokens": getattr(usage, "prompt_tokens", None),
+        "completion_tokens": getattr(usage, "completion_tokens", None),
+        "total_tokens": getattr(usage, "total_tokens", None),
+    }
+
+
+def timings(resp):
+    """llama.cpp prompt/cache timings; live in model_extra, not usage, here."""
+    extra = getattr(resp, "model_extra", None) or {}
+    if not isinstance(extra, dict):
+        return {}
+    t = extra.get("timings") or {}
+    if not isinstance(t, dict):
+        return {}
+    return {
+        "prompt_n": t.get("prompt_n"),
+        "cache_n": t.get("cache_n"),
+        "predicted_n": t.get("predicted_n"),
+    }

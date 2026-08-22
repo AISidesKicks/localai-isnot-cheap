@@ -184,8 +184,11 @@ On a cache miss, LiteLLM routes the prompt down to the local engine. The engine 
 4. **Observability Emission (LiteLLM $\rightarrow$ Phoenix):**
 LiteLLM exports an OTLP trace to Phoenix carrying the full usage footprint — prompt, completion, and **KV-cached** token counts — so every call can be priced and timed.
 
-5. **Engine Metrics Collection (Engines $\rightarrow$ VictoriaMetrics):**
-The engines and hosts expose their own metrics, which **VictoriaMetrics** scrapes and stores as GPU and host utilization data.
+5. **Metrics Collection (Metrics Scrape $\rightarrow$ VictoriaMetrics):**
+The engines and hosts expose their own metrics at `/metrics` — and the Redis and
+PostgreSQL datastores are covered too via sidecar **exporters** that translate
+their stats into Prometheus format. **VictoriaMetrics** scrapes the lot and
+stores it as GPU, host, and datastore utilization data.
 
 6. **Persistence & Insights (Phoenix $\rightarrow$ PostgreSQL):**
 Phoenix persists the ingested spans, token counts, and cost attributes into the shared **PostgreSQL**, making the whole lab's usage queryable.

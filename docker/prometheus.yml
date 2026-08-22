@@ -12,6 +12,9 @@ scrape_configs:
       - targets: ['cheap-llamasrv:8080']
         labels:
           engine_type: 'llamasrv'
+      - targets: ['cheap-llamaembed:8081']
+        labels:
+          engine_type: 'llamaembed'
   - job_name: 'redis-exporter'
     static_configs:
       - targets: ['cheap-redis-exporter:9121']

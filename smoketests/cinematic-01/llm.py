@@ -22,6 +22,18 @@ DEFAULT_BASE_URL = "http://localhost:4000"
 DEFAULT_MAX_TOKENS = 256
 DEFAULT_REASONING = {"enabled": False}
 CACHE_PARAM = {}  # LiteLLM Redis caching; boolean True regresses with 400s
+
+# Cache-mode presets passed per call as the litellm `cache` kwarg.
+#   1level  - bypass Redis reads entirely; the engine prefix-cache tier does the
+#             reuse (distinct +1/+2/+3 suffixes share a common prefix).
+#   2level  - legacy two-level wiring: LiteLLM Redis reuses identical prompts.
+#   no-cache- same per-request skip as 1level but with fully cold prompts so
+#             no tier (Redis or engine prefix) can reuse anything.
+CACHE_MODES = {
+    "1level": {"no-cache": True},
+    "2level": {},
+    "no-cache": {"no-cache": True},
+}
 DEMO_KEY = "sk-1234-master-key-4321"
 TIMEOUT_S = 120
 
@@ -88,26 +100,35 @@ def chat(
     response_format=None,
     reasoning=None,
     retries=3,
+    guided=True,
     **kv,
 ):
     """Cache-enabled completion via the LiteLLM SDK; returns (resp, seconds).
 
     On schema validation errors (empty/truncated completions), re-asks with a
     prefixed prompt and a higher generation budget until retries are spent,
-    backing off between attempts so the small GGUF produces a full answer.
+    backing off between attempts. `guided` toggles the LiteLLM JSON-schema
+    validation path (`enable_json_schema_validation`); some engines (vLLM
+    W8A16) return empty completions under guided decoding, so callers may pass
+    `guided=False` and rely on schema-parse-then-retry instead.
     """
+    cache_mode = kv.pop("cache_mode", None)
+    model = kv.pop("model", None) or MODEL
+    cache_param = CACHE_MODES.get(
+        str(cache_mode) if cache_mode is not None else "", CACHE_PARAM
+    )
     kwargs = {
-        "model": MODEL,
+        "model": model,
         "base_url": base_url,
         "custom_llm_provider": "openai",
         "api_key": get_master_key(),
-        "cache": CACHE_PARAM,
+        "cache": dict(cache_param),
         "messages": [{"role": "user", "content": content}],
         "max_tokens": max_tokens,
     }
     if reasoning is not None:
         kwargs["reasoning"] = reasoning
-    if response_format is not None:
+    if response_format is not None and guided:
         kwargs["response_format"] = response_format
         kwargs["enable_json_schema_validation"] = True
     kwargs.update(kv)
@@ -193,6 +214,58 @@ def usage_fields(resp):
         "completion_tokens": getattr(usage, "completion_tokens", None),
         "total_tokens": getattr(usage, "total_tokens", None),
     }
+
+
+def cached_tokens(resp):
+    """Engine-prefix-reuse tokens from the response, or None.
+
+    vLLM reports `usage.prompt_tokens_details.cached_tokens` first-class; the
+    no-cache/1level routes never hit LiteLLM Redis, so this is the only signal
+    that the engine's prefix cache actually replayed tokens. Falls back to the
+    same field under `model_extra` for providers that stuff it there.
+    """
+    usage = getattr(resp, "usage", None)
+    details = (
+        getattr(usage, "prompt_tokens_details", None) if usage is not None else None
+    )
+    value = None
+    if details is not None:
+        value = getattr(details, "cached_tokens", None)
+    if value is None:
+        extra = getattr(usage, "model_extra", None) if usage is not None else None
+        details = (
+            (extra or {}).get("prompt_tokens_details")
+            if isinstance(extra, dict)
+            else None
+        )
+        if isinstance(details, dict):
+            value = details.get("cached_tokens")
+    if isinstance(value, int) and not isinstance(value, bool):
+        return value
+    return None
+
+
+def vllm_prefix_metrics(base_url="http://localhost:8000"):
+    """Snapshot of vLLM's kernel prefix-cache counters, or None if unreachable.
+
+    vLLM 0.27 serves prompt reuse only through `/metrics`
+    (`vllm:prefix_cache_hits_total` / `vllm:prefix_cache_queries_total`); the
+    per-request `usage.prompt_tokens_details.cached_tokens` field is absent in
+    this build. Returns {"hits": int, "queries": int} so a demo can delta two
+    snapshots and prove the engine's prefix tier replayed tokens.
+    """
+    try:
+        with urllib.request.urlopen(base_url + "/metrics", timeout=10) as resp:
+            text = resp.read().decode("utf-8", "replace")
+    except (OSError, urllib.error.URLError):
+        return None
+    counts = {}
+    for line in text.splitlines():
+        if line.startswith("vllm:prefix_cache_hits_total{"):
+            counts["hits"] = int(float(line.rsplit(" ", 1)[-1]))
+        elif line.startswith("vllm:prefix_cache_queries_total{"):
+            counts["queries"] = int(float(line.rsplit(" ", 1)[-1]))
+    return counts if {"hits", "queries"} <= counts.keys() else None
 
 
 def timings(resp):

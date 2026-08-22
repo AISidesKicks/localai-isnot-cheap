@@ -5,12 +5,15 @@ Reads the generated CSV (datasets/cinematic-01/dataset.csv) as ground truth
 (studio names seeded, films/years model-generated — see design.md) and evaluates
 the model against it:
 
-  1. studio recall   — which studio produced a film (schema answer via StudioList)
+1. studio recall   — which studio produced a film (schema answer via StudioList)
   2. film+year match — model's year for a film within +/-2 of the dataset year
   3. year repeat     — deepeval ExactMatchMetric (threshold 0.8) over reworded
                        year prompts, so fresh Redis misses instead of hits
-  + the preserved 3-repeat cache demo (Q1 redis miss, Q2 hit, Q3 suffix miss
-    with llama.cpp KV reuse visible in timings.cache_n)
+  + the cache demo in three modes (`--model` routes through the gateway):
+      1level   — distinct +1/+2/+3 suffixes, LiteLLM bypassed per request
+                 (`cache={"no-cache": True}`), engine prefix cache does reuse
+      2level   — Q1/Q2/Q3 identical-prompt legacy demo, Q2 Redis hit
+      no-cache — noise-prefixed prompts, cold at every tier
 
 Writes per-run datasets/cinematic-01/runs/<run-id>/results.json (raw rows) and
 datasets/cinematic-01/runs/<run-id>/eval.json (scored scenarios), plus refreshed
@@ -26,6 +29,7 @@ import re
 import sys
 import time
 
+import llm
 from deepeval.metrics.exact_match.exact_match import ExactMatchMetric
 from deepeval.test_case import LLMTestCase
 
@@ -37,6 +41,7 @@ from llm import (
     StudioList,
     YearAnswer,
     cache_regime,
+    cached_tokens,
     chat,
     completion_text,
     get_repo_root,
@@ -44,11 +49,13 @@ from llm import (
     reasoning_content,
     timings,
     usage_fields,
+    vllm_prefix_metrics,
 )
 
 YEAR_TOLERANCE = 2
 REMINDER = "Please answer again:"
 MAX_TRIES = 3
+CACHE_MODES = ("1level", "2level", "no-cache", "both")
 
 BASE_PROMPT = "Give me a short summary about Marvel Cinematic Universe."
 Q3_SUFFIX = " - 3rd repeat"
@@ -65,11 +72,21 @@ def normalize(name):
 
 
 def parse_model(text, schema):
-    """Best-effort schema parse; None on malformed output."""
+    """Best-effort schema parse; None on malformed output.
+
+    vLLM's unguided completions often wrap JSON in Markdown code fences, so a
+    fenced block is stripped before validation.
+    """
     if not text:
         return None
+    stripped = text.strip()
+    if stripped.startswith("```"):
+        first_nl = stripped.find("\n")
+        last = stripped.rfind("```")
+        if first_nl != -1 and last > first_nl:
+            stripped = stripped[first_nl + 1 : last].strip()
     try:
-        return schema.model_validate_json(text)
+        return schema.model_validate_json(stripped)
     except Exception:  # noqa: BLE001 - malformed answers count as misses
         return None
 
@@ -79,8 +96,10 @@ def query_schema(content, schema, max_tokens, reasoning):
 
     Retries prepend a reminder so a cached empty/truncated answer for the
     original prompt is bypassed, not replayed. Empty completions degrade to a
-    miss instead of failing the run.
+    miss instead of failing the run. Guided decoding is skipped for vLLM
+    (returns empty completions); parse-then-retry covers it instead.
     """
+    guided = "vllm" not in llm.MODEL
     last_resp = None
     seconds = 0.0
     for attempt in range(1, MAX_TRIES + 1):
@@ -90,6 +109,7 @@ def query_schema(content, schema, max_tokens, reasoning):
             max_tokens=max_tokens,
             response_format=schema,
             reasoning=reasoning,
+            guided=guided,
         )
         if resp is None:
             continue
@@ -139,8 +159,8 @@ def scenario_studio_recall(sample, args, executor):
 
     def one(row):
         prompt = (
-            f'Which studio produced the movie "{row["film"]}"? Reply with a '
-            "JSON object listing one studio name."
+            f'Which studio produced the movie "{row["film"]}"? Reply with only a '
+            'JSON object shaped like {"studios": ["Studio Name"]}.'
         )
         parsed, text, seconds, resp = query_schema(
             prompt, StudioList, args.max_tokens, args.reasoning
@@ -178,7 +198,7 @@ def scenario_year_match(sample, args, executor):
             return None
         prompt = (
             f'In what year was the movie "{row["film"]}" released? Reply with '
-            "a JSON object with the title and the year."
+            'only a JSON object shaped like {"title": "Title", "year": 1995}.'
         )
         parsed, text, seconds, resp = query_schema(
             prompt, YearAnswer, args.max_tokens, args.reasoning
@@ -217,27 +237,31 @@ def scenario_year_repeat(sample, args, threshold, executor):
             return None
         prompt = (
             f'{REMINDER} what year was the movie "{row["film"]}" released? '
-            "Reply with a JSON object with the title and the year."
+            'Reply with only a JSON object shaped like {"title": "Title", "year": 1995}.'
         )
         parsed, text, seconds, resp = query_schema(
             prompt, YearAnswer, args.max_tokens, args.reasoning
         )
         year = parsed.year if parsed else None
         predicted = str(year) if year is not None else ""
-        metric = ExactMatchMetric(threshold=threshold)
-        metric.measure(
-            LLMTestCase(
-                input=prompt,
-                actual_output=predicted,
-                expected_output=str(row["year"]),
+        if not predicted:
+            metric_score = 0.0
+        else:
+            metric = ExactMatchMetric(threshold=threshold)
+            metric.measure(
+                LLMTestCase(
+                    input=prompt,
+                    actual_output=predicted,
+                    expected_output=str(row["year"]),
+                )
             )
-        )
+            metric_score = metric.score
         return {
             "studio": row["studio"],
             "film": row["film"],
             "expected": str(row["year"]),
             "predicted": predicted,
-            "metric_score": metric.score,
+            "metric_score": metric_score,
             "answer": text[:200],
             "cache_regime": cache_regime(resp),
             "reasoning": reasoning_content(resp),
@@ -256,38 +280,108 @@ def scenario_year_repeat(sample, args, threshold, executor):
     return rows, score, score >= threshold
 
 
-def cache_demo(args):
-    """Preserved 3-repeat demo: identical base prompt, then a suffix variant."""
-    calls = [
-        {"call": "Q1", "content": BASE_PROMPT},
-        {"call": "Q2", "content": BASE_PROMPT},
-        {"call": "Q3", "content": BASE_PROMPT + Q3_SUFFIX},
-    ]
+def ctdemo_rows(calls, mode, args):
+    """Run one cache-demo variant; retries are capped at one attempt so a
+    re-ask never mutates the prompt mid-demo and breaks the suffix/prefix
+    reuse invariants."""
     rows = []
     for spec in calls:
         resp, seconds = chat(
             spec["content"],
             max_tokens=256,
             reasoning=args.reasoning,
+            cache_mode=mode,
+            retries=1,
+            model=args.model,
         )
         regime = cache_regime(resp)
         row = {
+            "mode": mode,
             "call": spec["call"],
             "observed_regime": regime,
+            "prompt": spec["content"],
             "base_only": spec["content"] == BASE_PROMPT,
             "reasoning": reasoning_content(resp),
             "seconds": round(seconds, 4),
             "usage": usage_fields(resp),
+            "cached_tokens": cached_tokens(resp),
             "timings": timings(resp),
             "content_head": completion_text(resp)[:160],
         }
         rows.append(row)
         print(
-            f"  {row['call']} {regime:<20} {round(seconds, 4):>8.4f}s "
+            f"  [{mode:<8}] {row['call']} {regime:<20} {round(seconds, 4):>8.4f}s "
+            f"cached={row['cached_tokens']} "
             f"cache_n={row['timings'].get('cache_n')}",
             flush=True,
         )
     return rows
+
+
+def cache_demo(args, mode):
+    """Per-mode three-call demo. `both` runs each of the three modes in turn."""
+    if mode == "both":
+        rows = []
+        for m in CACHE_MODES[:3]:
+            rows.extend(cache_demo(args, m)[0])
+        return rows, "both"
+    pre = vllm_prefix_metrics(args.base_url.replace(":4000", ":8000")) or {}
+    if mode == "1level":
+        calls = [
+            {"call": "base 1", "content": BASE_PROMPT + " - 1"},
+            {"call": "base 2", "content": BASE_PROMPT + " - 2"},
+            {"call": "base 3", "content": BASE_PROMPT + " - 3"},
+        ]
+    elif mode == "2level":
+        calls = [
+            {"call": "Q1", "content": BASE_PROMPT},
+            {"call": "Q2", "content": BASE_PROMPT},
+            {"call": "Q3", "content": BASE_PROMPT + Q3_SUFFIX},
+        ]
+    else:  # no-cache
+        calls = [
+            {
+                "call": "N1",
+                "content": "Tell me about the Marvel Cinematic Universe film history.",
+            },
+            {
+                "call": "N2",
+                "content": "List some details from the Marvel Cinematic Universe movies.",
+            },
+            {
+                "call": "N3",
+                "content": "Provide a summary covering the Marvel Cinematic Universe.",
+            },
+        ]
+    print(f"cache demo: {mode}", flush=True)
+    rows = ctdemo_rows(calls, mode, args)
+    post = vllm_prefix_metrics(args.base_url.replace(":4000", ":8000")) or {}
+    if pre and post:
+        rows.append(
+            {
+                "mode": mode,
+                "call": "engine",
+                "observed_regime": "",
+                "prompt": "",
+                "base_only": False,
+                "reasoning": None,
+                "seconds": 0.0,
+                "usage": {},
+                "cached_tokens": None,
+                "timings": {},
+                "content_head": "",
+                "prefix_cache_delta": {
+                    "hits": post["hits"] - pre["hits"],
+                    "queries": post["queries"] - pre["queries"],
+                },
+            }
+        )
+        print(
+            f"  [{mode:<8}] engine prefix-cache Δ hits={post['hits'] - pre['hits']} "
+            f"queries={post['queries'] - pre['queries']}",
+            flush=True,
+        )
+    return rows, mode
 
 
 def default_run_id(model_alias):
@@ -327,8 +421,18 @@ def main():
         default=None,
         help="run identifier, defaults to timestamp+model (e.g. run-20260822-120000-local-gguf)",
     )
+    parser.add_argument(
+        "--model", default=MODEL, help="gateway model alias (default local-gguf)"
+    )
+    parser.add_argument(
+        "--cache-mode",
+        default="1level",
+        choices=CACHE_MODES,
+        help="cache demo mode: 1level (default) | 2level | no-cache | both",
+    )
     parser.add_argument("--skip-health", action="store_true", help="skip health probes")
     args = parser.parse_args()
+    llm.MODEL = args.model  # chat() defaults to MODEL when no model kwarg given
 
     if args.reasoning and args.max_tokens is None:
         args.max_tokens = 1536
@@ -342,7 +446,8 @@ def main():
         sys.exit(f"gateway not ready at {args.base_url}/health/readiness")
     print(f"gateway {args.base_url} healthy; dataset {args.csv}")
 
-    run_id = args.run_id or default_run_id(MODEL)
+    run_id = args.run_id or default_run_id(args.model)
+
     run_dir = os.path.join(RUNS_DIR, run_id)
     run_results = os.path.join(run_dir, "results.json")
     run_eval = os.path.join(run_dir, "eval.json")
@@ -371,15 +476,16 @@ def main():
             f"({'PASS' if exact_passed else 'FAIL'})"
         )
 
-    demo = cache_demo(args)
-    print("cache demo Q1/Q2/Q3 done")
+    demo, demo_mode = cache_demo(args, args.cache_mode)
+    print(f"cache demo {demo_mode} done")
 
     meta = {
         "name": "cinematic-01",
         "test": "smoketests/cinematic-01/test.py",
         "run_id": run_id,
         "run_at": time.strftime("%Y-%m-%dT%H:%M:%S%z"),
-        "model_alias": MODEL,
+        "model_alias": args.model,
+        "cache_mode": demo_mode,
         "base_url": args.base_url,
         "dataset": args.csv,
         "sample": len(sample),

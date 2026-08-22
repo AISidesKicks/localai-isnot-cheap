@@ -38,6 +38,24 @@ services:
     networks:
       - cheap-net
 
+  cheap-redis-exporter:
+    image: oliver006/redis_exporter:latest
+    container_name: cheap-redis-exporter
+    environment:
+      REDIS_ADDR: redis://cheap-redis:6379
+    ports:
+      - "9121:9121"
+    depends_on:
+      cheap-redis:
+        condition: service_healthy
+    deploy:
+      resources:
+        limits:
+          cpus: '0.50'
+          memory: 256M
+    networks:
+      - cheap-net
+
   cheap-litellm:
     image: ghcr.io/berriai/litellm:main-latest
     container_name: cheap-litellm

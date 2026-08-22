@@ -20,6 +20,12 @@ Main programming language is Python 3.12, use PEP conventions with condensed nam
 - `LICENSE`
 - No build, test, or lint tooling exists.
 
+## CHEAP python environment (isolated with pixi)
+
+We are running inside "pixi shell" 'cheap' - check it before implementing plans in code.
+Before install of python packages double-check "pixi info | grep Name" returns 'cheap'
+Python env has a preinstalled set of tools — suggest set expansion, if needed.
+
 ## Commit conventions
 
 Auto-commit locally, so we can keep track, using these rules:

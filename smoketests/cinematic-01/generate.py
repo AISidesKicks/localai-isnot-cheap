@@ -4,9 +4,9 @@
 The 20 studio names are seeded ground truth (see design.md); film titles and
 release years are produced by the llama.cpp-backed LFM2.5-2.6B through the
 LiteLLM gateway (alias `local-gguf`) using schema-validated structured output.
-The dataset lands in a QUOTE_ALL CSV at datasets/cinematic-01-dataset.csv;
+The dataset lands in a QUOTE_ALL CSV at datasets/cinematic-01/dataset.csv;
 per-call cache regime, seconds and llama.cpp timings are checkpointed to
-datasets/cinematic-01-generate.json after every studio.
+datasets/cinematic-01/generate.json after every studio.
 
 Same title across studios is deduped exactly on the normalized title; years are
 guarded to 1900-2023 and films outside that range are left out of the CSV.
@@ -19,6 +19,8 @@ import os
 import re
 import sys
 import time
+
+sys.path.insert(0, os.path.dirname(__file__))
 
 from llm import (
     DEFAULT_BASE_URL,
@@ -62,8 +64,8 @@ YEAR_MAX = 2023
 MAX_TRIES = 4
 RETRY_SUFFIX = " Please answer again."
 
-DEFAULT_CSV = os.path.join(get_repo_root(), "datasets", "cinematic-01-dataset.csv")
-DEFAULT_LOG = os.path.join(get_repo_root(), "datasets", "cinematic-01-generate.json")
+DEFAULT_CSV = os.path.join(get_repo_root(), "datasets", "cinematic-01", "dataset.csv")
+DEFAULT_LOG = os.path.join(get_repo_root(), "datasets", "cinematic-01", "generate.json")
 
 
 def normalize_title(title):

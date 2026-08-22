@@ -11,6 +11,12 @@ model_list:
       api_base: http://cheap-vllm:8000/v1
       api_key: dummy
 
+  - model_name: local-vllm
+    litellm_params:
+      model: openai/LiquidAI/LFM2.5-2.6B
+      api_base: http://cheap-vllm:8000/v1
+      api_key: dummy
+
   - model_name: local-sglang
     litellm_params:
       model: openai/LiquidAI/LFM2.5-2.6B

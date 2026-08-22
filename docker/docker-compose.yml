@@ -196,6 +196,7 @@ services:
       - "128000"
       - "--max-num-seqs"
       - "4"
+      - "--enable-prefix-caching"
     environment:
       HF_TOKEN: ${HF_TOKEN:-}
     volumes:

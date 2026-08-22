@@ -12,3 +12,13 @@ scrape_configs:
       - targets: ['cheap-llamasrv:8080']
         labels:
           engine_type: 'llamasrv'
+  - job_name: 'redis-exporter'
+    static_configs:
+      - targets: ['cheap-redis-exporter:9121']
+        labels:
+          db_type: 'redis'
+  - job_name: 'postgres-exporter'
+    static_configs:
+      - targets: ['cheap-postgres-exporter:9187']
+        labels:
+          db_type: 'postgres'

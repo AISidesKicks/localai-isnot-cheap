@@ -34,8 +34,6 @@ It has full support in all three engines we will use:
  - llama.cpp — GGUF checkpoints for efficient edge inference
  - vLLM — GPU-accelerated serving for production throughput
  - SGLang — GPU-accelerated serving for production throughput
- - MLX — Optimized inference for Apple Silicon
- - ONNX — Cross-platform inference across diverse accelerators
 
 Useful quantizations:
 

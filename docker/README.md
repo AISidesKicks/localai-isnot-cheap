@@ -107,6 +107,21 @@ The core stack starts without engines (plain `docker compose up -d`), but when
 a profile is active LiteLLM waits for the selected engine's `/health` before
 starting — activate two profiles at once and it waits for both.
 
+Switching engines mid-session: `docker compose` only applies `command`
+changes on `up -d` (recreate), not on `restart` or `stop`+`start`. To move from
+the llama.cpp profile to the vLLM profile:
+
+```sh
+docker compose -f docker/docker-compose.yml stop cheap-llamasrv   # frees the GPU
+docker compose -f docker/docker-compose.yml --profile vllm up -d cheap-vllm
+```
+
+`cheap-vllm` runs with `--enable-prefix-caching` (set in
+`docker/docker-compose.yml`), so shared prompt prefixes reuse KV blocks — watch
+`vllm:prefix_cache_hits_total` / `vllm:prefix_cache_queries_total` in
+VictoriaMetrics. Note the vLLM profile binds host port 8000, which conflicts
+with the optional `vm-mcp` container — stop `vm-mcp` first if it is running.
+
 Stop / tear down:
 
 ```sh
@@ -378,6 +393,7 @@ the Postgres volume.
 |--------------|----------------|----------------|
 | `local-gguf` | llama.cpp      | `llamasrv`   |
 | `local-llama`| vLLM           | `vllm`         |
+| `local-vllm` | vLLM           | `vllm`         |
 | `local-sglang`| SGLang        | `sglang`       |
 | `nomic-embed-llama` | llama.cpp (nomic-embed, 768-dim) | `embed-cpu` (F16) or `embed-gpu` (Q8) |
 | `gpt-4o`     | OpenAI         | external       |

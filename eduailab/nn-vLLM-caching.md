@@ -17,9 +17,12 @@ game:
 - `--enable-prefix-caching` — Automatic Prefix Caching. Same-hash blocks are shared
   across sequences instead of recomputed, and the cache is **global, LRU-evicted** —
   blocks from any sequence stick around until the GPU budget forces them out.
-- We don't set it in the compose profile (only `--max-num-seqs 4` today), so in the
-  out-of-the-box lab every long prompt is a cold prefill. Flipping it on is a
-  one-flag reconfig (recipe below).
+- **Status:** this repo's compose now sets it on `cheap-vllm` (between
+  `--max-num-seqs 4` and the healthcheck), so the out-of-the-box lab runs with
+  the L1 tier live. Verify with `docker inspect cheap-vllm` or by watching
+  `vllm:prefix_cache_hits_total` after two prompts that share a prefix.
+- Watch: `vllm:prefix_cache_queries_total` / `vllm:prefix_cache_hits_total`
+  (both in tokens), timed demo in `smoketests/cinematic-01` `--cache-mode 1level`.
 
 ### L2 — CPU RAM: the OffloadingConnector
 

@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """cinematic-01 smoke test: studio recall, film+year match, year repeat + cache demo.
 
-Reads the generated CSV (datasets/cinematic-01-dataset.csv) as ground truth
+Reads the generated CSV (datasets/cinematic-01/dataset.csv) as ground truth
 (studio names seeded, films/years model-generated — see design.md) and evaluates
 the model against it:
 
@@ -12,8 +12,8 @@ the model against it:
   + the preserved 3-repeat cache demo (Q1 redis miss, Q2 hit, Q3 suffix miss
     with llama.cpp KV reuse visible in timings.cache_n)
 
-Writes datasets/cinematic-01-results.json (raw rows) and
-datasets/cinematic-01-eval.json (scored scenarios).
+Writes datasets/cinematic-01/results.json (raw rows) and
+datasets/cinematic-01/eval.json (scored scenarios).
 """
 
 import argparse
@@ -26,6 +26,9 @@ import time
 
 from deepeval.metrics.exact_match.exact_match import ExactMatchMetric
 from deepeval.test_case import LLMTestCase
+
+sys.path.insert(0, os.path.dirname(__file__))
+
 from llm import (
     DEFAULT_BASE_URL,
     MODEL,
@@ -48,9 +51,9 @@ MAX_TRIES = 3
 BASE_PROMPT = "Give me a short summary about Marvel Cinematic Universe."
 Q3_SUFFIX = " - 3rd repeat"
 
-DEFAULT_CSV = os.path.join(get_repo_root(), "datasets", "cinematic-01-dataset.csv")
-RESULTS_PATH = os.path.join(get_repo_root(), "datasets", "cinematic-01-results.json")
-EVAL_PATH = os.path.join(get_repo_root(), "datasets", "cinematic-01-eval.json")
+DEFAULT_CSV = os.path.join(get_repo_root(), "datasets", "cinematic-01", "dataset.csv")
+RESULTS_PATH = os.path.join(get_repo_root(), "datasets", "cinematic-01", "results.json")
+EVAL_PATH = os.path.join(get_repo_root(), "datasets", "cinematic-01", "eval.json")
 
 
 def normalize(name):

@@ -12,8 +12,9 @@ the model against it:
   + the preserved 3-repeat cache demo (Q1 redis miss, Q2 hit, Q3 suffix miss
     with llama.cpp KV reuse visible in timings.cache_n)
 
-Writes datasets/cinematic-01/results.json (raw rows) and
-datasets/cinematic-01/eval.json (scored scenarios).
+Writes per-run datasets/cinematic-01/runs/<run-id>/results.json (raw rows) and
+datasets/cinematic-01/runs/<run-id>/eval.json (scored scenarios), plus refreshed
+"latest" copies at datasets/cinematic-01/results.json and eval.json.
 """
 
 import argparse
@@ -52,6 +53,7 @@ BASE_PROMPT = "Give me a short summary about Marvel Cinematic Universe."
 Q3_SUFFIX = " - 3rd repeat"
 
 DEFAULT_CSV = os.path.join(get_repo_root(), "datasets", "cinematic-01", "dataset.csv")
+RUNS_DIR = os.path.join(get_repo_root(), "datasets", "cinematic-01", "runs")
 RESULTS_PATH = os.path.join(get_repo_root(), "datasets", "cinematic-01", "results.json")
 EVAL_PATH = os.path.join(get_repo_root(), "datasets", "cinematic-01", "eval.json")
 
@@ -265,6 +267,11 @@ def cache_demo(args):
     return rows
 
 
+def default_run_id(model_alias):
+    """Unique per invocation: timestamp + model alias."""
+    return f"run-{time.strftime('%Y%m%d-%H%M%S')}-{model_alias}"
+
+
 def main():
     parser = argparse.ArgumentParser(description="Run the cinematic-01 smoke test.")
     parser.add_argument("--csv", default=DEFAULT_CSV, help="dataset CSV path")
@@ -281,14 +288,23 @@ def main():
     parser.add_argument(
         "--base-url", default=DEFAULT_BASE_URL, help="LiteLLM gateway URL"
     )
-    parser.add_argument("--results", default=RESULTS_PATH, help="raw results JSON path")
-    parser.add_argument("--eval", default=EVAL_PATH, help="scored eval JSON path")
+    parser.add_argument(
+        "--run-id",
+        default=None,
+        help="run identifier, defaults to timestamp+model (e.g. run-20260822-120000-local-gguf)",
+    )
     parser.add_argument("--skip-health", action="store_true", help="skip health probes")
     args = parser.parse_args()
 
     if not args.skip_health and not health(args.base_url + "/health/readiness"):
         sys.exit(f"gateway not ready at {args.base_url}/health/readiness")
     print(f"gateway {args.base_url} healthy; dataset {args.csv}")
+
+    run_id = args.run_id or default_run_id(MODEL)
+    run_dir = os.path.join(RUNS_DIR, run_id)
+    run_results = os.path.join(run_dir, "results.json")
+    run_eval = os.path.join(run_dir, "eval.json")
+    print(f"run id: {run_id}")
 
     rows = load_rows(args.csv)
     if not rows:
@@ -316,6 +332,7 @@ def main():
     meta = {
         "name": "cinematic-01",
         "test": "smoketests/cinematic-01/test.py",
+        "run_id": run_id,
         "run_at": time.strftime("%Y-%m-%dT%H:%M:%S%z"),
         "model_alias": MODEL,
         "base_url": args.base_url,
@@ -358,12 +375,20 @@ def main():
             "passed": exact_passed,
         },
     }
-    os.makedirs(os.path.dirname(args.results), exist_ok=True)
-    with open(args.results, "w", encoding="utf-8") as fh:
-        json.dump(results, fh, indent=2, ensure_ascii=False)
-    with open(args.eval, "w", encoding="utf-8") as fh:
-        json.dump(eval_summary, fh, indent=2, ensure_ascii=False)
-    print(f"wrote {args.results} and {args.eval}")
+    os.makedirs(run_dir, exist_ok=True)
+    for path, payload in ((run_results, results), (run_eval, eval_summary)):
+        with open(path, "w", encoding="utf-8") as fh:
+            json.dump(payload, fh, indent=2, ensure_ascii=False)
+    for path in (RESULTS_PATH, EVAL_PATH):
+        with open(path, "w", encoding="utf-8") as fh:
+            json.dump(
+                results if path == RESULTS_PATH else eval_summary,
+                fh,
+                indent=2,
+                ensure_ascii=False,
+            )
+    print(f"wrote {run_results} and {run_eval}")
+    print(f"latest copies at {RESULTS_PATH} and {EVAL_PATH}")
 
 
 if __name__ == "__main__":

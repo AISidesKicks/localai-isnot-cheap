@@ -57,8 +57,15 @@ so an eval can show cost-to-serve per prompt.
 ```
 datasets/cinematic-01/dataset.csv     QUOTE_ALL dataset (studio name, film name, year)
 datasets/cinematic-01/generate.json   per-call run log/checkpoint from generate.py
-datasets/cinematic-01/results.json    raw rows from test.py
-datasets/cinematic-01/eval.json       scored scenarios from test.py
+datasets/cinematic-01/runs/<run-id>/results.json   raw rows from one test.py run
+datasets/cinematic-01/runs/<run-id>/eval.json      scored scenarios from one test.py run
+datasets/cinematic-01/results.json    "latest" copy of runs/<run-id>/results.json
+datasets/cinematic-01/eval.json       "latest" copy of runs/<run-id>/eval.json
 ```
+
+`<run-id>` defaults to `run-<YYYYMMDD-HHMMSS>-<model_alias>` (see `--run-id` in
+test.py) and is tracked, so each run's numbers stay reviewable in history. The
+root-level `results.json`/`eval.json` copies are refreshed on every run so tools
+that read the old fixed paths keep working.
 
 Mirrors `smoketests/cinematic-01/` so the dataset dir scopes the `cinematic-01` prefix.

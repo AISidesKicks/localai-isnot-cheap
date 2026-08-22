@@ -1,0 +1,963 @@
+{
+  "meta": {
+    "name": "cinematic-01",
+    "test": "smoketests/cinematic-01/test.py",
+    "run_id": "run-20260822-182436-local-gguf",
+    "run_at": "2026-08-22T18:26:12+0200",
+    "model_alias": "local-gguf",
+    "base_url": "http://localhost:4000",
+    "dataset": "/home/roro/Workspaces/localai-isnot-cheap/datasets/cinematic-01/dataset.csv",
+    "sample": 20,
+    "year_tolerance": 2
+  },
+  "scenario_1_studio_recall": {
+    "score": "7/20",
+    "rows": [
+      {
+        "studio": "Marvel Studios",
+        "film": "Iron Man",
+        "guess": "Marvel Studios",
+        "answer": "{\"studios\": [\"Marvel Studios\"]}",
+        "correct": true,
+        "cache_regime": "litellm-redis-miss",
+        "seconds": 3.322,
+        "usage": {
+          "prompt_tokens": 30,
+          "completion_tokens": 221,
+          "total_tokens": 251
+        }
+      },
+      {
+        "studio": "DC Studios",
+        "film": "The Dark Knight",
+        "guess": "Warner Bros.",
+        "answer": "{\"studios\": [\"Warner Bros.\"]}",
+        "correct": false,
+        "cache_regime": "litellm-redis-miss",
+        "seconds": 1.714,
+        "usage": {
+          "prompt_tokens": 31,
+          "completion_tokens": 217,
+          "total_tokens": 248
+        }
+      },
+      {
+        "studio": "Walt Disney Pictures",
+        "film": "The Lion King",
+        "guess": "Walt Disney Animation Studios",
+        "answer": "{\"studios\": [\"Walt Disney Animation Studios\"]}",
+        "correct": false,
+        "cache_regime": "litellm-redis-miss",
+        "seconds": 2.375,
+        "usage": {
+          "prompt_tokens": 31,
+          "completion_tokens": 307,
+          "total_tokens": 338
+        }
+      },
+      {
+        "studio": "Pixar Animation Studios",
+        "film": "A Bug's Life",
+        "guess": "Pixar Animation Studios",
+        "answer": "{\"studios\": [\"Pixar Animation Studios\"]}",
+        "correct": true,
+        "cache_regime": "litellm-redis-miss",
+        "seconds": 1.087,
+        "usage": {
+          "prompt_tokens": 32,
+          "completion_tokens": 136,
+          "total_tokens": 168
+        }
+      },
+      {
+        "studio": "Warner Bros. Pictures",
+        "film": "The Dark Knight Rises",
+        "guess": "Warner Bros.",
+        "answer": "{\"studios\": [\"Warner Bros.\"]}",
+        "correct": false,
+        "cache_regime": "litellm-redis-miss",
+        "seconds": 1.218,
+        "usage": {
+          "prompt_tokens": 33,
+          "completion_tokens": 155,
+          "total_tokens": 188
+        }
+      },
+      {
+        "studio": "Universal Pictures",
+        "film": "Jurassic Park",
+        "guess": "Universal Pictures",
+        "answer": "{\"studios\": [\"Universal Pictures\"]}",
+        "correct": true,
+        "cache_regime": "litellm-redis-miss",
+        "seconds": 1.033,
+        "usage": {
+          "prompt_tokens": 32,
+          "completion_tokens": 128,
+          "total_tokens": 160
+        }
+      },
+      {
+        "studio": "Paramount Pictures",
+        "film": "Star Wars: Episode IV – A New Hope",
+        "guess": "20th Century Fox",
+        "answer": "{\"studios\": [\"20th Century Fox\"]}",
+        "correct": false,
+        "cache_regime": "litellm-redis-miss",
+        "seconds": 1.287,
+        "usage": {
+          "prompt_tokens": 37,
+          "completion_tokens": 161,
+          "total_tokens": 198
+        }
+      },
+      {
+        "studio": "Sony Pictures",
+        "film": "Spider-Man: Into the Spider-Verse",
+        "guess": "Sony Pictures Animation",
+        "answer": "{\"studios\": [\"Sony Pictures Animation\"]}",
+        "correct": false,
+        "cache_regime": "litellm-redis-miss",
+        "seconds": 1.308,
+        "usage": {
+          "prompt_tokens": 37,
+          "completion_tokens": 166,
+          "total_tokens": 203
+        }
+      },
+      {
+        "studio": "Columbia Pictures",
+        "film": "Gone with the Wind",
+        "guess": "Metro-Goldwyn-Mayer",
+        "answer": "{\n  \"studios\": [\n    \"Metro-Goldwyn-Mayer\"\n  ]\n}",
+        "correct": false,
+        "cache_regime": "litellm-redis-miss",
+        "seconds": 1.363,
+        "usage": {
+          "prompt_tokens": 33,
+          "completion_tokens": 174,
+          "total_tokens": 207
+        }
+      },
+      {
+        "studio": "20th Century Studios",
+        "film": "Ratatouille",
+        "guess": "Pixar Animation Studios",
+        "answer": "{\"studios\": [\"Pixar Animation Studios\"]}",
+        "correct": false,
+        "cache_regime": "litellm-redis-miss",
+        "seconds": 1.244,
+        "usage": {
+          "prompt_tokens": 33,
+          "completion_tokens": 154,
+          "total_tokens": 187
+        }
+      },
+      {
+        "studio": "DreamWorks Animation",
+        "film": "Shrek",
+        "guess": "DreamWorks Animation",
+        "answer": "{\n  \"studios\": [\n    \"DreamWorks Animation\"\n  ]\n}",
+        "correct": true,
+        "cache_regime": "litellm-redis-miss",
+        "seconds": 1.403,
+        "usage": {
+          "prompt_tokens": 30,
+          "completion_tokens": 180,
+          "total_tokens": 210
+        }
+      },
+      {
+        "studio": "Lionsgate Films",
+        "film": "The Fast and the Furious",
+        "guess": "Universal Pictures",
+        "answer": "{\"studios\": [\"Universal Pictures\"]}",
+        "correct": false,
+        "cache_regime": "litellm-redis-miss",
+        "seconds": 1.227,
+        "usage": {
+          "prompt_tokens": 34,
+          "completion_tokens": 152,
+          "total_tokens": 186
+        }
+      },
+      {
+        "studio": "A24",
+        "film": "Get Out",
+        "guess": "Skydance Media",
+        "answer": "{\"studios\": [\"Skydance Media\"]}",
+        "correct": false,
+        "cache_regime": "litellm-redis-miss",
+        "seconds": 1.266,
+        "usage": {
+          "prompt_tokens": 30,
+          "completion_tokens": 156,
+          "total_tokens": 186
+        }
+      },
+      {
+        "studio": "Metro-Goldwyn-Mayer",
+        "film": "Singin' in the Rain",
+        "guess": "Metro-Goldwyn-Mayer",
+        "answer": "{\"studios\": [\"Metro-Goldwyn-Mayer\"]}",
+        "correct": true,
+        "cache_regime": "litellm-redis-miss",
+        "seconds": 1.577,
+        "usage": {
+          "prompt_tokens": 34,
+          "completion_tokens": 201,
+          "total_tokens": 235
+        }
+      },
+      {
+        "studio": "Legendary Entertainment",
+        "film": "X-Men: Days of Future Past",
+        "guess": "20th Century Fox",
+        "answer": "{\"studios\": [\"20th Century Fox\"]}",
+        "correct": false,
+        "cache_regime": "litellm-redis-miss",
+        "seconds": 1.25,
+        "usage": {
+          "prompt_tokens": 36,
+          "completion_tokens": 154,
+          "total_tokens": 190
+        }
+      },
+      {
+        "studio": "New Line Cinema",
+        "film": "Fight Club",
+        "guess": "New Line Cinema",
+        "answer": "{\"studios\": [\"New Line Cinema\"]}",
+        "correct": true,
+        "cache_regime": "litellm-redis-miss",
+        "seconds": 2.032,
+        "usage": {
+          "prompt_tokens": 31,
+          "completion_tokens": 258,
+          "total_tokens": 289
+        }
+      },
+      {
+        "studio": "Studio Ghibli",
+        "film": "My Neighbor Totoro",
+        "guess": "Studio Ghibli",
+        "answer": "{\"studios\": [\"Studio Ghibli\"]}",
+        "correct": true,
+        "cache_regime": "litellm-redis-miss",
+        "seconds": 1.174,
+        "usage": {
+          "prompt_tokens": 33,
+          "completion_tokens": 145,
+          "total_tokens": 178
+        }
+      },
+      {
+        "studio": "Focus Features",
+        "film": "The Last Samurai",
+        "guess": "Paramount Pictures",
+        "answer": "{\"studios\": [\"Paramount Pictures\"]}",
+        "correct": false,
+        "cache_regime": "litellm-redis-miss",
+        "seconds": 1.227,
+        "usage": {
+          "prompt_tokens": 32,
+          "completion_tokens": 154,
+          "total_tokens": 186
+        }
+      },
+      {
+        "studio": "Searchlight Pictures",
+        "film": "Sully",
+        "guess": "Paramount Pictures",
+        "answer": "{\n  \"studios\": [\n    \"Paramount Pictures\"\n  ]\n}",
+        "correct": false,
+        "cache_regime": "litellm-redis-miss",
+        "seconds": 2.604,
+        "usage": {
+          "prompt_tokens": 31,
+          "completion_tokens": 337,
+          "total_tokens": 368
+        }
+      },
+      {
+        "studio": "Netflix",
+        "film": "The Irishman",
+        "guess": "A24",
+        "answer": "{\"studios\": [\"A24\"]}",
+        "correct": false,
+        "cache_regime": "litellm-redis-miss",
+        "seconds": 1.729,
+        "usage": {
+          "prompt_tokens": 31,
+          "completion_tokens": 221,
+          "total_tokens": 252
+        }
+      }
+    ]
+  },
+  "scenario_2_year_match": {
+    "score": "14/20",
+    "rows": [
+      {
+        "studio": "Marvel Studios",
+        "film": "Iron Man",
+        "expected": 1995,
+        "predicted": 2008,
+        "correct": false,
+        "answer": "{\n  \"title\": \"Iron Man\",\n  \"year\": 2008\n}",
+        "cache_regime": "litellm-redis-miss",
+        "seconds": 1.087,
+        "usage": {
+          "prompt_tokens": 35,
+          "completion_tokens": 138,
+          "total_tokens": 173
+        }
+      },
+      {
+        "studio": "DC Studios",
+        "film": "The Dark Knight",
+        "expected": 2008,
+        "predicted": 2008,
+        "correct": true,
+        "answer": "{\n  \"title\": \"The Dark Knight\",\n  \"year\": 2008\n}",
+        "cache_regime": "litellm-redis-miss",
+        "seconds": 1.166,
+        "usage": {
+          "prompt_tokens": 36,
+          "completion_tokens": 149,
+          "total_tokens": 185
+        }
+      },
+      {
+        "studio": "Walt Disney Pictures",
+        "film": "The Lion King",
+        "expected": 1995,
+        "predicted": 1994,
+        "correct": true,
+        "answer": "{\n  \"title\": \"The Lion King\",\n  \"year\": 1994\n}",
+        "cache_regime": "litellm-redis-miss",
+        "seconds": 1.075,
+        "usage": {
+          "prompt_tokens": 36,
+          "completion_tokens": 137,
+          "total_tokens": 173
+        }
+      },
+      {
+        "studio": "Pixar Animation Studios",
+        "film": "A Bug's Life",
+        "expected": 1995,
+        "predicted": 1998,
+        "correct": false,
+        "answer": "{\n  \"title\": \"A Bug's Life\",\n  \"year\": 1998\n}",
+        "cache_regime": "litellm-redis-miss",
+        "seconds": 1.849,
+        "usage": {
+          "prompt_tokens": 37,
+          "completion_tokens": 239,
+          "total_tokens": 276
+        }
+      },
+      {
+        "studio": "Warner Bros. Pictures",
+        "film": "The Dark Knight Rises",
+        "expected": 2012,
+        "predicted": 2012,
+        "correct": true,
+        "answer": "{\n  \"title\": \"The Dark Knight Rises\",\n  \"year\": 2012\n}",
+        "cache_regime": "litellm-redis-miss",
+        "seconds": 1.822,
+        "usage": {
+          "prompt_tokens": 38,
+          "completion_tokens": 237,
+          "total_tokens": 275
+        }
+      },
+      {
+        "studio": "Universal Pictures",
+        "film": "Jurassic Park",
+        "expected": 1995,
+        "predicted": 1993,
+        "correct": true,
+        "answer": "{\n  \"title\": \"Jurassic Park\",\n  \"year\": 1993\n}",
+        "cache_regime": "litellm-redis-miss",
+        "seconds": 1.071,
+        "usage": {
+          "prompt_tokens": 37,
+          "completion_tokens": 137,
+          "total_tokens": 174
+        }
+      },
+      {
+        "studio": "Paramount Pictures",
+        "film": "Star Wars: Episode IV – A New Hope",
+        "expected": 1977,
+        "predicted": 1977,
+        "correct": true,
+        "answer": "{\n  \"title\": \"Star Wars: Episode IV – A New Hope\",\n  \"year\": 1977\n}",
+        "cache_regime": "litellm-redis-miss",
+        "seconds": 2.051,
+        "usage": {
+          "prompt_tokens": 42,
+          "completion_tokens": 265,
+          "total_tokens": 307
+        }
+      },
+      {
+        "studio": "Sony Pictures",
+        "film": "Spider-Man: Into the Spider-Verse",
+        "expected": 2018,
+        "predicted": 2018,
+        "correct": true,
+        "answer": "{\n  \"title\": \"Spider-Man: Into the Spider-Verse\",\n  \"year\": 2018\n}",
+        "cache_regime": "litellm-redis-miss",
+        "seconds": 1.229,
+        "usage": {
+          "prompt_tokens": 42,
+          "completion_tokens": 157,
+          "total_tokens": 199
+        }
+      },
+      {
+        "studio": "Columbia Pictures",
+        "film": "Gone with the Wind",
+        "expected": 1939,
+        "predicted": 1939,
+        "correct": true,
+        "answer": "{\n  \"title\": \"Gone with the Wind\",\n  \"year\": 1939\n}",
+        "cache_regime": "litellm-redis-miss",
+        "seconds": 1.864,
+        "usage": {
+          "prompt_tokens": 38,
+          "completion_tokens": 241,
+          "total_tokens": 279
+        }
+      },
+      {
+        "studio": "20th Century Studios",
+        "film": "Ratatouille",
+        "expected": 2007,
+        "predicted": 2007,
+        "correct": true,
+        "answer": "{\n  \"title\": \"Ratatouille\",\n  \"year\": 2007\n}",
+        "cache_regime": "litellm-redis-miss",
+        "seconds": 2.076,
+        "usage": {
+          "prompt_tokens": 38,
+          "completion_tokens": 267,
+          "total_tokens": 305
+        }
+      },
+      {
+        "studio": "DreamWorks Animation",
+        "film": "Shrek",
+        "expected": 2001,
+        "predicted": 2001,
+        "correct": true,
+        "answer": "{\n  \"title\": \"Shrek\",\n  \"year\": 2001\n}",
+        "cache_regime": "litellm-redis-miss",
+        "seconds": 1.194,
+        "usage": {
+          "prompt_tokens": 35,
+          "completion_tokens": 152,
+          "total_tokens": 187
+        }
+      },
+      {
+        "studio": "Lionsgate Films",
+        "film": "The Fast and the Furious",
+        "expected": 2001,
+        "predicted": 2001,
+        "correct": true,
+        "answer": "{\n  \"title\": \"The Fast and the Furious\",\n  \"year\": 2001\n}",
+        "cache_regime": "litellm-redis-miss",
+        "seconds": 1.207,
+        "usage": {
+          "prompt_tokens": 39,
+          "completion_tokens": 154,
+          "total_tokens": 193
+        }
+      },
+      {
+        "studio": "A24",
+        "film": "Get Out",
+        "expected": 2017,
+        "predicted": 2017,
+        "correct": true,
+        "answer": "{\n  \"title\": \"Get Out\",\n  \"year\": 2017\n}",
+        "cache_regime": "litellm-redis-miss",
+        "seconds": 1.907,
+        "usage": {
+          "prompt_tokens": 35,
+          "completion_tokens": 248,
+          "total_tokens": 283
+        }
+      },
+      {
+        "studio": "Metro-Goldwyn-Mayer",
+        "film": "Singin' in the Rain",
+        "expected": 1952,
+        "predicted": 1952,
+        "correct": true,
+        "answer": "{\n  \"title\": \"Singin' in the Rain\",\n  \"year\": 1952\n}",
+        "cache_regime": "litellm-redis-miss",
+        "seconds": 3.526,
+        "usage": {
+          "prompt_tokens": 39,
+          "completion_tokens": 463,
+          "total_tokens": 502
+        }
+      },
+      {
+        "studio": "Legendary Entertainment",
+        "film": "X-Men: Days of Future Past",
+        "expected": 2020,
+        "predicted": 2014,
+        "correct": false,
+        "answer": "{\n  \"title\": \"X-Men: Days of Future Past\",\n  \"year\": 2014\n}",
+        "cache_regime": "litellm-redis-miss",
+        "seconds": 2.207,
+        "usage": {
+          "prompt_tokens": 41,
+          "completion_tokens": 286,
+          "total_tokens": 327
+        }
+      },
+      {
+        "studio": "New Line Cinema",
+        "film": "Fight Club",
+        "expected": 1995,
+        "predicted": 1999,
+        "correct": false,
+        "answer": "{\n  \"title\": \"Fight Club\",\n  \"year\": 1999\n}",
+        "cache_regime": "litellm-redis-miss",
+        "seconds": 1.981,
+        "usage": {
+          "prompt_tokens": 36,
+          "completion_tokens": 258,
+          "total_tokens": 294
+        }
+      },
+      {
+        "studio": "Studio Ghibli",
+        "film": "My Neighbor Totoro",
+        "expected": 1995,
+        "predicted": 1988,
+        "correct": false,
+        "answer": "{\n  \"title\": \"My Neighbor Totoro\",\n  \"year\": 1988\n}",
+        "cache_regime": "litellm-redis-miss",
+        "seconds": 1.206,
+        "usage": {
+          "prompt_tokens": 38,
+          "completion_tokens": 155,
+          "total_tokens": 193
+        }
+      },
+      {
+        "studio": "Focus Features",
+        "film": "The Last Samurai",
+        "expected": 1995,
+        "predicted": 2003,
+        "correct": false,
+        "answer": "{\n  \"title\": \"The Last Samurai\",\n  \"year\": 2003\n}",
+        "cache_regime": "litellm-redis-miss",
+        "seconds": 2.363,
+        "usage": {
+          "prompt_tokens": 37,
+          "completion_tokens": 308,
+          "total_tokens": 345
+        }
+      },
+      {
+        "studio": "Searchlight Pictures",
+        "film": "Sully",
+        "expected": 2016,
+        "predicted": 2016,
+        "correct": true,
+        "answer": "{\n  \"title\": \"Sully\",\n  \"year\": 2016\n}",
+        "cache_regime": "litellm-redis-miss",
+        "seconds": 1.58,
+        "usage": {
+          "prompt_tokens": 36,
+          "completion_tokens": 205,
+          "total_tokens": 241
+        }
+      },
+      {
+        "studio": "Netflix",
+        "film": "The Irishman",
+        "expected": 2019,
+        "predicted": 2019,
+        "correct": true,
+        "answer": "{\n  \"title\": \"The Irishman\",\n  \"year\": 2019\n}",
+        "cache_regime": "litellm-redis-miss",
+        "seconds": 2.188,
+        "usage": {
+          "prompt_tokens": 36,
+          "completion_tokens": 285,
+          "total_tokens": 321
+        }
+      }
+    ]
+  },
+  "scenario_3_year_repeat": {
+    "score": "0.65",
+    "rows": [
+      {
+        "studio": "Marvel Studios",
+        "film": "Iron Man",
+        "expected": "1995",
+        "predicted": "2008",
+        "metric_score": 0.0,
+        "answer": "{\"title\": \"Iron Man\", \"year\": 2008}",
+        "cache_regime": "litellm-redis-miss",
+        "seconds": 1.407,
+        "usage": {
+          "prompt_tokens": 38,
+          "completion_tokens": 181,
+          "total_tokens": 219
+        }
+      },
+      {
+        "studio": "DC Studios",
+        "film": "The Dark Knight",
+        "expected": "2008",
+        "predicted": "2008",
+        "metric_score": 1.0,
+        "answer": "{\"title\": \"The Dark Knight\", \"year\": 2008}",
+        "cache_regime": "litellm-redis-miss",
+        "seconds": 1.495,
+        "usage": {
+          "prompt_tokens": 39,
+          "completion_tokens": 193,
+          "total_tokens": 232
+        }
+      },
+      {
+        "studio": "Walt Disney Pictures",
+        "film": "The Lion King",
+        "expected": "1995",
+        "predicted": "1994",
+        "metric_score": 0.0,
+        "answer": "{\"title\": \"The Lion King\", \"year\": 1994}",
+        "cache_regime": "litellm-redis-miss",
+        "seconds": 1.195,
+        "usage": {
+          "prompt_tokens": 39,
+          "completion_tokens": 151,
+          "total_tokens": 190
+        }
+      },
+      {
+        "studio": "Pixar Animation Studios",
+        "film": "A Bug's Life",
+        "expected": "1995",
+        "predicted": "1998",
+        "metric_score": 0.0,
+        "answer": "{\"title\": \"A Bug's Life\", \"year\": 1998}",
+        "cache_regime": "litellm-redis-miss",
+        "seconds": 1.306,
+        "usage": {
+          "prompt_tokens": 40,
+          "completion_tokens": 167,
+          "total_tokens": 207
+        }
+      },
+      {
+        "studio": "Warner Bros. Pictures",
+        "film": "The Dark Knight Rises",
+        "expected": "2012",
+        "predicted": "2012",
+        "metric_score": 1.0,
+        "answer": "{\n  \"title\": \"The Dark Knight Rises\",\n  \"year\": 2012\n}",
+        "cache_regime": "litellm-redis-miss",
+        "seconds": 2.016,
+        "usage": {
+          "prompt_tokens": 41,
+          "completion_tokens": 262,
+          "total_tokens": 303
+        }
+      },
+      {
+        "studio": "Universal Pictures",
+        "film": "Jurassic Park",
+        "expected": "1995",
+        "predicted": "1993",
+        "metric_score": 0.0,
+        "answer": "{\"title\": \"Jurassic Park\", \"year\": 1993}",
+        "cache_regime": "litellm-redis-miss",
+        "seconds": 1.207,
+        "usage": {
+          "prompt_tokens": 40,
+          "completion_tokens": 154,
+          "total_tokens": 194
+        }
+      },
+      {
+        "studio": "Paramount Pictures",
+        "film": "Star Wars: Episode IV – A New Hope",
+        "expected": "1977",
+        "predicted": "1977",
+        "metric_score": 1.0,
+        "answer": "{\"title\": \"Star Wars: Episode IV – A New Hope\", \"year\": 1977}",
+        "cache_regime": "litellm-redis-miss",
+        "seconds": 0.998,
+        "usage": {
+          "prompt_tokens": 45,
+          "completion_tokens": 126,
+          "total_tokens": 171
+        }
+      },
+      {
+        "studio": "Sony Pictures",
+        "film": "Spider-Man: Into the Spider-Verse",
+        "expected": "2018",
+        "predicted": "2018",
+        "metric_score": 1.0,
+        "answer": "{\"title\": \"Spider-Man: Into the Spider-Verse\", \"year\": 2018}",
+        "cache_regime": "litellm-redis-miss",
+        "seconds": 1.547,
+        "usage": {
+          "prompt_tokens": 45,
+          "completion_tokens": 200,
+          "total_tokens": 245
+        }
+      },
+      {
+        "studio": "Columbia Pictures",
+        "film": "Gone with the Wind",
+        "expected": "1939",
+        "predicted": "1939",
+        "metric_score": 1.0,
+        "answer": "{\"title\": \"Gone with the Wind\", \"year\": 1939}",
+        "cache_regime": "litellm-redis-miss",
+        "seconds": 1.321,
+        "usage": {
+          "prompt_tokens": 41,
+          "completion_tokens": 170,
+          "total_tokens": 211
+        }
+      },
+      {
+        "studio": "20th Century Studios",
+        "film": "Ratatouille",
+        "expected": "2007",
+        "predicted": "2007",
+        "metric_score": 1.0,
+        "answer": "{\"title\": \"Ratatouille\", \"year\": 2007}",
+        "cache_regime": "litellm-redis-miss",
+        "seconds": 1.507,
+        "usage": {
+          "prompt_tokens": 41,
+          "completion_tokens": 194,
+          "total_tokens": 235
+        }
+      },
+      {
+        "studio": "DreamWorks Animation",
+        "film": "Shrek",
+        "expected": "2001",
+        "predicted": "2001",
+        "metric_score": 1.0,
+        "answer": "{\"title\": \"Shrek\", \"year\": 2001}",
+        "cache_regime": "litellm-redis-miss",
+        "seconds": 1.218,
+        "usage": {
+          "prompt_tokens": 38,
+          "completion_tokens": 155,
+          "total_tokens": 193
+        }
+      },
+      {
+        "studio": "Lionsgate Films",
+        "film": "The Fast and the Furious",
+        "expected": "2001",
+        "predicted": "2001",
+        "metric_score": 1.0,
+        "answer": "{\"title\": \"The Fast and the Furious\", \"year\": 2001}",
+        "cache_regime": "litellm-redis-miss",
+        "seconds": 1.261,
+        "usage": {
+          "prompt_tokens": 42,
+          "completion_tokens": 162,
+          "total_tokens": 204
+        }
+      },
+      {
+        "studio": "A24",
+        "film": "Get Out",
+        "expected": "2017",
+        "predicted": "2017",
+        "metric_score": 1.0,
+        "answer": "{\n  \"title\": \"Get Out\",\n  \"year\": 2017\n}",
+        "cache_regime": "litellm-redis-miss",
+        "seconds": 0.894,
+        "usage": {
+          "prompt_tokens": 38,
+          "completion_tokens": 113,
+          "total_tokens": 151
+        }
+      },
+      {
+        "studio": "Metro-Goldwyn-Mayer",
+        "film": "Singin' in the Rain",
+        "expected": "1952",
+        "predicted": "1952",
+        "metric_score": 1.0,
+        "answer": "{\"title\": \"Singin' in the Rain\", \"year\": 1952}",
+        "cache_regime": "litellm-redis-miss",
+        "seconds": 1.057,
+        "usage": {
+          "prompt_tokens": 42,
+          "completion_tokens": 133,
+          "total_tokens": 175
+        }
+      },
+      {
+        "studio": "Legendary Entertainment",
+        "film": "X-Men: Days of Future Past",
+        "expected": "2020",
+        "predicted": "2020",
+        "metric_score": 1.0,
+        "answer": "{\"title\": \"X-Men: Days of Future Past\", \"year\": 2020}",
+        "cache_regime": "litellm-redis-miss",
+        "seconds": 1.702,
+        "usage": {
+          "prompt_tokens": 44,
+          "completion_tokens": 221,
+          "total_tokens": 265
+        }
+      },
+      {
+        "studio": "New Line Cinema",
+        "film": "Fight Club",
+        "expected": "1995",
+        "predicted": "1999",
+        "metric_score": 0.0,
+        "answer": "{\"title\": \"Fight Club\", \"year\": 1999}",
+        "cache_regime": "litellm-redis-miss",
+        "seconds": 1.306,
+        "usage": {
+          "prompt_tokens": 39,
+          "completion_tokens": 167,
+          "total_tokens": 206
+        }
+      },
+      {
+        "studio": "Studio Ghibli",
+        "film": "My Neighbor Totoro",
+        "expected": "1995",
+        "predicted": "1988",
+        "metric_score": 0.0,
+        "answer": "{\"title\": \"My Neighbor Totoro\", \"year\": 1988}",
+        "cache_regime": "litellm-redis-miss",
+        "seconds": 0.972,
+        "usage": {
+          "prompt_tokens": 41,
+          "completion_tokens": 123,
+          "total_tokens": 164
+        }
+      },
+      {
+        "studio": "Focus Features",
+        "film": "The Last Samurai",
+        "expected": "1995",
+        "predicted": "2004",
+        "metric_score": 0.0,
+        "answer": "{\"title\": \"The Last Samurai\", \"year\": 2004}",
+        "cache_regime": "litellm-redis-miss",
+        "seconds": 1.277,
+        "usage": {
+          "prompt_tokens": 40,
+          "completion_tokens": 164,
+          "total_tokens": 204
+        }
+      },
+      {
+        "studio": "Searchlight Pictures",
+        "film": "Sully",
+        "expected": "2016",
+        "predicted": "2016",
+        "metric_score": 1.0,
+        "answer": "{\"title\": \"Sully\", \"year\": 2016}",
+        "cache_regime": "litellm-redis-miss",
+        "seconds": 0.923,
+        "usage": {
+          "prompt_tokens": 39,
+          "completion_tokens": 117,
+          "total_tokens": 156
+        }
+      },
+      {
+        "studio": "Netflix",
+        "film": "The Irishman",
+        "expected": "2019",
+        "predicted": "2019",
+        "metric_score": 1.0,
+        "answer": "{\"title\": \"The Irishman\", \"year\": 2019}",
+        "cache_regime": "litellm-redis-miss",
+        "seconds": 1.413,
+        "usage": {
+          "prompt_tokens": 39,
+          "completion_tokens": 181,
+          "total_tokens": 220
+        }
+      }
+    ]
+  },
+  "cache_demo": {
+    "rows": [
+      {
+        "call": "Q1",
+        "observed_regime": "litellm-redis-miss",
+        "base_only": true,
+        "seconds": 1.9384,
+        "usage": {
+          "prompt_tokens": 21,
+          "completion_tokens": 256,
+          "total_tokens": 277
+        },
+        "timings": {
+          "prompt_n": 21,
+          "cache_n": 0,
+          "predicted_n": 256
+        },
+        "content_head": ""
+      },
+      {
+        "call": "Q2",
+        "observed_regime": "litellm-redis-hit",
+        "base_only": true,
+        "seconds": 0.0095,
+        "usage": {
+          "prompt_tokens": 21,
+          "completion_tokens": 256,
+          "total_tokens": 277
+        },
+        "timings": {
+          "prompt_n": 21,
+          "cache_n": 0,
+          "predicted_n": 256
+        },
+        "content_head": ""
+      },
+      {
+        "call": "Q3",
+        "observed_regime": "litellm-redis-miss",
+        "base_only": false,
+        "seconds": 1.8591,
+        "usage": {
+          "prompt_tokens": 26,
+          "completion_tokens": 256,
+          "total_tokens": 282
+        },
+        "timings": {
+          "prompt_n": 26,
+          "cache_n": 0,
+          "predicted_n": 256
+        },
+        "content_head": ""
+      }
+    ]
+  }
+}

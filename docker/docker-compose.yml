@@ -264,6 +264,7 @@ services:
       - "mean"
       - "--ctx-size"
       - "8192"
+      - "--metrics"
       - "-t"
       - "3"
       - "--no-webui"
@@ -299,6 +300,7 @@ services:
       - "99"
       - "--ctx-size"
       - "8192"
+      - "--metrics"
       - "--no-webui"
     volumes:
       - ./models:/models:ro

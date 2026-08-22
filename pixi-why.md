@@ -13,6 +13,19 @@ To ensure 100% reproducibility of AI and data science experiments in the lab, dr
    A single pixi.toml file natively supports Linux (compute servers), Windows (workstations), and macOS (Apple Silicon laptops), making it seamless to share projects across different hardware in the lab.
 
 ------------------------------
+## 🔬 Multiple Environments for Free
+
+Pixi lets us define any number of named environments via `[feature.<name>]` tables plus an `[environments]` table — one project, many isolated dep sets, zero runtime overhead. You only pay for the dep set you activate.
+
+Planned split for this lab:
+
+   - `default` — the shared core (python, pip, ruff, litellm, openai, python-dotenv, pydantic).
+   - `experiment` — adds smoke-test tooling (pytest, httpx/httpx-sse, asyncio, anyio, diskcache) → `pixi run -e experiment …`.
+   - `benchmarks` — adds benchmark/evals tooling (deepeval, promptfoo, ragas, trulens stack, promptrefiner, promptimal, pandas/matplotlib/seaborn, rapidfuzz) → `pixi run -e benchmarks …`.
+
+Bonus: parallel env installs via `pixi install --environment {project:all}`, and the rest of our workflows keep using the lean `default` env.
+
+------------------------------
 ## 📂 Local Environments & Lab Backup Strategy
 Unlike Conda, which buries environments deep within the user's system directory (~/miniconda3/envs/...), Pixi installs the entire environment inside a local .pixi folder directly within your project directory.
 

@@ -171,8 +171,8 @@
         >
     </div>
 
-    <p><strong>So how to measure and bill AI tokens in small AI Lab?</strong><br>
-    This is tricky architectural and engineering challenge with lot of tradeoffs, ideal EDU AI LAB material.</p>
+    <p><strong>So how to measure and bill AI tokens in a small AI Lab?</strong><br>
+    This is a tricky architectural and engineering challenge with a lot of tradeoffs, ideal EDU AI LAB material.</p>
 
     <p>Here I share minimal setups distilled from the larger ones I use in enterprise workshops, to demonstrate the complexity of local AI inference engineering in practice and the role of caching.</p>
 
@@ -185,7 +185,7 @@
     <p><strong>Architecture</strong> - LiteLLM meter-and-bill gateway in front of local engines, with Redis caching, Phoenix observability, VictoriaMetrics metrics, and shared PostgreSQL under one roof.</p>
     <div style="margin: 2rem 0; text-align: center;">
         <img
-            src="overvew.jpeg"
+            src="overview.jpeg"
             alt="Architecture overview of LiteLLM, local inference engines, Arize Phoenix observability, VictoriaMetrics, Redis, and PostgreSQL"
             style="max-width: 100%; height: auto; border-radius: 8px; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);"
             loading="lazy"
@@ -203,17 +203,22 @@
 
     <p><strong>Mission</strong> - inference engineering is emerging as its own specialization. Just like you cannot learn programming by watching videos, you cannot learn this field from tutorials alone: you need infrastructure you can touch, feel, and explore, where tradeoffs and side effects show up for real. The EDU AI LAB is a single node, but it is Docker-container based — everything runs in containers on one machine — and it still carries enough complexity to demonstrate most inference-engineering principles from a systems-thinking perspective - turning reading into practice and letting you safely explore the tradeoffs of the field. You get the idea. <a href="https://github.com/AISidesKicks/localai-isnot-cheap" target="_blank"> Local AI is not CHEAP (GitHub Repository)</a></p>
 
-    <p class="footer-powered"><strong>Local AI is not CHEAP</strong> project si leveraged in these related projects:</p>
+    <p class="footer-powered"><strong>Local AI is not CHEAP</strong> project is leveraged in my related projects:</p>
     <ul class="footer-projects">
-        <li><a href="https://how.chimps.work" target="_blank">how.chimps.work</a> - AI benchmarking in REAL production (executable book style)</li>
-        <li><a href="https://how.evals.work" target="_blank">how.evals.work</a> - AI evals in REAL production (executable book style)</li>
-        <li><a href="https://my.pietra.dev" target="_blank">my.pietra.dev</a> - AI harness for Interaction Engineers based <a href="https://pi.dev" target="_blank">PI</a></li>
-        <li><a href="https://my.taufiq.dev" target="_blank">my.taufiq.dev</a> - AI harness for Inference Engineers based <a href="https://twotimespi.dev" target="_blank">TAU</a></li>
+        <li><a href="https://why.hybridai.rsvp" target="_blank">why.hybridai.rsvp</a> - REALITY: 1 trillion sized model can easily cost you 1 million dollars a year!</li>
+        <li><a href="https://howto.hybridai.click" target="_blank">howto.hybridai.click</a> - Automating HybridAI on NeoCloud with Agentic Infra approach</li>
+        <br>
+        <li><a href="https://ai.benchmarks.observer" target="_blank">ai.benchmarks.observer</a> - Actively exploring failures in popular public AI benchmarks</li>
+        <li><a href="https://howto.chimps.work" target="_blank">howto.chimps.work</a> - AI benchmarking in REAL production (executable book style)</li>
+        <li><a href="https://howto.evals.work" target="_blank">howto.evals.work</a> - AI evals in REAL production (executable book style)</li>
+        <br> 
+        <li><a href="https://my.pietra.dev" target="_blank">my.pietra.dev</a> - Custom AI harness for Interaction Engineers based on <a href="https://pi.dev" target="_blank">PI</a></li>
+        <li><a href="https://my.taufiq.dev" target="_blank">my.taufiq.dev</a> - Custom AI harness for Inference Engineers based on <a href="https://twotimespi.dev" target="_blank">TAU</a></li>
     </ul>
 
     <div class="divider"></div>
 
-    <p class="selfstudy">Deep dive materials about Inference Engineering - for self study.</p>
+    <p class="selfstudy">Deep dive materials about Inference Engineering - for self-study.</p>
 
     <div class="duo">
         <div class="card">
@@ -279,7 +284,7 @@
             <li><strong>Mixture of Experts (MoE):</strong> Analyzes dynamic routing architectures that activate sparse parameter subsets per token to increase model capacity without proportional compute costs.</li>
             <li><strong>Speculative Decoding and Long Context:</strong> Focuses on draft-and-verify decoding algorithms alongside specialized attention mechanisms designed to accelerate generation and handle expansive context windows.</li>
             <li><strong>Serving in Production:</strong> Addresses end-to-end deployment engineering, dynamic request batching, KV-cache orchestration, and system reliability for low-latency production APIs.</li>
-            <li><strong>The Whole Stack:</strong> as wrapping bonus.</li>
+            <li><strong>The Whole Stack:</strong> as a wrapping bonus.</li>
         </ol>
     </div>
 

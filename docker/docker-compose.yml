@@ -22,6 +22,30 @@ services:
     networks:
       - cheap-net
 
+  cheap-postgres-exporter:
+    image: prometheuscommunity/postgres-exporter:latest
+    container_name: cheap-postgres-exporter
+    environment:
+      DATA_SOURCE_NAME: postgresql://${POSTGRES_USER:-cheap}:${POSTGRES_PASSWORD:-secred_pwd}@cheap-postgres:5432/${POSTGRES_LITELLM_DB:-litellm_db}?sslmode=disable
+    ports:
+      - "9187:9187"
+    depends_on:
+      cheap-postgres:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD-SHELL", "wget -q -O /dev/null http://localhost:9187/metrics || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 15s
+    deploy:
+      resources:
+        limits:
+          cpus: '0.50'
+          memory: 256M
+    networks:
+      - cheap-net
+
   cheap-redis:
     image: redis:7-alpine
     container_name: cheap-redis

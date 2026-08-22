@@ -1,0 +1,38 @@
+[workspace]
+authors = ["HOT AIcoder <198066858+AISidesKicks@users.noreply.github.com>"]
+channels = ["conda-forge", "main", "r", "msys2"]
+name = "cheap"
+platforms = ["linux-64"]
+version = "0.1.0"
+
+[tasks]
+
+[dependencies]
+python = "3.12.*"
+pip = "*"
+
+[pypi-dependencies]
+litellm = "*"
+openai = "*"
+python-dotenv = "*"
+pydantic = ">=2.0"
+deepeval = "*"
+promptfoo = "*"
+ragas = "*"
+trulens = "*"
+trulens-providers-litellm = "*"
+trulens-providers-openai = "*"
+promptrefiner = "*"
+promptimal = "*"
+pandas = "*"
+tenacity = "*"
+matplotlib = "*"
+seaborn = "*"
+datasets = "*"
+rapidfuzz = "*"
+pytest = "*"
+httpx = "*"
+httpx-sse = "*"
+asyncio = "*"
+anyio = "*"
+diskcache = "*"

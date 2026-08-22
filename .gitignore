@@ -34,3 +34,6 @@ docker/models/hf-cache/
 pgdata/
 postgres-data/
 redis-data/
+# pixi environments
+.pixi/*
+!.pixi/config.toml

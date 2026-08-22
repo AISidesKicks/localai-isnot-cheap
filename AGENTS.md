@@ -18,7 +18,7 @@ Main programming language is Python 3.12, use PEP conventions with condensed nam
 - `README.md` — main documentation
 - `docs/` — landing page (`index.html`), GitHub Pages `CNAME` - web home for this project.
 - `LICENSE`
-- No build, test, or lint tooling exists.
+- Ruff linter (Python 3.12, via pixi 'cheap' env) — lint before committing.
 
 ## CHEAP python environment (isolated with pixi)
 

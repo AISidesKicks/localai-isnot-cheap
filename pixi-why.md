@@ -20,7 +20,7 @@ Unlike Conda, which buries environments deep within the user's system directory 
 ├── 📄 pixi.toml              # Project definition and package list
 ├── 📄 pixi.lock              # Locked exact versions (critical for text/Git backup)
 ├── 📁 src/                   # Your Python scripts and research code
-├── 📁 data/                  # Experimental data / datasets
+├── 📁 datasets/              # Experimental data / datasets
 └── 📁 .pixi/                 # CONTAINS THE ENTIRE LOCAL PYTHON INTERPRETER & LIBRARIES!
 
 ## 💡 Best Practices for Lab Backups:

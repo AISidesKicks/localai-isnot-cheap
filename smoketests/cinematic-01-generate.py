@@ -41,7 +41,7 @@ MODEL = "local-gguf"
 DEFAULT_BASE_URL = "http://localhost:4000"
 DEFAULT_OUTPUT = os.path.join(
     os.path.dirname(os.path.dirname(os.path.abspath(__file__))),
-    "data",
+    "datasets",
     "cinematic-01-dataset.json",
 )
 CACHE_PARAM = {}  # enabled LiteLLM Redis caching; boolean True 400s on 1.98.0

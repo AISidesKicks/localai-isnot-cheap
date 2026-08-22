@@ -123,6 +123,34 @@ def completion_text(resp):
         return ""
 
 
+def reasoning_content(resp, limit=400):
+    """Thinking snippet from a completion response, else None.
+
+    Tries the first-class `message.reasoning_content` field, then common
+    provider extras (reasoning_content/reasoning/thinking) under
+    `model_extra`, so llama.cpp/vLLM/SGLang response shapes all resolve.
+    Long reasoning is trimmed with an overflow marker.
+    """
+    message = getattr(getattr(resp, "choices", [None])[0], "message", None)
+    if message is None:
+        return None
+    text = getattr(message, "reasoning_content", None)
+    if not isinstance(text, str) or not text:
+        extra = getattr(message, "model_extra", None) or {}
+        text = None
+        for key in ("reasoning_content", "reasoning", "thinking"):
+            candidate = extra.get(key)
+            if isinstance(candidate, str) and candidate:
+                text = candidate
+                break
+    if not isinstance(text, str) or not text:
+        return None
+    text = text.strip()
+    if len(text) > limit:
+        return text[:limit] + "..."
+    return text
+
+
 def cache_regime(resp):
     """litellm-redis-hit iff hidden params carry the x-litellm-cache-key header."""
     hidden = getattr(resp, "_hidden_params", None) or {}

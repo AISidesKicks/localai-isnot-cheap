@@ -77,6 +77,10 @@ def render(results, eval_summary, run_id):
     a(f"- **gateway**: `{meta['base_url']}` (LiteLLM + Redis cache, llama.cpp engine)")
     a(f"- **dataset**: `{meta['dataset']}`")
     a(f"- **sample**: `{meta['sample']}` rows (round-robin across studios)")
+    a(
+        f"- **mode**: `{meta.get('reasoning', 'disabled')}` reasoning, "
+        f"`{meta.get('workers', 4)}` workers"
+    )
     a(f"- **run_at**: `{meta['run_at']}`")
     a(f"- **test**: `{meta['test']}`")
     a("")

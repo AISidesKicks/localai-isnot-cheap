@@ -18,6 +18,7 @@ datasets/cinematic-01/runs/<run-id>/eval.json (scored scenarios), plus refreshed
 """
 
 import argparse
+import concurrent.futures
 import csv
 import json
 import os
@@ -40,6 +41,7 @@ from llm import (
     completion_text,
     get_repo_root,
     health,
+    reasoning_content,
     timings,
     usage_fields,
 )
@@ -73,7 +75,7 @@ def parse_model(text, schema):
         return None
 
 
-def query_schema(content, schema, max_tokens):
+def query_schema(content, schema, max_tokens, reasoning):
     """Schema answer with retries; returns (model, text, seconds, resp).
 
     Retries append a suffix to the prompt so a cached empty/truncated answer for
@@ -87,6 +89,7 @@ def query_schema(content, schema, max_tokens):
             payload,
             max_tokens=max_tokens,
             response_format=schema,
+            reasoning=reasoning,
         )
         last_resp = resp
         parsed = parse_model(completion_text(resp), schema)
@@ -129,87 +132,97 @@ def sample_rows(rows, n):
     return picked
 
 
-def scenario_studio_recall(sample, args):
+def scenario_studio_recall(sample, args, executor):
     """Which studio produced each sampled film; exact normalized name match."""
-    rows = []
-    for row in sample:
+
+    def one(row):
         prompt = (
             f'Which studio produced the movie "{row["film"]}"? Reply with a '
             "JSON object listing one studio name."
         )
-        parsed, text, seconds, resp = query_schema(prompt, StudioList, args.max_tokens)
+        parsed, text, seconds, resp = query_schema(
+            prompt, StudioList, args.max_tokens, args.reasoning
+        )
         guess = parsed.studios[0] if parsed else None
         correct = guess is not None and normalize(guess) == normalize(row["studio"])
-        rows.append(
-            {
-                "studio": row["studio"],
-                "film": row["film"],
-                "guess": guess,
-                "answer": text[:200],
-                "correct": correct,
-                "cache_regime": cache_regime(resp),
-                "seconds": round(seconds, 3),
-                "usage": usage_fields(resp),
-            }
-        )
+        return {
+            "studio": row["studio"],
+            "film": row["film"],
+            "guess": guess,
+            "answer": text[:200],
+            "correct": correct,
+            "cache_regime": cache_regime(resp),
+            "reasoning": reasoning_content(resp),
+            "seconds": round(seconds, 3),
+            "usage": usage_fields(resp),
+        }
+
+    rows = list(executor.map(one, sample))
+    for row in rows:
         print(
-            f"  recall {row['studio']:<28} -> {guess or '?'}"
-            f"{'  OK' if correct else '  miss'} {round(seconds, 2)}s",
+            f"  recall {row['studio']:<28} -> {row.get('guess') or '?'}"
+            f"{'  OK' if row['correct'] else '  miss'} {row['seconds']}s",
             flush=True,
         )
     correct = sum(1 for r in rows if r["correct"])
     return rows, correct
 
 
-def scenario_year_match(sample, args):
+def scenario_year_match(sample, args, executor):
     """Model's year for each film, within +/-2 of the dataset year."""
-    rows = []
-    for row in sample:
+
+    def one(row):
         if row["year"] is None:
-            continue
+            return None
         prompt = (
             f'In what year was the movie "{row["film"]}" released? Reply with '
             "a JSON object with the title and the year."
         )
-        parsed, text, seconds, resp = query_schema(prompt, YearAnswer, args.max_tokens)
+        parsed, text, seconds, resp = query_schema(
+            prompt, YearAnswer, args.max_tokens, args.reasoning
+        )
         year = parsed.year if parsed else None
         ok = year is not None and abs(year - row["year"]) <= YEAR_TOLERANCE
-        rows.append(
-            {
-                "studio": row["studio"],
-                "film": row["film"],
-                "expected": row["year"],
-                "predicted": year,
-                "correct": ok,
-                "answer": text[:200],
-                "cache_regime": cache_regime(resp),
-                "seconds": round(seconds, 3),
-                "usage": usage_fields(resp),
-            }
-        )
+        return {
+            "studio": row["studio"],
+            "film": row["film"],
+            "expected": row["year"],
+            "predicted": year,
+            "correct": ok,
+            "answer": text[:200],
+            "cache_regime": cache_regime(resp),
+            "reasoning": reasoning_content(resp),
+            "seconds": round(seconds, 3),
+            "usage": usage_fields(resp),
+        }
+
+    rows = [r for r in executor.map(one, sample) if r is not None]
+    for row in rows:
         print(
-            f"  year   {row['film']:<40} {row['year']} vs {year}"
-            f" {'OK' if ok else 'miss'} {round(seconds, 2)}s",
+            f"  year   {row['film']:<40} {row['expected']} vs {row.get('predicted')}"
+            f" {'OK' if row['correct'] else 'miss'} {row['seconds']}s",
             flush=True,
         )
     correct = sum(1 for r in rows if r["correct"])
     return rows, correct
 
 
-def scenario_year_repeat(sample, args, threshold):
+def scenario_year_repeat(sample, args, threshold, executor):
     """Reworded year re-answer scored with deepeval ExactMatchMetric."""
-    metric = ExactMatchMetric(threshold=threshold)
-    rows = []
-    for row in sample:
+
+    def one(row):
         if row["year"] is None:
-            continue
+            return None
         prompt = (
             f'{REMINDER} what year was the movie "{row["film"]}" released? '
             "Reply with a JSON object with the title and the year."
         )
-        parsed, text, seconds, resp = query_schema(prompt, YearAnswer, args.max_tokens)
+        parsed, text, seconds, resp = query_schema(
+            prompt, YearAnswer, args.max_tokens, args.reasoning
+        )
         year = parsed.year if parsed else None
         predicted = str(year) if year is not None else ""
+        metric = ExactMatchMetric(threshold=threshold)
         metric.measure(
             LLMTestCase(
                 input=prompt,
@@ -217,7 +230,7 @@ def scenario_year_repeat(sample, args, threshold):
                 expected_output=str(row["year"]),
             )
         )
-        row_out = {
+        return {
             "studio": row["studio"],
             "film": row["film"],
             "expected": str(row["year"]),
@@ -225,13 +238,16 @@ def scenario_year_repeat(sample, args, threshold):
             "metric_score": metric.score,
             "answer": text[:200],
             "cache_regime": cache_regime(resp),
+            "reasoning": reasoning_content(resp),
             "seconds": round(seconds, 3),
             "usage": usage_fields(resp),
         }
-        rows.append(row_out)
+
+    rows = [r for r in executor.map(one, sample) if r is not None]
+    for row in rows:
         print(
-            f"  repeat {row['film']:<40} {row['year']} vs {predicted}"
-            f" {'OK' if metric.score == 1.0 else 'miss'} {round(seconds, 2)}s",
+            f"  repeat {row['film']:<40} {row['expected']} vs {row['predicted']}"
+            f" {'OK' if row['metric_score'] == 1.0 else 'miss'} {row['seconds']}s",
             flush=True,
         )
     score = sum(r["metric_score"] for r in rows) / len(rows) if rows else 0.0
@@ -247,12 +263,17 @@ def cache_demo(args):
     ]
     rows = []
     for spec in calls:
-        resp, seconds = chat(spec["content"], max_tokens=256)
+        resp, seconds = chat(
+            spec["content"],
+            max_tokens=256,
+            reasoning=args.reasoning,
+        )
         regime = cache_regime(resp)
         row = {
             "call": spec["call"],
             "observed_regime": regime,
             "base_only": spec["content"] == BASE_PROMPT,
+            "reasoning": reasoning_content(resp),
             "seconds": round(seconds, 4),
             "usage": usage_fields(resp),
             "timings": timings(resp),
@@ -281,7 +302,18 @@ def main():
         default=20,
         help="films to probe per scenario (default 20)",
     )
-    parser.add_argument("--max-tokens", type=int, default=512)
+    parser.add_argument("--max-tokens", type=int, default=None)
+    parser.add_argument(
+        "--reasoning",
+        action="store_true",
+        help="let the model reason first (slower, larger token budget)",
+    )
+    parser.add_argument(
+        "--workers",
+        type=int,
+        default=4,
+        help="max concurrent calls (matches the engines' 4 parallel slots)",
+    )
     parser.add_argument(
         "--threshold", type=float, default=0.8, help="ExactMatchMetric threshold"
     )
@@ -295,6 +327,14 @@ def main():
     )
     parser.add_argument("--skip-health", action="store_true", help="skip health probes")
     args = parser.parse_args()
+
+    if args.reasoning and args.max_tokens is None:
+        args.max_tokens = 1536
+    if args.max_tokens is None:
+        args.max_tokens = 512
+    args.reasoning = {"enabled": True} if args.reasoning else {"enabled": False}
+    if args.workers < 1:
+        sys.exit("--workers must be >= 1")
 
     if not args.skip_health and not health(args.base_url + "/health/readiness"):
         sys.exit(f"gateway not ready at {args.base_url}/health/readiness")
@@ -312,19 +352,22 @@ def main():
     sample = sample_rows(rows, args.sample)
     print(f"{len(rows)} rows loaded, sampling {len(sample)} ({args.sample})")
 
-    recall, recall_ok = scenario_studio_recall(sample, args)
-    print(f"scenario 1 studio recall: {recall_ok}/{len(recall)}")
+    with concurrent.futures.ThreadPoolExecutor(max_workers=args.workers) as executor:
+        recall, recall_ok = scenario_studio_recall(sample, args, executor)
+        print(f"scenario 1 studio recall: {recall_ok}/{len(recall)}")
 
-    year_match, year_ok = scenario_year_match(sample, args)
-    print(f"scenario 2 year match (+/-{YEAR_TOLERANCE}): {year_ok}/{len(year_match)}")
+        year_match, year_ok = scenario_year_match(sample, args, executor)
+        print(
+            f"scenario 2 year match (+/-{YEAR_TOLERANCE}): {year_ok}/{len(year_match)}"
+        )
 
-    year_repeat, exact_score, exact_passed = scenario_year_repeat(
-        sample, args, args.threshold
-    )
-    print(
-        f"scenario 3 year repeat ExactMatchMetric: {exact_score:.2f} "
-        f"({'PASS' if exact_passed else 'FAIL'})"
-    )
+        year_repeat, exact_score, exact_passed = scenario_year_repeat(
+            sample, args, args.threshold, executor
+        )
+        print(
+            f"scenario 3 year repeat ExactMatchMetric: {exact_score:.2f} "
+            f"({'PASS' if exact_passed else 'FAIL'})"
+        )
 
     demo = cache_demo(args)
     print("cache demo Q1/Q2/Q3 done")
@@ -339,6 +382,8 @@ def main():
         "dataset": args.csv,
         "sample": len(sample),
         "year_tolerance": YEAR_TOLERANCE,
+        "reasoning": "enabled" if args.reasoning["enabled"] else "disabled",
+        "workers": args.workers,
     }
     results = {
         "meta": meta,

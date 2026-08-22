@@ -244,4 +244,6 @@ You can later replace yourself some componets with bigger guns "propmeteus + gra
 
 **Hint:** You can rum big montirong stack on second computer - like gamming PC (gateway + interference engine) + laptop (monitoring) booted live Linux from USB disk
 
+**Advanced**: In realted projects we will also address HybridAI approches - runing some large models in NeoClouds envorments.
+
 *Footnote: I have dyslexia and I am not a native English speaker, so from time to time I let the LLMs give my English a power-up — think of it as a GPU-accelerated spellchecker running at a few hundred tokens per second. If any sentence here reads a little too polished, that was the model showing off, not me.*

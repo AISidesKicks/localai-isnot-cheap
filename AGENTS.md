@@ -11,7 +11,7 @@ vLLM, SGLang engines, Arize Phoenix observability, VictoriaMetrics).
 
 The tone for documenting steps is informal.
 
-Main programing language is Python, use PEP conventions with condenced naming.
+Main programming language is Python 3.12, use PEP conventions with condensed naming.
 
 ## Repository layout
 

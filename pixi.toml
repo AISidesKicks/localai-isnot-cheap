@@ -6,6 +6,8 @@ platforms = ["linux-64"]
 version = "0.1.0"
 
 [tasks]
+cinematic-01-generate = "python smoketests/cinematic-01/generate.py"
+cinematic-01-test = "python smoketests/cinematic-01/test.py"
 
 [dependencies]
 python = "3.12.*"

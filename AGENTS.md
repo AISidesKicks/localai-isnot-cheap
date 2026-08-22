@@ -26,6 +26,11 @@ We are running inside "pixi shell" 'cheap' - check it before implementing plans 
 Before install of python packages double-check "pixi info | grep Name" returns 'cheap'
 Python env has a preinstalled set of tools — suggest set expansion, if needed.
 
+## CHEAP docker environment (isolated with prefix cheap-)
+
+All project related containers, volumes, networks and so on must have 'cheap-' prefix, even test and temp ones!
+Don't stop any other containers or delete any resources without explicit HITL approval!
+
 ## Commit conventions
 
 Auto-commit locally, so we can keep track, using these rules:

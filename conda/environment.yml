@@ -1,0 +1,33 @@
+name: cheap
+channels:
+  - conda-forge
+  - defaults
+dependencies:
+  - python=3.12
+  - pip
+  - pip:
+      - litellm
+      - openai
+      - python-dotenv
+      - pydantic >=2.0
+      - deepeval
+      - promptfoo
+      - ragas
+      - trulens
+      - trulens-providers-litellm
+      - trulens-providers-openai
+      - promptrefiner
+      - promptimal
+      - pandas
+      - tenacity
+      - matplotlib
+      - seaborn
+      - datasets
+      - rapidfuzz
+      - pytest
+      - httpx
+      - httpx-sse
+      - asyncio
+      - anyio
+      - diskcache
+

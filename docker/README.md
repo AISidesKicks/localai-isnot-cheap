@@ -253,6 +253,42 @@ built-in UI. This is fine — the WebUI lives in llama.ui on 3333 instead.
 `LITELLM_WEBUI_KEY` is still defined in `.env`/compose even though Open WebUI was
 removed; llama.ui uses it for manual config, so keep it.
 
+## Monitoring
+
+The datastores are watched too — not just the inference engines. Stock Redis and
+PostgreSQL images don't expose a Prometheus `/metrics` endpoint, so the stack
+runs **sidecar exporters**: small containers co-located with the datastore that
+translate its stats into Prometheus-format metrics.
+
+| Sidecar | Image | Scrapes | Exposes |
+|---------|-------|---------|---------|
+| `cheap-redis-exporter` | `oliver006/redis_exporter` | `redis://cheap-redis:6379` | `:9121/metrics` |
+| `cheap-postgres-exporter` | `prometheuscommunity/postgres-exporter` | `cheap-postgres:5432` (LiteLLM db) | `:9187/metrics` |
+
+Both are capped at **0.50 CPU / 256M memory** via `deploy.resources.limits` —
+same thin limits as the rest of the metric path (VictoriaMetrics itself runs on
+the same cap). They start only after their datastore reports healthy
+(`depends_on: service_healthy`), so they never scrape a half-booted DB. The
+Redis exporter intentionally has **no healthcheck** (its `:latest` image is
+scratch-based — no shell or wget); the Postgres exporter's busybox-based image
+has one that wgets `/metrics`.
+
+VictoriaMetrics scrapes both through `prometheus.yml` (labels
+`db_type: redis` / `db_type: postgres`). Query them like the engine metrics —
+through the VM query API on 8428:
+
+```sh
+# is the exporter connected to Redis? (1 = up)
+curl -s 'http://localhost:8428/api/v1/query?query=redis_up'
+# is the postgres scrape working? (1 = up)
+curl -s 'http://localhost:8428/api/v1/query?query=pg_up'
+```
+
+or browse them in the VM UI at http://localhost:8428/vmui. Useful datastore
+metrics behind those scrapes: `redis_connected_clients`,
+`redis_memory_used_bytes`, `redis_keyspace_hits_total`, `pg_stat_database_numbackends`,
+`pg_stat_database_tup_returned`, and `pg_size_bytes`-style per-database gauges.
+
 ## Port map
 
 | Port | Service        | Notes                          |
@@ -260,7 +296,9 @@ removed; llama.ui uses it for manual config, so keep it.
 | 4000 | LiteLLM        | OpenAI-compatible gateway + MCP gateway (`/mcp`) |
 | 3333 | llama.ui       | browser-hosted WebUI (data in IndexedDB, no volume) |
 | 5432 | PostgreSQL     | LiteLLM + Phoenix databases    |
+| 9187 | Postgres exporter | Prometheus `/metrics` for PostgreSQL |
 | 6379 | Redis          | LiteLLM cache                  |
+| 9121 | Redis exporter | Prometheus `/metrics` for Redis |
 | 8080 | llama.cpp      | API-only (`--no-webui`), only with `--profile llamasrv` |
 | 8000 | vLLM           | only with `--profile vllm`     |
 | 30000| SGLang         | only with `--profile sglang`   |
@@ -356,4 +394,6 @@ The embed alias instead serves `nomic-embed-text-v1.5` (768-dim) on llama.cpp
 | vLLM | local inference engine (W8A16) | https://github.com/vllm-project/vllm |
 | SGLang | local inference engine (W8A16) | https://github.com/sgl-project/sglang |
 | PostgreSQL | LiteLLM + Phoenix databases | https://www.postgresql.org |
+| Postgres exporter | Prometheus `/metrics` for PostgreSQL | https://github.com/prometheus-community/postgres_exporter |
 | Redis | LiteLLM cache | https://redis.io |
+| Redis exporter | Prometheus `/metrics` for Redis | https://github.com/oliver006/redis_exporter |

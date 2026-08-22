@@ -5,7 +5,14 @@ name = "cheap"
 platforms = ["linux-64"]
 version = "0.1.0"
 
+[activation]
+
+[activation.env]
+TMPDIR = "/run/user/$UID/pixi_tmp/$PIXI_PROJECT_NAME"
+SCRATCH = "$PIXI_PROJECT_ROOT/scratch"
+
 [tasks]
+default = "mkdir -p /run/user/$UID/pixi_tmp/$PIXI_PROJECT_NAME"
 cinematic-01-generate = "python smoketests/cinematic-01/generate.py"
 cinematic-01-test = "python smoketests/cinematic-01/test.py"
 

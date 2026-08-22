@@ -32,8 +32,23 @@ the model's limitations.
 Every call goes through `llm.chat()` with a Pydantic `response_format`
 (`StudioList` / `FilmList` / `YearAnswer`) plus
 `enable_json_schema_validation=True`. The 2.6B camel is comfortable emitting
-small JSON; reasoning is turned off (`{"enabled": False}`) so the answer lands
-in `content` fast instead of eating the token budget in `reasoning_content`.
+small JSON. Reasoning is a test-time opt-in (`--reasoning`, mirroring
+`generate.py`): off by default so the answer lands in `content` fast instead of
+eating the token budget; when on, the engine gets headroom (max_tokens up to
+1536) and the thinking text is recorded per call via
+`llm.reasoning_content()`. The `generate.py` path keeps reasoning **off**
+(`{"enabled": False}`) because the dataset needs clean, fast schema answers.
+
+## Concurrency
+
+The `test.py` step runs its three scenarios (studio recall, year match, year
+repeat) through a `ThreadPoolExecutor` with `--workers` (default 4), matching
+the engines' 4 parallel slots (llama.cpp `--parallel 4`, vLLM
+`--max-num-seqs 4`, SGLang `--max-running-requests 4`) and the 128K contexts.
+Row order stays deterministic (`executor.map`); each call resolves its own
+master key per thread. The cache demo stays sequential so Q2 can observe Q1's
+Redis hit. Run mode is recorded in `meta` (`reasoning: enabled/disabled`,
+`workers`) and shown in the rendered report.
 
 ## Dedup and the year guard
 

@@ -55,8 +55,10 @@ so an eval can show cost-to-serve per prompt.
 ## Layout
 
 ```
-datasets/cinematic-01-dataset.csv     QUOTE_ALL dataset (studio name, film name, year)
-datasets/cinematic-01-generate.json   per-call run log/checkpoint from generate.py
-datasets/cinematic-01-results.json    raw rows from test.py
-datasets/cinematic-01-eval.json       scored scenarios from test.py
+datasets/cinematic-01/dataset.csv     QUOTE_ALL dataset (studio name, film name, year)
+datasets/cinematic-01/generate.json   per-call run log/checkpoint from generate.py
+datasets/cinematic-01/results.json    raw rows from test.py
+datasets/cinematic-01/eval.json       scored scenarios from test.py
 ```
+
+Mirrors `smoketests/cinematic-01/` so the dataset dir scopes the `cinematic-01` prefix.

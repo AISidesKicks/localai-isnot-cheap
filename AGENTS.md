@@ -6,10 +6,12 @@ You are an experienced Inference Engineer.
 
 This is an **educational EDU AI LAB** project — "Local AI is not cheap!" It
 demonstrates how to meter and bill AI tokens for local inference in a small
-lab environment (LiteLLM gateway, llama.ui WebUI, Redis caching, and (llama.cpp, vLLM,
-SGLang) engines, Arize Phoenix observability, VictoriaMetrics).
+lab environment (LiteLLM gateway, llama.ui, Redis caching, and llama.cpp,
+vLLM, SGLang engines, Arize Phoenix observability, VictoriaMetrics).
 
 The tone for documenting steps is informal.
+
+Main programing language is Python, use PEP conventions with condenced naming.
 
 ## Repository layout
 
@@ -28,5 +30,4 @@ Auto-commit locally, so we can keep track, using these rules:
 
 ## Task completion notification
 
-When the work for a task is done — announce "All tasks are done" without a
-bell or beep characters.
+When the work for a task is done — announce "All tasks are done".

@@ -131,19 +131,19 @@ We can also try Google's [embeddinggemma](https://ai.google.dev/gemma/docs/embed
                                       │
                                       │ (1. API Request + Virtual Key)
                                       ▼
-┌───────────────────────────────────────────────────────────────────────────┐ ┌─────────────┐
-│                           LITELLM (AI GATEWAY)                            │ │  LLAMA.UI   │
-│     • Request Interception & Quota Checks (Users/Teams/Apps)              │ │             │
-│     • Cache Layer: Exact / Semantic Response Matching                     │ │ • manual    │
-│     • Rate Limiting (TPM/RPM) & Dynamic Cost Calculation                  │ │  debugging  │
-│     • OTLP Trace Export to Phoenix                                        │ │  (point to  │
-│     • MCP Gateway: MCP and namespaced tools                               │ │   srv API)  │
-│     • Skills HUB: Set of useful skills                                    │ │             │
-└───────┬────────────────────────────────┬───────────────────────────────┬──┘ └─────────────┘
-        │                                │                               │
-        │ (2. Cache Lookup               │ (3. Cache Miss:               │ (4. OTLP Trace &)
-        │     Auth Key Check)            │     Inference Request)        │     Usage Events)
-        ▼                                ▼                               ▼
+       ┌─.─.─.─ ┌──────────────────────────────────────────────────────────┐ ┌─.─.─.─.─.─.─┐
+       ▽        │          LITELLM (AI GATEWAY)                            │ │  LLAMA.UI   │
+┌─.─.─.─.─.─.─┐ │ • Request Interception & Quota Checks (Users/Teams/Apps) │ ◁             │
+│OpenResponses│ │ • Cache Layer: Exact / Semantic Response Matching        │ │ • manual    │
+│             │ │ • Rate Limiting (TPM/RPM) & Dynamic Cost Calculation     │ │  debugging  │
+│ • API Sim   │ │ • OTLP Trace Export to Phoenix                           │ │  (point to  │
+│   (MongoDB) │ │ • MCP Gateway: MCP and namespaced tools                  │ │   srv API)  │
+│             │ │ • Skills HUB: Set of useful skills                       │ │             │
+└─.┬.─.─.─.─.┬┘ └─┬──────────────────────────┬─────────────────────────┬───┘ └─.┬.─.─.─.─.─┘
+   │         └ ─ ─│ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─┬── │ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ │ ─ ─ ─ ─┘
+   │ (9. Session) │ (2. Cache Lookup     │   │ (3. Cache Miss:         │ (4. OTLP Trace &)
+   │     Lookup   │     Auth Key Check)  │   │     Inference Request)  │     Usage Events)
+   ▽              ▼                      ▽   ▼                         ▼
 ┌───────────────────────┐ ┌───────────────────────────────┐ ┌────────────────────────────────┐
 │        REDIS          │ │   LOCAL AI INFERENCE ENGINE   │ │    PHOENIX (OBSERVABILITY)     │
 │ LiteLLM Cache:        │ │ [ llama.cpp | vLLM | SGLang ] │ │ • OTLP Trace Ingestion         │
@@ -201,6 +201,10 @@ Custom report scripts query the persisted trace and spend data to build per-team
    - **Governed (MCP Gateway / Toolsets):** ideally agents don't touch raw infrastructure; they reach it through governed MCP access:
       - **Aggregated (MCP Gateway):** all three admin MCPs surface behind the gateway's single MCP endpoint, tools namespaced per server (`phoenix-*`, `victoriametrics-*`, `litellm_admin-*`).
       - **Managed (Toolsets):** curated, named subsets of tools pulled from across the servers, so each team only gets the slice of the lab they're meant to see.
+
+9. **Responces API simulation (OPTIONAL):**
+   - ..Expand here.. This also a CACHE type - rembers session flow  data):**
+   Mess as usual [Open Responses ORG/](openresponses.org) $\rightarrow$ [open-responses](https://github.com/open-responses/open-responses)
 ---
 
 ### Will it RUN considerations
@@ -249,17 +253,17 @@ You can later replace yourself some componets with bigger guns "propmeteus + gra
 
 **Advanced**: In realted projects we will also address HybridAI approches - runing some large models in NeoClouds envorments.
 
-*Footnote: I have dyslexia and I am not a native English speaker, so from time to time I let the LLMs give my English a power-up — think of it as a GPU-accelerated spellchecker running at a few hundred tokens per second. If any sentence here reads a little too polished, that was the model showing off, not me.*
-
 ### Will it BREACH considerations
 
 Well more in "way" - will it mess a LOT???
 
 **Isolation**
-  - docker (docker): main services are isolated by deafult
-  - microsandbox (superradcompany): we can isolate tools calls and agents
+  - [docker (Docker Engine)](https://docs.docker.com/engine/install/): main services are isolated by deafult
+  - [microsandbox (superradcompany)](https://github.com/superradcompany/microsandbox): we can isolate tools calls and agents (MicroVMs (KVM) + OCI Images)
 
 **Least info visible**
   - Backup outside box (or at least not auto mouted path)
   - I encript .env for projects I am not working on
   - Shapshot to backup regulary git for EDU AI LAB
+
+*Footnote: I have dyslexia and I am not a native English speaker, so from time to time I let the LLMs give my English a power-up — think of it as a GPU-accelerated spellchecker running at a few hundred tokens per second. If any sentence here reads a little too polished, that was the model showing off, not me.*

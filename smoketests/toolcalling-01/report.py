@@ -95,10 +95,10 @@ def render(results, eval_summary, run_id):
     a("## Per-scenario detail")
     a("")
     a(
-        "| Scenarios | tool_calls | name_ok | args_ok | syntax_ok | pythonic | round_trip_ok | seconds |"
+        "| Scenarios | tool_calls | name_ok | args_ok | syntax_ok | pythonic | round_trip_ok | exec_ok | executor | exec_sec | seconds |"
     )
     a(
-        "|-----------|------------|---------|---------|-----------|----------|---------------|---------|"
+        "|-----------|------------|---------|---------|-----------|----------|---------------|---------|----------|----------|---------|"
     )
     for r in rows:
         pythonic = r.get("pythonic") or "—"
@@ -109,7 +109,11 @@ def render(results, eval_summary, run_id):
             f"{'Y' if r.get('tool_name_ok') else 'n'} | "
             f"{'Y' if r.get('args_ok') else 'n'} | "
             f"{'Y' if r.get('syntax_ok') else 'n'} | `{pythonic}` | "
-            f"{'Y' if r.get('round_trip_ok') else 'n'} | {r.get('seconds', 0.0):.2f}s |"
+            f"{'Y' if r.get('round_trip_ok') else 'n'} | "
+            f"{'Y' if r.get('executed_ok') else 'n'} | "
+            f"{r.get('executor_mode', '—')} | "
+            f"{r.get('exec_seconds', 0.0):.2f}s | "
+            f"{r.get('seconds', 0.0):.2f}s |"
         )
     a("")
 

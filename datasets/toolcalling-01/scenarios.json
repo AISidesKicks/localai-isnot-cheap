@@ -43,6 +43,20 @@
           "required": ["title"]
         }
       }
+    },
+    {
+      "type": "function",
+      "function": {
+        "name": "fs_list",
+        "description": "List filesystem entries at a given path.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "path": {"type": "string", "description": "Filesystem path to list"}
+          },
+          "required": ["path"]
+        }
+      }
     }
   ],
   "scenarios": [
@@ -68,6 +82,13 @@
       "expect_tool": true
     },
     {
+      "id": "calc-bill-real",
+      "prompt": "Calculate 15% of a $120 bill using the calculator tool.",
+      "tool": "calculate",
+      "args": {"expression": "0.15 * 120"},
+      "expect_tool": true
+    },
+    {
       "id": "calc-multiply",
       "prompt": "Work out 12 times 7.",
       "tool": "calculate",
@@ -82,10 +103,31 @@
       "expect_tool": true
     },
     {
+      "id": "film-totoro-real",
+      "prompt": "What year was My Neighbor Totoro released? Use the film index tool.",
+      "tool": "lookup_film_year",
+      "args": {"title": "My Neighbor Totoro", "studio": "Studio Ghibli"},
+      "expect_tool": true
+    },
+    {
       "id": "film-inception",
       "prompt": "What was the release year of Inception from Warner Bros.?",
       "tool": "lookup_film_year",
       "args": {"title": "Inception", "studio": "Warner Bros."},
+      "expect_tool": true
+    },
+    {
+      "id": "film-inception-real",
+      "prompt": "What year was Inception released? Use the film index tool.",
+      "tool": "lookup_film_year",
+      "args": {"title": "Inception", "studio": "Warner Bros."},
+      "expect_tool": true
+    },
+    {
+      "id": "fs-list-root",
+      "prompt": "List the files in the root directory using the filesystem tool.",
+      "tool": "fs_list",
+      "args": {"path": "/"},
       "expect_tool": true
     }
   ]

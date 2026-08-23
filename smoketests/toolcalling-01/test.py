@@ -26,6 +26,7 @@ import time
 
 sys.path.insert(0, os.path.dirname(__file__))
 
+from executor import detect_executor
 from llm import (
     DEFAULT_BASE_URL,
     DEFAULT_TEMPERATURE,
@@ -40,6 +41,7 @@ from llm import (
     tool_calls,
     usage_fields,
 )
+from sandbox import SandboxContext, stop_and_remove
 
 DEFAULT_SCENARIOS = os.path.join(
     get_repo_root(), "datasets", "toolcalling-01", "scenarios.json"
@@ -91,6 +93,19 @@ def pythonic_syntax(name, args_parsed):
     return source
 
 
+def execute_tool(tool_name, args_dict, executor):
+    """Execute a tool call through the active executor."""
+    import time as _time
+
+    t0 = _time.monotonic()
+    try:
+        content = executor.execute(tool_name, args_dict)
+    except Exception as exc:  # noqa: BLE001
+        content = f"error: {exc}"
+    elapsed = round(_time.monotonic() - t0, 3)
+    return content, executor.mode, elapsed
+
+
 def mock_result(call):
     """Return a mock tool output string (stub; never hits an external API)."""
     template = MOCK_RESPONSES.get(call.get("name"), "ok")
@@ -101,7 +116,7 @@ def mock_result(call):
         return "ok"
 
 
-def run_case(scenario, args):
+def run_case(scenario, args, executor=None):
     """One scenario: emit tool calls, score name/args/syntax, optional round-trip."""
     data = load_scenarios(args.scenarios)
     tools = data["tools"]
@@ -145,6 +160,9 @@ def run_case(scenario, args):
         "timings": timings(last_resp) if last_resp else {},
         "seconds": round(last_seconds, 3) if last_seconds else 0.0,
         "usage": usage_fields(last_resp) if last_resp else {},
+        "executed_ok": False,
+        "executor_mode": executor.mode if executor else "local",
+        "exec_seconds": 0.0,
     }
 
     if not selected:
@@ -169,9 +187,20 @@ def run_case(scenario, args):
         }
     )
 
+    exec_content = None
     if args.round_trip and pythonic is not None and args_parsed is not None:
+        if executor is not None:
+            content_str, exe_mode, exe_sec = execute_tool(
+                selected["name"], args_parsed, executor
+            )
+            row["executed_ok"] = True
+            row["executor_mode"] = exe_mode
+            row["exec_seconds"] = exe_sec
+            exec_content = content_str
+        else:
+            exec_content = mock_result(selected)
         selected["_args"] = args_parsed
-        rt = roundtrip(content, tools, selected, args)
+        rt = roundtrip(content, tools, selected, args, exec_content=exec_content)
         row["round_trip"] = rt
         row["round_trip_ok"] = bool(rt and rt.get("final_answer"))
         row["final_answer"] = rt.get("final_answer") if rt else None
@@ -186,8 +215,9 @@ def raw_args_json(call):
         return "{}"
 
 
-def roundtrip(content, tools, call, args):
-    """Feed a mock tool result back and ask for the final answer."""
+def roundtrip(content, tools, call, args, exec_content=None):
+    """Feed a (mock or real) tool result back and ask for the final answer."""
+    tool_result = exec_content if exec_content is not None else mock_result(call)
     messages = [
         {"role": "user", "content": content},
         {
@@ -204,7 +234,7 @@ def roundtrip(content, tools, call, args):
                 }
             ],
         },
-        {"role": "tool", "tool_call_id": "call_mock", "content": mock_result(call)},
+        {"role": "tool", "tool_call_id": "call_mock", "content": tool_result},
         {"role": "user", "content": "Using the tool result, give the final answer."},
     ]
     resp, seconds = chat(
@@ -257,6 +287,12 @@ def main():
         "--model", default=MODEL, help="gateway model alias (default local-sglang)"
     )
     parser.add_argument("--skip-health", action="store_true", help="skip health probes")
+    parser.add_argument(
+        "--executor",
+        default="auto",
+        choices=["sandbox", "local", "auto"],
+        help="tool executor mode (default auto: probe sandbox, fall back local)",
+    )
     args = parser.parse_args()
     import llm as llm_mod
 
@@ -280,12 +316,29 @@ def main():
         sys.exit("empty scenarios file")
     print(f"{len(scenarios)} scenarios loaded")
 
+    sandbox_ctx = SandboxContext()
+    tool_executor = None
+    executor_mode = "local"
+    try:
+        tool_executor, executor_mode = detect_executor(
+            sandbox_ctx, prefer=args.executor
+        )
+        print(f"executor mode: {executor_mode}")
+    except Exception as exc:  # noqa: BLE001
+        print(f"executor detection failed ({exc}); using local mock", file=sys.stderr)
+
     rows = []
-    with concurrent.futures.ThreadPoolExecutor(max_workers=args.workers) as executor:
-        futures = [executor.submit(run_case, s, args=args) for s in scenarios]
+    with concurrent.futures.ThreadPoolExecutor(max_workers=args.workers) as pool:
+        futures = [
+            pool.submit(run_case, s, args=args, executor=tool_executor)
+            for s in scenarios
+        ]
         for fut in concurrent.futures.as_completed(futures):
             rows.append(fut.result())
     rows.sort(key=lambda r: r["scenario"])
+
+    if sandbox_ctx.sandbox is not None:
+        stop_and_remove(sandbox_ctx)
 
     for row in rows:
         print(

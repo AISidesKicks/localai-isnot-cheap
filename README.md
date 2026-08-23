@@ -202,9 +202,9 @@ Custom report scripts query the persisted trace and spend data to build per-team
       - **Aggregated (MCP Gateway):** all three admin MCPs surface behind the gateway's single MCP endpoint, tools namespaced per server (`phoenix-*`, `victoriametrics-*`, `litellm_admin-*`).
       - **Managed (Toolsets):** curated, named subsets of tools pulled from across the servers, so each team only gets the slice of the lab they're meant to see.
 
-9. **Responces API simulation (OPTIONAL):**
-   - ..Expand here.. This also a CACHE type - rembers session flow  data):**
-   Mess as usual [Open Responses ORG/](openresponses.org) $\rightarrow$ [open-responses](https://github.com/open-responses/open-responses)
+9. **Responses API simulation (OPTIONAL):**
+   - A session-aware cache layer that remembers conversation flow and state across turns
+   - See [Open Responses](https://github.com/open-responses/open-responses)
 ---
 
 ### Will it RUN considerations
@@ -258,12 +258,15 @@ You can later replace yourself some componets with bigger guns "propmeteus + gra
 Well more in "way" - will it mess a LOT???
 
 **Isolation**
-  - [docker (Docker Engine)](https://docs.docker.com/engine/install/): main services are isolated by deafult
-  - [microsandbox (superradcompany)](https://github.com/superradcompany/microsandbox): we can isolate tools calls and agents (MicroVMs (KVM) + OCI Images)
+  - [docker (Docker Engine)](https://docs.docker.com/engine/install/): main services are isolated by default
+  - [microsandbox (superradcompany)](https://github.com/superradcompany/microsandbox): we can isolate tool calls and agents (MicroVMs on KVM + OCI Images)
+  **Note:** There is a **Docker sandbox** project, but [microsandbox](https://docs.microsandbox.dev/getting-started/agents) is more lightweight and has CLI, SDK, API, MCP, SKILL = 100% Agentic Infra FIT!
 
 **Least info visible**
   - Backup outside box (or at least not auto mouted path)
   - I encript .env for projects I am not working on
-  - Shapshot to backup regulary git for EDU AI LAB
+  - I use disposable read-only keys (like **HF**) or prepaid per-project keys with caps and small budget (like **OpenRouter**, **VERDA** ...)
+  - Snapshot and backup regularly git for EDU AI LAB
+  - YES, we can in future make lab to run inside **Docker sandbox** (lab needs a programming AI harness like **opencode**)
 
 *Footnote: I have dyslexia and I am not a native English speaker, so from time to time I let the LLMs give my English a power-up — think of it as a GPU-accelerated spellchecker running at a few hundred tokens per second. If any sentence here reads a little too polished, that was the model showing off, not me.*

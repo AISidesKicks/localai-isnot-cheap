@@ -158,10 +158,6 @@ services:
       - "--parallel"
       - "4"
       - "--no-kv-unified"
-      - "-ctk"
-      - "q8_0"
-      - "-ctv"
-      - "q8_0"
       - "--no-webui"
     volumes:
       - ./models:/models:ro

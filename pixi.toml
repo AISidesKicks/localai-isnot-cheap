@@ -18,6 +18,7 @@ cinematic-01-test = "python smoketests/cinematic-01/test.py"
 cinematic-01-report = "python smoketests/cinematic-01/report.py"
 toolcalling-01-test = "python smoketests/toolcalling-01/test.py"
 toolcalling-01-report = "python smoketests/toolcalling-01/report.py"
+toolcalling-01-sandbox = "python smoketests/toolcalling-01/test.py --executor sandbox --round-trip"
 
 [dependencies]
 python = "3.12.*"

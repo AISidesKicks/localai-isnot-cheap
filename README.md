@@ -250,3 +250,16 @@ You can later replace yourself some componets with bigger guns "propmeteus + gra
 **Advanced**: In realted projects we will also address HybridAI approches - runing some large models in NeoClouds envorments.
 
 *Footnote: I have dyslexia and I am not a native English speaker, so from time to time I let the LLMs give my English a power-up — think of it as a GPU-accelerated spellchecker running at a few hundred tokens per second. If any sentence here reads a little too polished, that was the model showing off, not me.*
+
+### Will it BREACH considerations
+
+Well more in "way" - will it mess a LOT???
+
+**Isolation**
+  - docker (docker): main services are isolated by deafult
+  - microsandbox (superradcompany): we can isolate tools calls and agents
+
+**Least info visible**
+  - Backup outside box (or at least not auto mouted path)
+  - I encript .env for projects I am not working on
+  - Shapshot to backup regulary git for EDU AI LAB

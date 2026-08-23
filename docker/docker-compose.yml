@@ -228,6 +228,8 @@ services:
       - "30000"
       - "--reasoning-parser"
       - "deepseek-r1"
+      - "--tool-call-parser"
+      - "lfm2"
       - "--enable-metrics"
       - "--context-length"
       - "128000"

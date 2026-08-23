@@ -1,0 +1,1215 @@
+{
+  "meta": {
+    "name": "cinematic-01",
+    "test": "smoketests/cinematic-01/test.py",
+    "run_id": "run-20260823-093956-local-vllm",
+    "run_at": "2026-08-23T09:41:15+0200",
+    "model_alias": "local-vllm",
+    "cache_mode": "both",
+    "base_url": "http://localhost:4000",
+    "dataset": "/home/roro/Workspaces/localai-isnot-cheap/datasets/cinematic-01/dataset.csv",
+    "sample": 20,
+    "year_tolerance": 2,
+    "reasoning": "disabled",
+    "workers": 4
+  },
+  "scenario_1_studio_recall": {
+    "score": "6/20",
+    "rows": [
+      {
+        "studio": "Marvel Studios",
+        "film": "Iron Man",
+        "guess": "Marvel Studios",
+        "answer": "{\"studios\": [\"Marvel Studios\"]}",
+        "correct": true,
+        "cache_regime": "litellm-redis-miss",
+        "reasoning": "The user asks: \"Which studio produced the movie 'Iron Man'? Reply with only a JSON object shaped like {\"studios\": [\"Studio Name\"]}.\"\n\nWe need to answer with exactly that format, containing a JSON object with key \"studios\" and an array of strings (the studio name). The question is about which studio produced the movie \"Iron Man\". There are multiple Iron Man movies. The original 2008 film \"Iron Man\"...",
+        "seconds": 3.899,
+        "usage": {
+          "prompt_tokens": 37,
+          "completion_tokens": 298,
+          "total_tokens": 335
+        }
+      },
+      {
+        "studio": "DC Studios",
+        "film": "The Dark Knight",
+        "guess": "Warner Bros. Pictures",
+        "answer": "{\"studios\": [\"Warner Bros. Pictures\", \"Legendary Pictures\"]}",
+        "correct": false,
+        "cache_regime": "litellm-redis-miss",
+        "reasoning": "The user asks: \"Which studio produced the movie 'The Dark Knight'? Reply with only a JSON object shaped like {\"studios\": [\"Studio Name\"]}.\"\n\nWe need to output exactly a JSON object with key \"studios\" and an array of strings containing the studio name(s). The question is about which studio produced \"The Dark Knight\". That film was produced by Warner Bros. (the main studio) and also by Legendary Pic...",
+        "seconds": 4.89,
+        "usage": {
+          "prompt_tokens": 38,
+          "completion_tokens": 426,
+          "total_tokens": 464
+        }
+      },
+      {
+        "studio": "Walt Disney Pictures",
+        "film": "The Lion King",
+        "guess": "Walt Disney Animation Studios",
+        "answer": "{\"studios\": [\"Walt Disney Animation Studios\"]}",
+        "correct": false,
+        "cache_regime": "litellm-redis-miss",
+        "reasoning": "The user asks: \"Which studio produced the movie 'The Lion King'? Reply with only a JSON object shaped like {\"studios\": [\"Studio Name\"]}.\"\n\nWe need to output exactly a JSON object with key \"studios\" and an array of strings containing the studio name(s). The question is about which studio produced the movie \"The Lion King\". There are multiple versions: The original 1994 animated film was produced by...",
+        "seconds": 3.569,
+        "usage": {
+          "prompt_tokens": 38,
+          "completion_tokens": 257,
+          "total_tokens": 295
+        }
+      },
+      {
+        "studio": "Pixar Animation Studios",
+        "film": "A Bug's Life",
+        "guess": "Pixar Animation Studios",
+        "answer": "{\"studios\": [\"Pixar Animation Studios\"]}",
+        "correct": true,
+        "cache_regime": "litellm-redis-miss",
+        "reasoning": "The user asks: \"Which studio produced the movie 'A Bug's Life'? Reply with only a JSON object shaped like {\"studios\": [\"Studio Name\"]}.\"\n\nWe need to output exactly a JSON object with key \"studios\" and an array of strings containing the studio name(s). The question is about which studio produced the movie \"A Bug's Life\". That film was produced by Pixar Animation Studios (and also Disney? Actually, ...",
+        "seconds": 4.762,
+        "usage": {
+          "prompt_tokens": 39,
+          "completion_tokens": 412,
+          "total_tokens": 451
+        }
+      },
+      {
+        "studio": "Warner Bros. Pictures",
+        "film": "The Dark Knight Rises",
+        "guess": "Warner Bros.",
+        "answer": "{\"studios\": [\"Warner Bros.\"]}",
+        "correct": false,
+        "cache_regime": "litellm-redis-miss",
+        "reasoning": "We need to answer the question: \"Which studio produced the movie 'The Dark Knight Rises'?\" The user wants a reply with only a JSON object shaped like {\"studios\": [\"Studio Name\"]}. So we must output exactly that JSON, no extra text. The correct studio for The Dark Knight Rises is Warner Bros. (the production company). However, sometimes it's listed as \"Warner Bros. Pictures\" or just \"Warner Bros.\" ...",
+        "seconds": 1.585,
+        "usage": {
+          "prompt_tokens": 44,
+          "completion_tokens": 194,
+          "total_tokens": 238
+        }
+      },
+      {
+        "studio": "Universal Pictures",
+        "film": "Jurassic Park",
+        "guess": "Amblin Entertainment",
+        "answer": "{\"studios\": [\"Amblin Entertainment\"]}",
+        "correct": false,
+        "cache_regime": "litellm-redis-miss",
+        "reasoning": "The user asks: \"Which studio produced the movie 'Jurassic Park'? Reply with only a JSON object shaped like {\"studios\": [\"Studio Name\"]}.\"\n\nWe need to output exactly a JSON object with key \"studios\" and an array of strings containing the studio name(s). The question is about which studio produced Jurassic Park. The original film was produced by Amblin Entertainment (the production company) and also...",
+        "seconds": 2.189,
+        "usage": {
+          "prompt_tokens": 39,
+          "completion_tokens": 278,
+          "total_tokens": 317
+        }
+      },
+      {
+        "studio": "Paramount Pictures",
+        "film": "Star Wars: Episode IV – A New Hope",
+        "guess": "20th Century Fox",
+        "answer": "{\"studios\": [\"20th Century Fox\"]}",
+        "correct": false,
+        "cache_regime": "litellm-redis-miss",
+        "reasoning": "The user asks: \"Please answer again: Which studio produced the movie 'Star Wars: Episode IV – A New Hope'? Reply with only a JSON object shaped like {\"studios\": [\"Studio Name\"]}.\"\n\nWe need to output a JSON object with key \"studios\" and an array of studio names. The correct studio is 20th Century Fox (now 20th Century Studios). At the time, it was produced by 20th Century Fox. So the answer should ...",
+        "seconds": 1.111,
+        "usage": {
+          "prompt_tokens": 48,
+          "completion_tokens": 139,
+          "total_tokens": 187
+        }
+      },
+      {
+        "studio": "Sony Pictures",
+        "film": "Spider-Man: Into the Spider-Verse",
+        "guess": "Sony Pictures Animation",
+        "answer": "{\"studios\": [\"Sony Pictures Animation\", \"Columbia Pictures\"]}",
+        "correct": false,
+        "cache_regime": "litellm-redis-miss",
+        "reasoning": "The user asks: \"Which studio produced the movie 'Spider-Man: Into the Spider-Verse'? Reply with only a JSON object shaped like {\"studios\": [\"Studio Name\"]}.\"\n\nWe need to output exactly a JSON object with key \"studios\" and an array of strings containing the studio name(s). The question is about which studio produced the movie. The correct answer: \"Spider-Man: Into the Spider-Verse\" was produced by ...",
+        "seconds": 3.573,
+        "usage": {
+          "prompt_tokens": 44,
+          "completion_tokens": 460,
+          "total_tokens": 504
+        }
+      },
+      {
+        "studio": "Columbia Pictures",
+        "film": "Gone with the Wind",
+        "guess": "Metro-Goldwyn-Mayer",
+        "answer": "{\"studios\": [\"Metro-Goldwyn-Mayer\"]}",
+        "correct": false,
+        "cache_regime": "litellm-redis-miss",
+        "reasoning": "The user asks: \"Which studio produced the movie 'Gone with the Wind'? Reply with only a JSON object shaped like {\"studios\": [\"Studio Name\"]}.\"\n\nWe need to output exactly a JSON object with key \"studios\" and an array of strings containing the studio name(s). The question is about which studio produced the movie \"Gone with the Wind\". Historically, \"Gone with the Wind\" (1939) was produced by Metro-Go...",
+        "seconds": 2.185,
+        "usage": {
+          "prompt_tokens": 40,
+          "completion_tokens": 281,
+          "total_tokens": 321
+        }
+      },
+      {
+        "studio": "20th Century Studios",
+        "film": "Ratatouille",
+        "guess": "Pixar Animation Studios",
+        "answer": "{\"studios\": [\"Pixar Animation Studios\"]}",
+        "correct": false,
+        "cache_regime": "litellm-redis-miss",
+        "reasoning": "The user asks: \"Which studio produced the movie 'Ratatouille'? Reply with only a JSON object shaped like {\"studios\": [\"Studio Name\"]}.\"\n\nWe need to output exactly a JSON object with key \"studios\" and an array of strings containing the studio name(s). The question is about Ratatouille, which is a Pixar animated film. It was produced by Pixar Animation Studios (and also distributed by Walt Disney Pi...",
+        "seconds": 3.698,
+        "usage": {
+          "prompt_tokens": 40,
+          "completion_tokens": 473,
+          "total_tokens": 513
+        }
+      },
+      {
+        "studio": "DreamWorks Animation",
+        "film": "Shrek",
+        "guess": "DreamWorks Animation",
+        "answer": "{\"studios\": [\"DreamWorks Animation\"]}",
+        "correct": true,
+        "cache_regime": "litellm-redis-miss",
+        "reasoning": "The user asks: \"Which studio produced the movie 'Shrek'? Reply with only a JSON object shaped like {\"studios\": [\"Studio Name\"]}.\"\n\nWe need to output exactly a JSON object with key \"studios\" and an array of strings containing the studio name(s). The question is about Shrek. The original Shrek (2001) was produced by DreamWorks Animation, which is a studio. Also possibly \"DreamWorks SKG\". But typical...",
+        "seconds": 1.935,
+        "usage": {
+          "prompt_tokens": 37,
+          "completion_tokens": 242,
+          "total_tokens": 279
+        }
+      },
+      {
+        "studio": "Lionsgate Films",
+        "film": "The Fast and the Furious",
+        "guess": "20th Century Fox",
+        "answer": "{\"studios\": [\"20th Century Fox\"]}",
+        "correct": false,
+        "cache_regime": "litellm-redis-miss",
+        "reasoning": "We are asked to answer which studio produced the movie \"The Fast and the Furious\". The correct studio is 20th Century Fox (now owned by Disney, but historically it was 20th Century Fox). However, note that the franchise has been under different studios. The original \"The Fast and the Furious\" (2001) was produced by 20th Century Fox. But in recent years, after Disney acquired 20th Century Fox, the ...",
+        "seconds": 3.979,
+        "usage": {
+          "prompt_tokens": 45,
+          "completion_tokens": 509,
+          "total_tokens": 554
+        }
+      },
+      {
+        "studio": "A24",
+        "film": "Get Out",
+        "guess": "20th Century Fox",
+        "answer": "{\"studios\": [\"20th Century Fox\", \"Blumhouse Pictures\"]}",
+        "correct": false,
+        "cache_regime": "litellm-redis-miss",
+        "reasoning": "The user asks: \"Please answer again: Which studio produced the movie 'Get Out'? Reply with only a JSON object shaped like {\"studios\": [\"Studio Name\"]}.\"\n\nWe need to provide a JSON object with key \"studios\" and an array of studio names. The question: which studio produced the movie \"Get Out\". The film \"Get Out\" (2017) was directed by Jordan Peele, produced by various companies: It was produced by 2...",
+        "seconds": 3.419,
+        "usage": {
+          "prompt_tokens": 41,
+          "completion_tokens": 435,
+          "total_tokens": 476
+        }
+      },
+      {
+        "studio": "Metro-Goldwyn-Mayer",
+        "film": "Singin' in the Rain",
+        "guess": "Metro-Goldwyn-Mayer",
+        "answer": "{\"studios\": [\"Metro-Goldwyn-Mayer\"]}",
+        "correct": true,
+        "cache_regime": "litellm-redis-miss",
+        "reasoning": "The user asks: \"Which studio produced the movie 'Singin' in the Rain'? Reply with only a JSON object shaped like {\"studios\": [\"Studio Name\"]}.\"\n\nWe need to provide a JSON object with key \"studios\" and an array of strings containing the studio name(s). The question is about which studio produced the movie \"Singin' in the Rain\". I know that \"Singin' in the Rain\" (1952) was produced by MGM (Metro-Gol...",
+        "seconds": 2.086,
+        "usage": {
+          "prompt_tokens": 41,
+          "completion_tokens": 269,
+          "total_tokens": 310
+        }
+      },
+      {
+        "studio": "Legendary Entertainment",
+        "film": "X-Men: Days of Future Past",
+        "guess": "20th Century Fox",
+        "answer": "{\"studios\": [\"20th Century Fox\"]}",
+        "correct": false,
+        "cache_regime": "litellm-redis-miss",
+        "reasoning": "The user asks: \"Which studio produced the movie 'X-Men: Days of Future Past'? Reply with only a JSON object shaped like {\"studios\": [\"Studio Name\"]}.\"\n\nWe need to output exactly a JSON object with key \"studios\" and an array containing the studio name(s). The question is about which studio produced that movie. I know X-Men: Days of Future Past (2014) was produced by 20th Century Fox (now 20th Centu...",
+        "seconds": 2.645,
+        "usage": {
+          "prompt_tokens": 43,
+          "completion_tokens": 332,
+          "total_tokens": 375
+        }
+      },
+      {
+        "studio": "New Line Cinema",
+        "film": "Fight Club",
+        "guess": "New Line Cinema",
+        "answer": "{\"studios\": [\"New Line Cinema\"]}",
+        "correct": true,
+        "cache_regime": "litellm-redis-miss",
+        "reasoning": "The user asks: \"Which studio produced the movie 'Fight Club'? Reply with only a JSON object shaped like {\"studios\": [\"Studio Name\"]}.\"\n\nWe need to answer with exactly that format. The question is about the production studio(s) of the film Fight Club (1999). The main studio was New Line Cinema? Actually, Fight Club was directed by David Fincher and produced by New Line Cinema (the company behind ma...",
+        "seconds": 1.618,
+        "usage": {
+          "prompt_tokens": 38,
+          "completion_tokens": 202,
+          "total_tokens": 240
+        }
+      },
+      {
+        "studio": "Studio Ghibli",
+        "film": "My Neighbor Totoro",
+        "guess": "Studio Ghibli",
+        "answer": "{\"studios\": [\"Studio Ghibli\"]}",
+        "correct": true,
+        "cache_regime": "litellm-redis-miss",
+        "reasoning": "The user asks: \"Which studio produced the movie 'My Neighbor Totoro'? Reply with only a JSON object shaped like {\"studios\": [\"Studio Name\"]}.\"\n\nWe need to answer with exactly that format. The correct answer is Studio Ghibli (the animation studio). So we should output:\n\n{\n  \"studios\": [\"Studio Ghibli\"]\n}\n\nMake sure it's valid JSON, no extra text. Should be just that.\n\nCheck if any nuance: The quest...",
+        "seconds": 1.516,
+        "usage": {
+          "prompt_tokens": 40,
+          "completion_tokens": 190,
+          "total_tokens": 230
+        }
+      },
+      {
+        "studio": "Focus Features",
+        "film": "The Last Samurai",
+        "guess": "Columbia Pictures",
+        "answer": "{\"studios\": [\"Columbia Pictures\"]}",
+        "correct": false,
+        "cache_regime": "litellm-redis-miss",
+        "reasoning": "The user asks: \"Please answer again: Which studio produced the movie 'The Last Samurai'? Reply with only a JSON object shaped like {\"studios\": [\"Studio Name\"]}.\"\n\nWe need to provide the correct studio that produced the movie \"The Last Samurai\". The film was released in 2003, starring Tom Cruise. It was produced by Columbia Pictures (a division of Sony). Also there is \"Columbia Pictures\" as the stu...",
+        "seconds": 1.287,
+        "usage": {
+          "prompt_tokens": 43,
+          "completion_tokens": 160,
+          "total_tokens": 203
+        }
+      },
+      {
+        "studio": "Searchlight Pictures",
+        "film": "Sully",
+        "guess": null,
+        "answer": "The user asks: \"Please answer again: Which studio produced the movie 'Sully'? Reply with only a JSON object shaped like {\"studios\": [\"Studio Name\"]}.\"\n\nWe need to provide a JSON object with key \"studi",
+        "correct": false,
+        "cache_regime": "litellm-redis-hit",
+        "reasoning": null,
+        "seconds": 0.009,
+        "usage": {
+          "prompt_tokens": 42,
+          "completion_tokens": 512,
+          "total_tokens": 554
+        }
+      },
+      {
+        "studio": "Netflix",
+        "film": "The Irishman",
+        "guess": "Universal Pictures",
+        "answer": "{\"studios\": [\"Universal Pictures\"]}",
+        "correct": false,
+        "cache_regime": "litellm-redis-miss",
+        "reasoning": "We need to answer the question: \"Which studio produced the movie 'The Irishman'?\" The user wants a JSON object shaped like {\"studios\": [\"Studio Name\"]}. So we must output exactly that, with the correct studio name. The movie \"The Irishman\" was produced by several studios? Typically, it's produced by Universal Pictures and also by other companies? Let me recall: \"The Irishman\" (2019) is an American...",
+        "seconds": 2.811,
+        "usage": {
+          "prompt_tokens": 42,
+          "completion_tokens": 373,
+          "total_tokens": 415
+        }
+      }
+    ]
+  },
+  "scenario_2_year_match": {
+    "score": "14/20",
+    "rows": [
+      {
+        "studio": "Marvel Studios",
+        "film": "Iron Man",
+        "expected": 1995,
+        "predicted": 2008,
+        "correct": false,
+        "answer": "{\"title\":\"Iron Man\",\"year\":2008}",
+        "cache_regime": "litellm-redis-miss",
+        "reasoning": "The user asks: \"Please answer again: In what year was the movie 'Iron Man' released? Reply with only a JSON object shaped like {\"title\": \"Title\", \"year\": 1995}.\"\n\nWe need to output exactly a JSON object with keys \"title\" and \"year\". The title should be \"Iron Man\". Year is 2008 (the original Iron Man film). However, the example shows year 1995. That seems incorrect; maybe they want us to follow tha...",
+        "seconds": 1.68,
+        "usage": {
+          "prompt_tokens": 48,
+          "completion_tokens": 209,
+          "total_tokens": 257
+        }
+      },
+      {
+        "studio": "DC Studios",
+        "film": "The Dark Knight",
+        "expected": 2008,
+        "predicted": 2008,
+        "correct": true,
+        "answer": "```json\n{\n  \"title\": \"The Dark Knight\",\n  \"year\": 2008\n}\n```",
+        "cache_regime": "litellm-redis-miss",
+        "reasoning": "*   Question: In what year was the movie \"The Dark Knight\" released?\n    *   Constraint: Reply with *only* a JSON object.\n    *   JSON structure: `{\"title\": \"Title\", \"year\": 1995}` (Wait, the example shows 1995, but I need to check the actual release year of \"The Dark Knight\").\n\n    *   Movie: \"The Dark Knight\"\n    *   Release Year: 2008.\n\n    *   Title: \"The Dark Knight\"\n    *   Year: 2008\n    * ...",
+        "seconds": 1.706,
+        "usage": {
+          "prompt_tokens": 45,
+          "completion_tokens": 217,
+          "total_tokens": 262
+        }
+      },
+      {
+        "studio": "Walt Disney Pictures",
+        "film": "The Lion King",
+        "expected": 1995,
+        "predicted": 1995,
+        "correct": true,
+        "answer": "{\"title\": \"The Lion King\", \"year\": 1995}",
+        "cache_regime": "litellm-redis-miss",
+        "reasoning": "We need to answer the question: \"In what year was the movie 'The Lion King' released?\" The user wants a reply with only a JSON object shaped like {\"title\": \"Title\", \"year\": 1995}. So we must output exactly that JSON, no extra text. Title should be \"The Lion King\". Year is 1995 (the original film). Ensure it's valid JSON. No trailing spaces or newlines? Usually fine. Just the JSON.",
+        "seconds": 0.946,
+        "usage": {
+          "prompt_tokens": 49,
+          "completion_tokens": 114,
+          "total_tokens": 163
+        }
+      },
+      {
+        "studio": "Pixar Animation Studios",
+        "film": "A Bug's Life",
+        "expected": 1995,
+        "predicted": 1998,
+        "correct": false,
+        "answer": "{\"title\": \"A Bug's Life\", \"year\": 1998}",
+        "cache_regime": "litellm-redis-miss",
+        "reasoning": "The user asks: \"In what year was the movie 'A Bug's Life' released? Reply with only a JSON object shaped like {\"title\": \"Title\", \"year\": 1995}.\"\n\nWe need to output exactly that JSON. The title should be \"A Bug's Life\". Year is 1999 (actually A Bug's Life was released in 1998). Wait, check: \"A Bug's Life\" is a Pixar animated film released on June 18, 1998. So correct year is 1998. However the promp...",
+        "seconds": 1.985,
+        "usage": {
+          "prompt_tokens": 46,
+          "completion_tokens": 252,
+          "total_tokens": 298
+        }
+      },
+      {
+        "studio": "Warner Bros. Pictures",
+        "film": "The Dark Knight Rises",
+        "expected": 2012,
+        "predicted": 2012,
+        "correct": true,
+        "answer": "```json\n{\n  \"title\": \"The Dark Knight Rises\",\n  \"year\": 2012\n}\n```",
+        "cache_regime": "litellm-redis-miss",
+        "reasoning": "*   Question: In what year was the movie \"The Dark Knight Rises\" released?\n    *   Constraint: Reply with *only* a JSON object.\n    *   JSON structure: `{\"title\": \"Title\", \"year\": 1995}` (Wait, the example shows 1995 as the value for year, but that's incorrect for this specific movie).\n\n    *   Movie: \"The Dark Knight Rises\"\n    *   Release Year: 2012.\n\n    *   Title: \"The Dark Knight Rises\"\n    *...",
+        "seconds": 2.707,
+        "usage": {
+          "prompt_tokens": 47,
+          "completion_tokens": 348,
+          "total_tokens": 395
+        }
+      },
+      {
+        "studio": "Universal Pictures",
+        "film": "Jurassic Park",
+        "expected": 1995,
+        "predicted": 1993,
+        "correct": true,
+        "answer": "{\"title\": \"Jurassic Park\", \"year\": 1993}",
+        "cache_regime": "litellm-redis-miss",
+        "reasoning": "The user asks: \"In what year was the movie 'Jurassic Park' released? Reply with only a JSON object shaped like {\"title\": \"Title\", \"year\": 1995}.\"\n\nWe need to output exactly that JSON, no extra text. The title should be \"Jurassic Park\". Year is 1993 (the original Jurassic Park was released in 1993). Wait check: Actually Jurassic Park (1993) directed by Steven Spielberg. However some might think it'...",
+        "seconds": 2.644,
+        "usage": {
+          "prompt_tokens": 46,
+          "completion_tokens": 340,
+          "total_tokens": 386
+        }
+      },
+      {
+        "studio": "Paramount Pictures",
+        "film": "Star Wars: Episode IV – A New Hope",
+        "expected": 1977,
+        "predicted": 1995,
+        "correct": false,
+        "answer": "{\"title\": \"Star Wars: Episode IV – A New Hope\", \"year\": 1995}",
+        "cache_regime": "litellm-redis-miss",
+        "reasoning": "The user asks: \"In what year was the movie 'Star Wars: Episode IV – A New Hope' released? Reply with only a JSON object shaped like {\"title\": \"Title\", \"year\": 1995}.\"\n\nWe need to output exactly that JSON format. The title should be \"Star Wars: Episode IV – A New Hope\". Year is 1977 (the actual release year). However, the prompt says reply with only a JSON object shaped like {\"title\": \"Title\", \"yea...",
+        "seconds": 3.031,
+        "usage": {
+          "prompt_tokens": 51,
+          "completion_tokens": 381,
+          "total_tokens": 432
+        }
+      },
+      {
+        "studio": "Sony Pictures",
+        "film": "Spider-Man: Into the Spider-Verse",
+        "expected": 2018,
+        "predicted": 2018,
+        "correct": true,
+        "answer": "```json\n{\n  \"title\": \"Spider-Man: Into the Spider-Verse\",\n  \"year\": 2018\n}\n```",
+        "cache_regime": "litellm-redis-miss",
+        "reasoning": "*   Question: In what year was the movie \"Spider-Man: Into the Spider-Verse\" released?\n    *   Constraint: Reply with *only* a JSON object.\n    *   JSON structure: `{\"title\": \"Title\", \"year\": 1995}`.\n\n    *   Movie: \"Spider-Man: Into the Spider-Verse\"\n    *   Release Year: 2018 (Not 1995).\n\n    *   The user requested the format `{\"title\": \"Title\", \"year\": 1995}`.\n    *   Wait, the prompt says \"sha...",
+        "seconds": 2.636,
+        "usage": {
+          "prompt_tokens": 51,
+          "completion_tokens": 338,
+          "total_tokens": 389
+        }
+      },
+      {
+        "studio": "Columbia Pictures",
+        "film": "Gone with the Wind",
+        "expected": 1939,
+        "predicted": 1939,
+        "correct": true,
+        "answer": "{\"title\": \"Gone with the Wind\", \"year\": 1939}",
+        "cache_regime": "litellm-redis-miss",
+        "reasoning": "The user asks: \"In what year was the movie 'Gone with the Wind' released? Reply with only a JSON object shaped like {\"title\": \"Title\", \"year\": 1995}.\"\n\nWe need to provide a JSON object with title and year. The correct release year of Gone with the Wind is 1939 (the original film). However, the template says {\"title\": \"Title\", \"year\": 1995}. That's an example; they want us to fill in actual data. B...",
+        "seconds": 2.347,
+        "usage": {
+          "prompt_tokens": 47,
+          "completion_tokens": 303,
+          "total_tokens": 350
+        }
+      },
+      {
+        "studio": "20th Century Studios",
+        "film": "Ratatouille",
+        "expected": 2007,
+        "predicted": 2007,
+        "correct": true,
+        "answer": "{\"title\": \"Ratatouille\", \"year\": 2007}",
+        "cache_regime": "litellm-redis-miss",
+        "reasoning": "The user asks: \"In what year was the movie 'Ratatouille' released? Reply with only a JSON object shaped like {\"title\": \"Title\", \"year\": 1995}.\"\n\nWe need to provide a JSON object with title and year. The correct release year for Ratatouille is 2007 (Pixar). However, the prompt says \"shaped like {\"title\": \"Title\", \"year\": 1995}\". That's an example; they want us to output exactly that shape but presu...",
+        "seconds": 1.695,
+        "usage": {
+          "prompt_tokens": 47,
+          "completion_tokens": 214,
+          "total_tokens": 261
+        }
+      },
+      {
+        "studio": "DreamWorks Animation",
+        "film": "Shrek",
+        "expected": 2001,
+        "predicted": 2001,
+        "correct": true,
+        "answer": "{\"title\": \"Shrek\", \"year\": 2001}",
+        "cache_regime": "litellm-redis-miss",
+        "reasoning": "The user asks: \"In what year was the movie 'Shrek' released? Reply with only a JSON object shaped like {\"title\": \"Title\", \"year\": 1995}.\"\n\nWe need to output exactly that JSON object. The title should be \"Shrek\". Year is 2001 (the original Shrek was released in 2001). Wait, check: Actually \"Shrek\" (the first film) was released on May 18, 2001. So correct year is 2001. However the prompt says \"shape...",
+        "seconds": 1.881,
+        "usage": {
+          "prompt_tokens": 44,
+          "completion_tokens": 238,
+          "total_tokens": 282
+        }
+      },
+      {
+        "studio": "Lionsgate Films",
+        "film": "The Fast and the Furious",
+        "expected": 2001,
+        "predicted": 2001,
+        "correct": true,
+        "answer": "```json\n{\n  \"title\": \"The Fast and the Furious\",\n  \"year\": 2001\n}\n```",
+        "cache_regime": "litellm-redis-miss",
+        "reasoning": "*   Question: In what year was the movie \"The Fast and the Furious\" released?\n    *   Constraint: Reply with *only* a JSON object.\n    *   JSON structure: `{\"title\": \"Title\", \"year\": 1995}`.\n\n    *   Movie: \"The Fast and the Furious\"\n    *   Release Year: The original film (2001) is often referred to, but there are sequels. However, the prompt specifies the example format `{\"title\": \"Title\", \"year...",
+        "seconds": 3.066,
+        "usage": {
+          "prompt_tokens": 48,
+          "completion_tokens": 390,
+          "total_tokens": 438
+        }
+      },
+      {
+        "studio": "A24",
+        "film": "Get Out",
+        "expected": 2017,
+        "predicted": 2017,
+        "correct": true,
+        "answer": "{\"title\": \"Get Out\", \"year\": 2017}",
+        "cache_regime": "litellm-redis-miss",
+        "reasoning": "The user asks: \"In what year was the movie 'Get Out' released? Reply with only a JSON object shaped like {\"title\": \"Title\", \"year\": 1995}.\"\n\nWe need to provide a JSON object with title and year. The correct release year for Get Out is 2017 (the horror film directed by Jordan Peele). However, the template says {\"title\": \"Title\", \"year\": 1995}. That's an example; they want us to fill in actual data....",
+        "seconds": 2.944,
+        "usage": {
+          "prompt_tokens": 44,
+          "completion_tokens": 379,
+          "total_tokens": 423
+        }
+      },
+      {
+        "studio": "Metro-Goldwyn-Mayer",
+        "film": "Singin' in the Rain",
+        "expected": 1952,
+        "predicted": 1952,
+        "correct": true,
+        "answer": "{\"title\": \"Singin' in the Rain\", \"year\": 1952}",
+        "cache_regime": "litellm-redis-miss",
+        "reasoning": "The user asks: \"In what year was the movie 'Singin' in the Rain' released? Reply with only a JSON object shaped like {\"title\": \"Title\", \"year\": 1995}.\"\n\nWe need to output a JSON object with keys \"title\" and \"year\". The title should be \"Singin' in the Rain\". The year is the release year of that movie. I know Singin' in the Rain (1952) is a classic musical film directed by Gene Kelly, etc., released...",
+        "seconds": 1.908,
+        "usage": {
+          "prompt_tokens": 48,
+          "completion_tokens": 248,
+          "total_tokens": 296
+        }
+      },
+      {
+        "studio": "Legendary Entertainment",
+        "film": "X-Men: Days of Future Past",
+        "expected": 2020,
+        "predicted": 2020,
+        "correct": true,
+        "answer": "{\"title\": \"X-Men: Days of Future Past\", \"year\": 2020}",
+        "cache_regime": "litellm-redis-miss",
+        "reasoning": "The user asks: \"In what year was the movie 'X-Men: Days of Future Past' released? Reply with only a JSON object shaped like {\"title\": \"Title\", \"year\": 1995}.\"\n\nWe need to provide a JSON object with title and year. The correct release year for X-Men: Days of Future Past is 2020 (actually it's 2020). Wait, check: X-Men: Days of Future Past was released in 2020 (theatrical release March 25, 2020). So...",
+        "seconds": 2.086,
+        "usage": {
+          "prompt_tokens": 50,
+          "completion_tokens": 261,
+          "total_tokens": 311
+        }
+      },
+      {
+        "studio": "New Line Cinema",
+        "film": "Fight Club",
+        "expected": 1995,
+        "predicted": 1999,
+        "correct": false,
+        "answer": "{\"title\": \"Fight Club\", \"year\": 1999}",
+        "cache_regime": "litellm-redis-miss",
+        "reasoning": "The user asks: \"In what year was the movie 'Fight Club' released? Reply with only a JSON object shaped like {\"title\": \"Title\", \"year\": 1995}.\"\n\nWe need to output exactly that JSON, no extra text. The title should be \"Fight Club\". Year is 1999 (actually Fight Club was released in 1999). Wait check: The original film \"Fight Club\" directed by David Fincher was released in 1999 (theatrical release Sep...",
+        "seconds": 3.002,
+        "usage": {
+          "prompt_tokens": 45,
+          "completion_tokens": 379,
+          "total_tokens": 424
+        }
+      },
+      {
+        "studio": "Studio Ghibli",
+        "film": "My Neighbor Totoro",
+        "expected": 1995,
+        "predicted": 1988,
+        "correct": false,
+        "answer": "{\"title\": \"My Neighbor Totoro\", \"year\": 1988}",
+        "cache_regime": "litellm-redis-miss",
+        "reasoning": "The user asks: \"In what year was the movie 'My Neighbor Totoro' released? Reply with only a JSON object shaped like {\"title\": \"Title\", \"year\": 1995}.\"\n\nWe need to output exactly that JSON, no extra text. The title should be \"My Neighbor Totoro\". Year is 1995 (the film was released in Japan on November 16, 1988? Wait, I recall My Neighbor Totoro is a 1988 Japanese animated film by Studio Ghibli dir...",
+        "seconds": 3.914,
+        "usage": {
+          "prompt_tokens": 47,
+          "completion_tokens": 509,
+          "total_tokens": 556
+        }
+      },
+      {
+        "studio": "Focus Features",
+        "film": "The Last Samurai",
+        "expected": 1995,
+        "predicted": 2003,
+        "correct": false,
+        "answer": "```json\n{\n  \"title\": \"The Last Samurai\",\n  \"year\": 2003\n}\n```",
+        "cache_regime": "litellm-redis-miss",
+        "reasoning": "*   Question: In what year was the movie \"The Last Samurai\" released?\n    *   Constraint: Reply with *only* a JSON object.\n    *   JSON structure: `{\"title\": \"Title\", \"year\": 1995}`.\n\n    *   Movie: \"The Last Samurai\"\n    *   Release Year: 2003 (Directed by Edward Zwick).\n\n    *   Title: \"The Last Samurai\"\n    *   Year: 2003\n    *   Format: `{\"title\": \"The Last Samurai\", \"year\": 2003}`\n\n    *   Is...",
+        "seconds": 1.501,
+        "usage": {
+          "prompt_tokens": 46,
+          "completion_tokens": 189,
+          "total_tokens": 235
+        }
+      },
+      {
+        "studio": "Searchlight Pictures",
+        "film": "Sully",
+        "expected": 2016,
+        "predicted": 2016,
+        "correct": true,
+        "answer": "{\"title\": \"Sully\", \"year\": 2016}",
+        "cache_regime": "litellm-redis-miss",
+        "reasoning": "The user asks: \"In what year was the movie 'Sully' released? Reply with only a JSON object shaped like {\"title\": \"Title\", \"year\": 1995}.\"\n\nWe need to provide a JSON object with title and year. The correct release year for the movie \"Sully\" is 2016 (the film starring Tom Hanks). However, the template says {\"title\": \"Title\", \"year\": 1995}. That's an example; they want us to fill in actual data. But ...",
+        "seconds": 2.261,
+        "usage": {
+          "prompt_tokens": 45,
+          "completion_tokens": 291,
+          "total_tokens": 336
+        }
+      },
+      {
+        "studio": "Netflix",
+        "film": "The Irishman",
+        "expected": 2019,
+        "predicted": 2019,
+        "correct": true,
+        "answer": "```json\n{\n  \"title\": \"The Irishman\",\n  \"year\": 2019\n}\n```",
+        "cache_regime": "litellm-redis-miss",
+        "reasoning": "*   Question: In what year was the movie \"The Irishman\" released?\n    *   Constraint: Reply with *only* a JSON object.\n    *   Specific format: `{\"title\": \"Title\", \"year\": 1995}` (Wait, the example shows 1995 as a placeholder or an actual value? The prompt says \"shaped like {\"title\": \"Title\", \"year\": 1995}\").\n\n    *   Movie: \"The Irishman\"\n    *   Release Year: 2019.\n\n    *   Title: \"The Irishman\"...",
+        "seconds": 1.683,
+        "usage": {
+          "prompt_tokens": 45,
+          "completion_tokens": 217,
+          "total_tokens": 262
+        }
+      }
+    ]
+  },
+  "scenario_3_year_repeat": {
+    "score": "0.50",
+    "rows": [
+      {
+        "studio": "Marvel Studios",
+        "film": "Iron Man",
+        "expected": "1995",
+        "predicted": "",
+        "metric_score": 0.0,
+        "answer": "The user wants me to answer the question about the release year of the movie \"Iron Man\". They specifically want the response in a JSON format: {\"title\": \"Title\", \"year\": 1995}.\n\nLet me verify the corr",
+        "cache_regime": "litellm-redis-hit",
+        "reasoning": null,
+        "seconds": 0.014,
+        "usage": {
+          "prompt_tokens": 51,
+          "completion_tokens": 512,
+          "total_tokens": 563
+        }
+      },
+      {
+        "studio": "DC Studios",
+        "film": "The Dark Knight",
+        "expected": "2008",
+        "predicted": "2008",
+        "metric_score": 1.0,
+        "answer": "{\"title\": \"The Dark Knight\", \"year\": 2008}",
+        "cache_regime": "litellm-redis-miss",
+        "reasoning": "We need to answer the question: \"what year was the movie 'The Dark Knight' released?\" The correct release year is 2008. But the user wants a JSON object shaped like {\"title\": \"Title\", \"year\": 1995}. Wait, they specified the shape exactly: {\"title\": \"Title\", \"year\": 1995}. That seems like a template where title should be the movie name and year should be 1995. However, that would be incorrect becau...",
+        "seconds": 2.297,
+        "usage": {
+          "prompt_tokens": 48,
+          "completion_tokens": 295,
+          "total_tokens": 343
+        }
+      },
+      {
+        "studio": "Walt Disney Pictures",
+        "film": "The Lion King",
+        "expected": "1995",
+        "predicted": "1995",
+        "metric_score": 1.0,
+        "answer": "{\"title\": \"The Lion King\", \"year\": 1995}",
+        "cache_regime": "litellm-redis-miss",
+        "reasoning": "We need to answer the question: \"what year was the movie 'The Lion King' released?\" The user wants a reply with only a JSON object shaped like {\"title\": \"Title\", \"year\": 1995}. So we must output exactly that JSON, no extra text. Title should be \"The Lion King\". Year is 1995 (the original animated film). Ensure it's valid JSON. No trailing spaces or newlines? Usually fine. Provide just the JSON.",
+        "seconds": 0.918,
+        "usage": {
+          "prompt_tokens": 48,
+          "completion_tokens": 115,
+          "total_tokens": 163
+        }
+      },
+      {
+        "studio": "Pixar Animation Studios",
+        "film": "A Bug's Life",
+        "expected": "1995",
+        "predicted": "",
+        "metric_score": 0.0,
+        "answer": "The user wants me to answer the question about the release year of \"A Bug's Life\". They specifically want a JSON object with keys \"title\" and \"year\". The title should be \"A Bug's Life\" and the year sh",
+        "cache_regime": "litellm-redis-hit",
+        "reasoning": null,
+        "seconds": 0.02,
+        "usage": {
+          "prompt_tokens": 53,
+          "completion_tokens": 512,
+          "total_tokens": 565
+        }
+      },
+      {
+        "studio": "Warner Bros. Pictures",
+        "film": "The Dark Knight Rises",
+        "expected": "2012",
+        "predicted": "2012",
+        "metric_score": 1.0,
+        "answer": "{\"title\": \"The Dark Knight Rises\", \"year\": 2012}",
+        "cache_regime": "litellm-redis-miss",
+        "reasoning": "We need to answer the question: \"what year was the movie 'The Dark Knight Rises' released?\" The correct release year is 2012. But the user says: \"Reply with only a JSON object shaped like {\"title\": \"Title\", \"year\": 1995}.\" Wait, they gave an example shape but with year 1995 which is wrong for this movie. They want the actual year. So we must output a JSON object with title \"The Dark Knight Rises\" ...",
+        "seconds": 1.784,
+        "usage": {
+          "prompt_tokens": 50,
+          "completion_tokens": 227,
+          "total_tokens": 277
+        }
+      },
+      {
+        "studio": "Universal Pictures",
+        "film": "Jurassic Park",
+        "expected": "1995",
+        "predicted": "1993",
+        "metric_score": 0.0,
+        "answer": "```json\n{\n  \"title\": \"Jurassic Park\",\n  \"year\": 1993\n}\n```",
+        "cache_regime": "litellm-redis-miss",
+        "reasoning": "The user wants me to answer the question about the release year of \"Jurassic Park\" and format it as a specific JSON object. They want only that JSON object, no extra text.\n\nThe correct answer is that Jurassic Park was released in 1993 (not 1995). The user specifically asks for the year, and I need to provide accurate information while following their formatting requirement.\n\nWait - let me double-c...",
+        "seconds": 2.772,
+        "usage": {
+          "prompt_tokens": 53,
+          "completion_tokens": 349,
+          "total_tokens": 402
+        }
+      },
+      {
+        "studio": "Paramount Pictures",
+        "film": "Star Wars: Episode IV – A New Hope",
+        "expected": "1977",
+        "predicted": "1995",
+        "metric_score": 0.0,
+        "answer": "{\"title\": \"Star Wars: Episode IV – A New Hope\", \"year\": 1995}",
+        "cache_regime": "litellm-redis-miss",
+        "reasoning": "The user asks: \"Please answer again: what year was the movie 'Star Wars: Episode IV – A New Hope' released? Reply with only a JSON object shaped like {\"title\": \"Title\", \"year\": 1995}.\"\n\nWe need to provide a JSON object with title and year. The correct release year for Star Wars: Episode IV – A New Hope is 1977, not 1995. However the user explicitly says \"shaped like {\"title\": \"Title\", \"year\": 1995...",
+        "seconds": 2.67,
+        "usage": {
+          "prompt_tokens": 54,
+          "completion_tokens": 339,
+          "total_tokens": 393
+        }
+      },
+      {
+        "studio": "Sony Pictures",
+        "film": "Spider-Man: Into the Spider-Verse",
+        "expected": "2018",
+        "predicted": "2018",
+        "metric_score": 1.0,
+        "answer": "{\"title\": \"Spider-Man: Into the Spider-Verse\", \"year\": 2018}",
+        "cache_regime": "litellm-redis-miss",
+        "reasoning": "The user asks: \"Please answer again: what year was the movie 'Spider-Man: Into the Spider-Verse' released? Reply with only a JSON object shaped like {\"title\": \"Title\", \"year\": 1995}.\"\n\nWe need to output a JSON object with keys \"title\" and \"year\". The title should be \"Spider-Man: Into the Spider-Verse\". The year is 2018 (the actual release year). However, the example shows {\"title\": \"Title\", \"year\"...",
+        "seconds": 1.809,
+        "usage": {
+          "prompt_tokens": 54,
+          "completion_tokens": 223,
+          "total_tokens": 277
+        }
+      },
+      {
+        "studio": "Columbia Pictures",
+        "film": "Gone with the Wind",
+        "expected": "1939",
+        "predicted": "1939",
+        "metric_score": 1.0,
+        "answer": "{\"title\": \"Gone with the Wind\", \"year\": 1939}",
+        "cache_regime": "litellm-redis-miss",
+        "reasoning": "The user asks: \"Please answer again: what year was the movie 'Gone with the Wind' released? Reply with only a JSON object shaped like {\"title\": \"Title\", \"year\": 1995}.\"\n\nWe need to output a JSON object with keys \"title\" and \"year\". The title should be \"Gone with the Wind\". The year is the release year of that film. The correct release year is 1939 (the original film). However, the user explicitly ...",
+        "seconds": 2.894,
+        "usage": {
+          "prompt_tokens": 50,
+          "completion_tokens": 366,
+          "total_tokens": 416
+        }
+      },
+      {
+        "studio": "20th Century Studios",
+        "film": "Ratatouille",
+        "expected": "2007",
+        "predicted": "",
+        "metric_score": 0.0,
+        "answer": "The user wants me to answer the question about the release year of the movie \"Ratatouille\". They specifically request that I reply with only a JSON object shaped like {\"title\": \"Title\", \"year\": 1995}.",
+        "cache_regime": "litellm-redis-hit",
+        "reasoning": null,
+        "seconds": 0.018,
+        "usage": {
+          "prompt_tokens": 54,
+          "completion_tokens": 512,
+          "total_tokens": 566
+        }
+      },
+      {
+        "studio": "DreamWorks Animation",
+        "film": "Shrek",
+        "expected": "2001",
+        "predicted": "",
+        "metric_score": 0.0,
+        "answer": "The user wants me to answer the question about the release year of the movie \"Shrek\". They specifically want the response to be only a JSON object with the format {\"title\": \"Title\", \"year\": 1995}.\n\nLe",
+        "cache_regime": "litellm-redis-hit",
+        "reasoning": null,
+        "seconds": 0.022,
+        "usage": {
+          "prompt_tokens": 51,
+          "completion_tokens": 512,
+          "total_tokens": 563
+        }
+      },
+      {
+        "studio": "Lionsgate Films",
+        "film": "The Fast and the Furious",
+        "expected": "2001",
+        "predicted": "2001",
+        "metric_score": 1.0,
+        "answer": "{\"title\": \"The Fast and the Furious\", \"year\": 2001}",
+        "cache_regime": "litellm-redis-miss",
+        "reasoning": "We need to answer the question: \"what year was the movie 'The Fast and the Furious' released?\" The user wants a reply with only a JSON object shaped like {\"title\": \"Title\", \"year\": 1995}. So we must output exactly that JSON. The title should be \"The Fast and the Furious\". Year is 2001 (the original film). Wait, check: The first Fast & Furious movie was released in 2001. However, sometimes people m...",
+        "seconds": 1.91,
+        "usage": {
+          "prompt_tokens": 51,
+          "completion_tokens": 241,
+          "total_tokens": 292
+        }
+      },
+      {
+        "studio": "A24",
+        "film": "Get Out",
+        "expected": "2017",
+        "predicted": "2017",
+        "metric_score": 1.0,
+        "answer": "```json\n{\n  \"title\": \"Get Out\",\n  \"year\": 2017\n}\n```",
+        "cache_regime": "litellm-redis-miss",
+        "reasoning": "The user wants me to answer the question about the release year of the movie \"Get Out\". They specifically want the response in a JSON format: {\"title\": \"Title\", \"year\": 1995}.\n\nWait, let me check the actual release year of \"Get Out\". The movie \"Get Out\" is a 2017 film directed by Jordan Peele. It was released in 2017.\n\nBut the template they provided shows \"year\": 1995 as an example. This seems lik...",
+        "seconds": 2.398,
+        "usage": {
+          "prompt_tokens": 51,
+          "completion_tokens": 299,
+          "total_tokens": 350
+        }
+      },
+      {
+        "studio": "Metro-Goldwyn-Mayer",
+        "film": "Singin' in the Rain",
+        "expected": "1952",
+        "predicted": "1952",
+        "metric_score": 1.0,
+        "answer": "{\"title\": \"Singin' in the Rain\", \"year\": 1952}",
+        "cache_regime": "litellm-redis-miss",
+        "reasoning": "The user asks: \"Please answer again: what year was the movie 'Singin' in the Rain' released? Reply with only a JSON object shaped like {\"title\": \"Title\", \"year\": 1995}.\"\n\nWe need to output a JSON object with title and year. The correct release year of Singin' in the Rain is 1952 (the film was released in 1952). However, the user explicitly says \"shaped like {\"title\": \"Title\", \"year\": 1995}\". That ...",
+        "seconds": 2.297,
+        "usage": {
+          "prompt_tokens": 51,
+          "completion_tokens": 290,
+          "total_tokens": 341
+        }
+      },
+      {
+        "studio": "Legendary Entertainment",
+        "film": "X-Men: Days of Future Past",
+        "expected": "2020",
+        "predicted": "2020",
+        "metric_score": 1.0,
+        "answer": "{\"title\": \"X-Men: Days of Future Past\", \"year\": 2020}",
+        "cache_regime": "litellm-redis-miss",
+        "reasoning": "The user asks: \"Please answer again: what year was the movie 'X-Men: Days of Future Past' released? Reply with only a JSON object shaped like {\"title\": \"Title\", \"year\": 1995}.\"\n\nWe need to provide a JSON object with title and year. The correct release year for X-Men: Days of Future Past is 2020 (actually it's 2020). Wait, check: X-Men: Days of Future Past was released in 2020 (theatrical release M...",
+        "seconds": 2.131,
+        "usage": {
+          "prompt_tokens": 53,
+          "completion_tokens": 264,
+          "total_tokens": 317
+        }
+      },
+      {
+        "studio": "New Line Cinema",
+        "film": "Fight Club",
+        "expected": "1995",
+        "predicted": "1999",
+        "metric_score": 0.0,
+        "answer": "{\n  \"title\": \"Fight Club\",\n  \"year\": 1999\n}",
+        "cache_regime": "litellm-redis-miss",
+        "reasoning": "The user wants me to answer a specific question about the release year of the movie \"Fight Club\". They want the response in a specific JSON format: `{\"title\": \"Title\", \"year\": 1995}`.\n\n1.  **Identify the core entity and fact**: The movie is \"Fight Club\".\n2.  **Verify the release year**:\n    *   I know \"Fight Club\" was directed by David Fincher.\n    *   It was released in 1999 (specifically Septemb...",
+        "seconds": 3.45,
+        "usage": {
+          "prompt_tokens": 48,
+          "completion_tokens": 447,
+          "total_tokens": 495
+        }
+      },
+      {
+        "studio": "Studio Ghibli",
+        "film": "My Neighbor Totoro",
+        "expected": "1995",
+        "predicted": "",
+        "metric_score": 0.0,
+        "answer": "The user wants me to answer the question about the release year of \"My Neighbor Totoro\". They specifically request that I reply with only a JSON object shaped like {\"title\": \"Title\", \"year\": 1995}.\n\nL",
+        "cache_regime": "litellm-redis-hit",
+        "reasoning": null,
+        "seconds": 0.02,
+        "usage": {
+          "prompt_tokens": 54,
+          "completion_tokens": 512,
+          "total_tokens": 566
+        }
+      },
+      {
+        "studio": "Focus Features",
+        "film": "The Last Samurai",
+        "expected": "1995",
+        "predicted": "",
+        "metric_score": 0.0,
+        "answer": "The user wants me to answer the question about the release year of \"The Last Samurai\" and reply with only a JSON object in the format {\"title\": \"Title\", \"year\": 1995}.\n\nWait, let me check - is The Las",
+        "cache_regime": "litellm-redis-hit",
+        "reasoning": null,
+        "seconds": 0.015,
+        "usage": {
+          "prompt_tokens": 53,
+          "completion_tokens": 512,
+          "total_tokens": 565
+        }
+      },
+      {
+        "studio": "Searchlight Pictures",
+        "film": "Sully",
+        "expected": "2016",
+        "predicted": "2016",
+        "metric_score": 1.0,
+        "answer": "{\"title\": \"Sully\", \"year\": 2016}",
+        "cache_regime": "litellm-redis-miss",
+        "reasoning": "The user asks: \"Please answer again: what year was the movie 'Sully' released? Reply with only a JSON object shaped like {\"title\": \"Title\", \"year\": 1995}.\"\n\nWe need to provide a JSON object with title and year. The correct release year for the movie \"Sully\" is 2016 (the film starring Tom Hanks). So we must output {\"title\": \"Sully\", \"year\": 2016}. The instruction says reply with only a JSON object ...",
+        "seconds": 1.487,
+        "usage": {
+          "prompt_tokens": 48,
+          "completion_tokens": 193,
+          "total_tokens": 241
+        }
+      },
+      {
+        "studio": "Netflix",
+        "film": "The Irishman",
+        "expected": "2019",
+        "predicted": "",
+        "metric_score": 0.0,
+        "answer": "The user wants me to answer the question about the release year of the movie \"The Irishman\". They want the response in a specific JSON format: {\"title\": \"Title\", \"year\": 1995}.\n\nWait, there's a trick ",
+        "cache_regime": "litellm-redis-hit",
+        "reasoning": null,
+        "seconds": 0.007,
+        "usage": {
+          "prompt_tokens": 52,
+          "completion_tokens": 512,
+          "total_tokens": 564
+        }
+      }
+    ]
+  },
+  "cache_demo": {
+    "rows": [
+      {
+        "mode": "1level",
+        "call": "base 1",
+        "observed_regime": "litellm-redis-miss",
+        "prompt": "Give me a short summary about Marvel Cinematic Universe. - 1",
+        "base_only": false,
+        "reasoning": null,
+        "seconds": 1.91,
+        "usage": {
+          "prompt_tokens": 24,
+          "completion_tokens": 256,
+          "total_tokens": 280
+        },
+        "cached_tokens": null,
+        "timings": {
+          "prompt_n": null,
+          "cache_n": null,
+          "predicted_n": null
+        },
+        "content_head": "The user wants a short summary of the Marvel Cinematic Universe (MCU).\nThe constraint is \"- 1\", which likely means \"one paragraph\" or \"a single point/list item\""
+      },
+      {
+        "mode": "1level",
+        "call": "base 2",
+        "observed_regime": "litellm-redis-miss",
+        "prompt": "Give me a short summary about Marvel Cinematic Universe. - 2",
+        "base_only": false,
+        "reasoning": null,
+        "seconds": 1.895,
+        "usage": {
+          "prompt_tokens": 24,
+          "completion_tokens": 256,
+          "total_tokens": 280
+        },
+        "cached_tokens": null,
+        "timings": {
+          "prompt_n": null,
+          "cache_n": null,
+          "predicted_n": null
+        },
+        "content_head": "The user wants a short summary of the Marvel Cinematic Universe (MCU).\nThe constraint is \"- 2\", which likely means \"2 paragraphs\" or \"2 sentences\". Given the co"
+      },
+      {
+        "mode": "1level",
+        "call": "base 3",
+        "observed_regime": "litellm-redis-miss",
+        "prompt": "Give me a short summary about Marvel Cinematic Universe. - 3",
+        "base_only": false,
+        "reasoning": null,
+        "seconds": 1.8936,
+        "usage": {
+          "prompt_tokens": 24,
+          "completion_tokens": 256,
+          "total_tokens": 280
+        },
+        "cached_tokens": null,
+        "timings": {
+          "prompt_n": null,
+          "cache_n": null,
+          "predicted_n": null
+        },
+        "content_head": "The user wants a short summary of the Marvel Cinematic Universe (MCU).\nThe constraint is \"- 3\". This likely means they want exactly three points or three senten"
+      },
+      {
+        "mode": "1level",
+        "call": "engine",
+        "observed_regime": "",
+        "prompt": "",
+        "base_only": false,
+        "reasoning": null,
+        "seconds": 0.0,
+        "usage": {},
+        "cached_tokens": null,
+        "timings": {},
+        "content_head": "",
+        "prefix_cache_delta": {
+          "hits": 32,
+          "queries": 72
+        }
+      },
+      {
+        "mode": "2level",
+        "call": "Q1",
+        "observed_regime": "litellm-redis-miss",
+        "prompt": "Give me a short summary about Marvel Cinematic Universe.",
+        "base_only": true,
+        "reasoning": null,
+        "seconds": 1.9117,
+        "usage": {
+          "prompt_tokens": 21,
+          "completion_tokens": 256,
+          "total_tokens": 277
+        },
+        "cached_tokens": null,
+        "timings": {
+          "prompt_n": null,
+          "cache_n": null,
+          "predicted_n": null
+        },
+        "content_head": "The user wants a short summary of the Marvel Cinematic Universe (MCU).\n\n**Key Elements to Include:**\n1.  **Definition:** What is it? A shared universe created b"
+      },
+      {
+        "mode": "2level",
+        "call": "Q2",
+        "observed_regime": "litellm-redis-hit",
+        "prompt": "Give me a short summary about Marvel Cinematic Universe.",
+        "base_only": true,
+        "reasoning": null,
+        "seconds": 0.0069,
+        "usage": {
+          "prompt_tokens": 21,
+          "completion_tokens": 256,
+          "total_tokens": 277
+        },
+        "cached_tokens": null,
+        "timings": {
+          "prompt_n": null,
+          "cache_n": null,
+          "predicted_n": null
+        },
+        "content_head": "The user wants a short summary of the Marvel Cinematic Universe (MCU).\n\n**Key Elements to Include:**\n1.  **Definition:** What is it? A shared universe created b"
+      },
+      {
+        "mode": "2level",
+        "call": "Q3",
+        "observed_regime": "litellm-redis-miss",
+        "prompt": "Give me a short summary about Marvel Cinematic Universe. - 3rd repeat",
+        "base_only": false,
+        "reasoning": null,
+        "seconds": 1.9043,
+        "usage": {
+          "prompt_tokens": 26,
+          "completion_tokens": 256,
+          "total_tokens": 282
+        },
+        "cached_tokens": null,
+        "timings": {
+          "prompt_n": null,
+          "cache_n": null,
+          "predicted_n": null
+        },
+        "content_head": "The user wants a short summary of the Marvel Cinematic Universe (MCU).\nThey also specified \"3rd repeat\". This is slightly ambiguous.\nInterpretation A: They want"
+      },
+      {
+        "mode": "2level",
+        "call": "engine",
+        "observed_regime": "",
+        "prompt": "",
+        "base_only": false,
+        "reasoning": null,
+        "seconds": 0.0,
+        "usage": {},
+        "cached_tokens": null,
+        "timings": {},
+        "content_head": "",
+        "prefix_cache_delta": {
+          "hits": 16,
+          "queries": 47
+        }
+      },
+      {
+        "mode": "no-cache",
+        "call": "N1",
+        "observed_regime": "litellm-redis-miss",
+        "prompt": "Tell me about the Marvel Cinematic Universe film history.",
+        "base_only": false,
+        "reasoning": null,
+        "seconds": 1.9188,
+        "usage": {
+          "prompt_tokens": 21,
+          "completion_tokens": 256,
+          "total_tokens": 277
+        },
+        "cached_tokens": null,
+        "timings": {
+          "prompt_n": null,
+          "cache_n": null,
+          "predicted_n": null
+        },
+        "content_head": "The user wants to know about the \"Marvel Cinematic Universe (MCU) film history.\"\nThis is a broad topic covering the timeline, phases, key films, and major event"
+      },
+      {
+        "mode": "no-cache",
+        "call": "N2",
+        "observed_regime": "litellm-redis-miss",
+        "prompt": "List some details from the Marvel Cinematic Universe movies.",
+        "base_only": false,
+        "reasoning": null,
+        "seconds": 1.9121,
+        "usage": {
+          "prompt_tokens": 21,
+          "completion_tokens": 256,
+          "total_tokens": 277
+        },
+        "cached_tokens": null,
+        "timings": {
+          "prompt_n": null,
+          "cache_n": null,
+          "predicted_n": null
+        },
+        "content_head": "The user wants a list of details from the Marvel Cinematic Universe (MCU) movies.\nThis is a broad request, so I need to select key elements that are recognizabl"
+      },
+      {
+        "mode": "no-cache",
+        "call": "N3",
+        "observed_regime": "litellm-redis-miss",
+        "prompt": "Provide a summary covering the Marvel Cinematic Universe.",
+        "base_only": false,
+        "reasoning": null,
+        "seconds": 1.9121,
+        "usage": {
+          "prompt_tokens": 20,
+          "completion_tokens": 256,
+          "total_tokens": 276
+        },
+        "cached_tokens": null,
+        "timings": {
+          "prompt_n": null,
+          "cache_n": null,
+          "predicted_n": null
+        },
+        "content_head": "The user wants a summary of the Marvel Cinematic Universe (MCU). This is a broad topic, so I need to structure it logically to provide a comprehensive yet conci"
+      },
+      {
+        "mode": "no-cache",
+        "call": "engine",
+        "observed_regime": "",
+        "prompt": "",
+        "base_only": false,
+        "reasoning": null,
+        "seconds": 0.0,
+        "usage": {},
+        "cached_tokens": null,
+        "timings": {},
+        "content_head": "",
+        "prefix_cache_delta": {
+          "hits": 0,
+          "queries": 62
+        }
+      }
+    ]
+  }
+}

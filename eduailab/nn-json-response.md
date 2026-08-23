@@ -1,4 +1,4 @@
-# JSON / structured output: llama.cpp vs vLLM (the 2.6B, guided vs unguided)
+# JSON / structured output: llama.cpp vs vLLM vs SGLang (the 2.6B, guided vs unguided)
 
 Every cinematic-01 call goes through `llm.chat()` with a Pydantic `response_format`
 (`StudioList` / `FilmList` / `YearAnswer`) — this was the llama.cpp-optimized
@@ -64,18 +64,30 @@ Two fixes landed in `test.py`:
 
 ## 4. Score deltas as evidence
 
-| Scenario | llama.cpp Q8_0 GGUF | vLLM W8A16 | Gap |
-|---|---|---|---|
-| 1 Studio recall | 49/154 (0.318) | 51/154 (0.331) | ~parity |
-| 2 Year match (±2) | 126/154 (0.818) | 134/154 (0.870) | vLLM ahead |
-| 3 Year repeat | 0.805 PASS | **0.623 FAIL** | the regression |
+| Scenario | llama.cpp Q8_0 GGUF | vLLM W8A16 | SGLang W8A16 | Notes |
+|---|---|---|---|---|
+| 1 Studio recall | 49/154 (0.318) | 51/154 (0.331) | 51/154 (0.331) | ≈ parity |
+| 2 Year match (±2) | 126/154 (0.818) | 134/154 (0.870) | 134/154 (0.870) | vLLM/SGLang ahead |
+| 3 Year repeat | 0.805 PASS | **0.623 FAIL** | **0.844 PASS** | guided clean; unguided regresses |
+
+### SGLang (W8A16, guided) — the third data point
+
+SGLang is a *third* engine riding the same `guided` toggle, and it behaves like llama.cpp,
+not vLLM. Because `query_schema` gates on `guided = "vllm" not in llm.MODEL`, the SGLang
+alias (`local-sglang`) is **not** vLLM, so it keeps strict guided decoding
+(`response_format` + `enable_json_schema_validation=True`). The result: clean schema JSON,
+S3 clears the bar at **0.844 PASS** — the exact scenario vLLM dropped to 0.623. That
+confirms the story wasn't "the model can't do JSON," it is specifically the vLLM quantization
+path that breaks guided decode.
 
 The interesting one is S3 (exact year repeat, `deepeval.ExactMatchMetric`): it's the
 strictest scenario, scoring exact `"year": N` fields. With llama.cpp's guided decode
 those come back as clean integers and it clears the 0.8 bar. vLLM's unguided output —
 even after fence-stripping — drifts toward wrapped/prose-y text instead of a strict
-numeric year field, which drops exact-match from 0.805 down to 0.623. That's the whole
-story in one row: **the structured-output gap, not the model, is what cost the S3 pass.**
+numeric year field, which drops exact-match from 0.805 down to 0.623. SGLang restores
+the guided path (0.844 PASS), proving the regression is vLLM's, not the model's. That's
+the whole story in one row: **the structured-output gap, not the model, is what cost the
+vLLM S3 pass.**
 
 ## 5. Cross-ref: the cache demos
 
@@ -93,6 +105,13 @@ shows prefix-cache reuse per mode:
 `1level` proves the engine prefix cache replayed ~32 prompt tokens across the three
 `BASE_PROMPT + " - N"` suffixes (shared prefix), while `no-cache` (fully cold prompts)
 replayed none.
+
+The SGLang run's cache demo reads **gauges, not counters**: it reports
+`sglang:cache_hit_rate` and `sglang:kv_cache_memory_usage_gb` rather than vLLM's
+cumulative hit/query deltas. On the baseline run these came back as a 0.0 hit rate
+and ~1.93 GB resident KV (the same warm-cache footprint the report shows), so it is a
+point-in-time snapshot of the radix tree rather than a per-mode reuse tally — the
+`cached_tokens` / `cache_n` replay columns stay unpopulated there (`—`).
 
 The failure mode lands *inside* those numbers: an **empty guided completion is an
 ordinary response**, so it gets Redis-cached like any other. A rerun with the same
@@ -116,6 +135,7 @@ Run artifacts backing this note:
 
 - llama.cpp baseline: `datasets/cinematic-01/runs/run-20260822-211110-local-gguf/`
 - vLLM run + cache-demo deltas: `datasets/cinematic-01/runs/run-20260822-223412-local-vllm/`
+- SGLang baseline (guided, clean S3): `datasets/cinematic-01/runs/run-20260823-112134-local-sglang/`
 - Design rationale: `smoketests/cinematic-01/design.md` (structured output section)
 
 Sibling engine notes: [vLLM caching](nn-vLLM-caching.md),

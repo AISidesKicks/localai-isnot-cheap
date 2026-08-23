@@ -113,6 +113,16 @@ Note the Mamba **conv_state and SSM state are *not* covered by `--kv-cache-dtype
 they live in their own buffers (`--mamba-ssm-dtype` controls the SSM state) — so a
 hybrid model keeps a chunk of cache in high precision no matter what you ask for.
 
+**Baseline snapshot (cinematic-01, non-quantized fp16 default):** the current
+`cheap-sglang` block has no `--kv-cache-dtype`/`--quantization-param-path`, so it
+runs the KV cache at the default fp16-ish dtype — treat these as the *unquantized*
+reference, not an 8-bit result. From the live run: `sglang:cache_hit_rate` **0.0**,
+`sglang:kv_cache_memory_usage_gb` **1.93** (warm cache resident), `nvidia-smi` **9455
+MiB** / 12282 MiB used. Quality gate (sample 154, `--cache-mode both`): S1 studio recall
+**51/154** (33%), S2 year match **134/154** (87%), S3 year repeat **0.844** (PASS, thresh
+0.8). Determinism held on this fp16 run — SGLang #35938 flags that a *quantized* KV is
+where determinism can break, so an fp8 follow-up must re-gate S3.
+
 ## The lab's translation
 
 - Our LFM2.5-2.6B is a small hybrid — the perfect worst case for 4-bit. If the 8-bit

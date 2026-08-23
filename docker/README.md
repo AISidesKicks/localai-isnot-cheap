@@ -45,6 +45,14 @@ and the KV cache 6.62 GiB at the default `--gpu-memory-utilization 0.92`
 (roughly 91% of the card). W8A16 keeps the model on a 12 GiB card with
 headroom for a small batch.
 
+`cheap-vllm` now runs `--kv-cache-dtype fp8_per_token_head` (scale-free fp8:
+per-token-head scales are computed at runtime, no calibration pass). The KV
+pool reports ~7.16 GiB available to the engine with ~882k cache tokens — vs
+6.62 GiB fp16 — so token capacity roughly doubles. Live VRAM at idle stays in
+the same band: the cache is reserved under `--gpu-memory-utilization 0.92`
+regardless of dtype, so the win is more cache, not less reserved VRAM. On this
+hybrid the 8 attention layers carry K/V, so the fp8 halving applies there.
+
 ### SGLang VRAM usage
 
 Same checkpoint, same RTX 4070: 9.37 GiB after load (engine process, vs

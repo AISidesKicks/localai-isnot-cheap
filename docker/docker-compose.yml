@@ -197,6 +197,8 @@ services:
       - "--max-num-seqs"
       - "4"
       - "--enable-prefix-caching"
+      - "--kv-cache-dtype"
+      - "fp8_per_token_head"
     environment:
       HF_TOKEN: ${HF_TOKEN:-}
     volumes:

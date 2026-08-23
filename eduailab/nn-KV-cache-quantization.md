@@ -56,8 +56,9 @@ designs and why 2-bit/4-bit KV cache only works when the scales are handled righ
 ## Engine samples — exact flags + what to measure
 
 All three engines can store KV at lower precision today. Flags below are manual
-reconfig labs (no compose changes in this repo yet); measure the cache with the
-engine's own metrics or `nvidia-smi`.
+reconfig labs; `cheap-vllm` in this repo now ships `fp8_per_token_head` live
+(see the vLLM sample). Measure the cache with the engine's own metrics or
+`nvidia-smi`.
 
 ### llama.cpp
 
@@ -77,10 +78,20 @@ at `-ctk f16 -ctv f16` on LFM2.5-2.6B-Q8_0, 128K context.
 ### vLLM
 
 ```sh
---kv-cache-dtype fp8_e4m3       # 8-bit, E4M3 (more precision, fewer range than E5M2)
---kv-cache-dtype fp8_e5m2       # 8-bit, E5M2 (more range, less precision)
---kv-cache-dtype-skip-layers 4  # keep the first N layers fp16 — they see every token
+--kv-cache-dtype fp8_per_token_head  # live in-repo: scale-free fp8 (default for cheap-vllm)
+--kv-cache-dtype fp8_e4m3            # 8-bit, E4M3 (static scales — hybrid trap)
+--kv-cache-dtype fp8_e5m2            # 8-bit, E5M2 (static scales — hybrid trap)
+--kv-cache-dtype-skip-layers 4       # keep the first N layers fp16 — they see every token
 ```
+
+The repo's `cheap-vllm` container runs `fp8_per_token_head` — vLLM's scale-free
+8-bit. It needs no `kv_scales.json` and no `--calculate-kv-scales` pass: dynamic
+per-token-head scales get computed at runtime (the validator logs *"Dynamic
+per-token-head scales will be computed at runtime"*). That sidesteps the exact
+hybrid trap — `fp8_e4m3`/`fp8_e5m2` carry static scales that silently fall back
+to `1.0` when the calibration pass is disabled on recurrent layers (vLLM
+#52793, #52475). Verified live: the container resolves the dtype and the kernel
+reports ~7.16 GiB / ~882k tokens of cache vs 6.62 GiB fp16.
 
 Measure: `vllm:kv_cache_usage_perc` and `vllm:prefix_cache_hits` on `/metrics`, plus the
 VRAM baseline in docker/README.md (KV 6.62 GiB of 11.4 GiB at the default fp16).

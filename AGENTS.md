@@ -33,7 +33,7 @@ Don't stop any other containers or delete any resources without explicit HITL ap
 
 ## For temporal work always use $SCRATCH and $TMPDIR
 
-- `$SCRATCH` — scratch disk dir for logs and artifacts that must persist crash (`$PIXI_PROJECT_ROOT/scratch`, gitignored except `.gitkeep`)
+- `$SCRATCH` — scratch disk dir for logs and artifacts that persist through crashes (`$PIXI_PROJECT_ROOT/scratch`, gitignored except `.gitkeep`)
 - `$TMPDIR` — tmpfs dir at `/run/user/$UID/pixi_tmp/$PIXI_PROJECT_NAME` (created by pixi `default` task)
 
 ## Commit conventions

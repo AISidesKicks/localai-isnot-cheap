@@ -204,6 +204,9 @@ Custom report scripts query the persisted trace and spend data to build per-team
 
 9. **Responses API simulation (OPTIONAL):**
    - A session-aware cache layer that remembers conversation flow and state across turns
+   - **MongoDB-backed**: every session stores accumulated messages, tool call results, and conversation branches in a document store — survives restarts and supports concurrent sessions
+   - **Mock API server**: a lightweight Flask/FastAPI server that mirrors the Open Responses `/responses` endpoint contract locally. Returns plausible-but-simulated completions when no engine is running, so client code can be developed and tested without GPU access
+   - **Session isolation**: each virtual key maps to an isolated session namespace; no data leaks between teams or test runs
    - See [Open Responses](https://github.com/open-responses/open-responses)
 ---
 

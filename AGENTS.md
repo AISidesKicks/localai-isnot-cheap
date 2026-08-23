@@ -43,6 +43,7 @@ Auto-commit locally, so we can keep track, using these rules:
 - Small granular conventional commits.
 - Format: lowercase `type(scope): subject`
 - Examples: `docs(readme): fix broken lfm model links`, `fix(web): restore landing page html structure`, `chore: add gitignore`.
+- Typos fixing: submit merrit of changge, not then you just 'clean it'
 
 ## Task completion notification
 

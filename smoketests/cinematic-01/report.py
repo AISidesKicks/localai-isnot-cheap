@@ -164,11 +164,18 @@ def render(results, eval_summary, run_id):
         r for r in demo if r.get("call") == "engine" and r.get("prefix_cache_delta")
     ]
     if engine_rows:
-        a("| Mode | vLLM prefix-cache Δ hits | Δ queries |")
-        a("|------|--------------------------|-----------|")
-        for r in engine_rows:
-            d = r["prefix_cache_delta"]
-            a(f"| {r['mode']} | {d['hits']} | {d['queries']} |")
+        if "sglang" in model_alias:
+            a("| Mode | SGLang cache-hit rate | KV-cache memory (GB) |")
+            a("|------|-----------------------|----------------------|")
+            for r in engine_rows:
+                d = r["prefix_cache_delta"]
+                a(f"| {r['mode']} | {d['hits']:.3f} | {d['queries']:.3f} |")
+        else:
+            a("| Mode | vLLM prefix-cache Δ hits | Δ queries |")
+            a("|------|--------------------------|-----------|")
+            for r in engine_rows:
+                d = r["prefix_cache_delta"]
+                a(f"| {r['mode']} | {d['hits']} | {d['queries']} |")
         a("")
     a(
         "In 2level, call Q2 reuses the Q1 response from Redis — the engine "

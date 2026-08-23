@@ -47,6 +47,7 @@ from llm import (
     get_repo_root,
     health,
     reasoning_content,
+    sglang_prefix_metrics,
     timings,
     usage_fields,
     vllm_prefix_metrics,
@@ -325,7 +326,13 @@ def cache_demo(args, mode):
         for m in CACHE_MODES[:3]:
             rows.extend(cache_demo(args, m)[0])
         return rows, "both"
-    pre = vllm_prefix_metrics(args.base_url.replace(":4000", ":8000")) or {}
+
+    def prefix_metrics():
+        if "sglang" in llm.MODEL:
+            return sglang_prefix_metrics("http://localhost:30000")
+        return vllm_prefix_metrics(args.base_url.replace(":4000", ":8000"))
+
+    pre = prefix_metrics() or {}
     if mode == "1level":
         calls = [
             {"call": "base 1", "content": BASE_PROMPT + " - 1"},
@@ -355,7 +362,7 @@ def cache_demo(args, mode):
         ]
     print(f"cache demo: {mode}", flush=True)
     rows = ctdemo_rows(calls, mode, args)
-    post = vllm_prefix_metrics(args.base_url.replace(":4000", ":8000")) or {}
+    post = prefix_metrics() or {}
     if pre and post:
         rows.append(
             {

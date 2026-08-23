@@ -268,6 +268,31 @@ def vllm_prefix_metrics(base_url="http://localhost:8000"):
     return counts if {"hits", "queries"} <= counts.keys() else None
 
 
+def sglang_prefix_metrics(base_url="http://localhost:30000"):
+    """Snapshot of SGLang's KV-prefix-cache counters, or None if unreachable.
+
+    SGLang serves token reuse through `/metrics` Prometheus gauges: a cache hit
+    rate (`sglang:cache_hit_rate`) and the KV cache memory resident in GB
+    (`sglang:kv_cache_memory_usage_gb`). Unlike vLLM's absolute hit/query
+    counters, these are rates/gauge snapshots, so a demo records them at the
+    wall-clock moment of the probe rather than as a cumulative delta. Returns
+    {"hits": float, "queries": float} (as the hit rate and KV-cache GB) so the
+    cache-demo row stays the same shape.
+    """
+    try:
+        with urllib.request.urlopen(base_url + "/metrics", timeout=10) as resp:
+            text = resp.read().decode("utf-8", "replace")
+    except (OSError, urllib.error.URLError):
+        return None
+    counts = {}
+    for line in text.splitlines():
+        if line.startswith("sglang:cache_hit_rate{"):
+            counts["hits"] = float(line.rsplit(" ", 1)[-1])
+        elif line.startswith("sglang:kv_cache_memory_usage_gb{"):
+            counts["queries"] = float(line.rsplit(" ", 1)[-1])
+    return counts if {"hits", "queries"} <= counts.keys() else None
+
+
 def timings(resp):
     """llama.cpp prompt/cache timings; live in model_extra, not usage, here."""
     extra = getattr(resp, "model_extra", None) or {}

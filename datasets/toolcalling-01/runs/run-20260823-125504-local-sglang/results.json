@@ -1,0 +1,224 @@
+{
+  "meta": {
+    "name": "toolcalling-01",
+    "test": "smoketests/toolcalling-01/test.py",
+    "run_id": "run-20260823-125504-local-sglang",
+    "run_at": "2026-08-23T12:55:07+0200",
+    "model_alias": "local-sglang",
+    "base_url": "http://localhost:4000",
+    "dataset": "/home/roro/Workspaces/localai-isnot-cheap/datasets/toolcalling-01/scenarios.json",
+    "scenarios": 6,
+    "temperature": 0.1,
+    "workers": 4
+  },
+  "rows": [
+    {
+      "scenario": "calc-bill",
+      "prompt": "Calculate 15% of a $120 bill.",
+      "tool_calls": 1,
+      "tool_used": true,
+      "expected_tool": "calculate",
+      "tool_name_ok": true,
+      "arguments": "{\"expression\": \"0.15 * 120\"}",
+      "args_parsed": {
+        "expression": "0.15 * 120"
+      },
+      "expected_args": {
+        "expression": "0.15 * 120"
+      },
+      "args_ok": true,
+      "pythonic": "calculate(expression='0.15 * 120')",
+      "syntax_ok": true,
+      "round_trip": null,
+      "round_trip_ok": false,
+      "final_answer": null,
+      "reasoning": "The user wants me to calculate 15% of $120. This is a straightforward arithmetic calculation. I can use the calculate function with an expression like \"0.15 * 120\" or \"15/100 * 120\". Let me use the calculate tool for this.",
+      "cache_regime": "litellm-redis-miss",
+      "timings": {
+        "prompt_n": null,
+        "cache_n": null,
+        "predicted_n": null
+      },
+      "seconds": 2.322,
+      "usage": {
+        "prompt_tokens": 288,
+        "completion_tokens": 73,
+        "total_tokens": 361
+      }
+    },
+    {
+      "scenario": "calc-multiply",
+      "prompt": "Work out 12 times 7.",
+      "tool_calls": 1,
+      "tool_used": true,
+      "expected_tool": "calculate",
+      "tool_name_ok": true,
+      "arguments": "{\"expression\": \"12 * 7\"}",
+      "args_parsed": {
+        "expression": "12 * 7"
+      },
+      "expected_args": {
+        "expression": "12 * 7"
+      },
+      "args_ok": true,
+      "pythonic": "calculate(expression='12 * 7')",
+      "syntax_ok": true,
+      "round_trip": null,
+      "round_trip_ok": false,
+      "final_answer": null,
+      "reasoning": "The user wants me to calculate 12 times 7. I have a tool called \"calculate\" that can evaluate arithmetic expressions. Let me use it with the expression \"12 * 7\".",
+      "cache_regime": "litellm-redis-miss",
+      "timings": {
+        "prompt_n": null,
+        "cache_n": null,
+        "predicted_n": null
+      },
+      "seconds": 2.113,
+      "usage": {
+        "prompt_tokens": 286,
+        "completion_tokens": 54,
+        "total_tokens": 340
+      }
+    },
+    {
+      "scenario": "film-inception",
+      "prompt": "What was the release year of Inception from Warner Bros.?",
+      "tool_calls": 1,
+      "tool_used": true,
+      "expected_tool": "lookup_film_year",
+      "tool_name_ok": true,
+      "arguments": "{\"title\": \"Inception\", \"studio\": \"Warner Bros.\"}",
+      "args_parsed": {
+        "title": "Inception",
+        "studio": "Warner Bros."
+      },
+      "expected_args": {
+        "title": "Inception",
+        "studio": "Warner Bros."
+      },
+      "args_ok": true,
+      "pythonic": "lookup_film_year(title='Inception', studio='Warner Bros.')",
+      "syntax_ok": true,
+      "round_trip": null,
+      "round_trip_ok": false,
+      "final_answer": null,
+      "reasoning": "The user is asking about the release year of \"Inception\" from Warner Bros. I should use the lookup_film_year function to get this information. The required parameter is \"title\", and I can also provide \"studio\" as optional context.\n\nLet me call the lookup_film_year function with:\n- title: \"Inception\"\n- studio: \"Warner Bros.\"\n\nThis should return the release year for Inception produced by Warner Bros...",
+      "cache_regime": "litellm-redis-miss",
+      "timings": {
+        "prompt_n": null,
+        "cache_n": null,
+        "predicted_n": null
+      },
+      "seconds": 1.152,
+      "usage": {
+        "prompt_tokens": 291,
+        "completion_tokens": 115,
+        "total_tokens": 406
+      }
+    },
+    {
+      "scenario": "film-totoro",
+      "prompt": "In what year was Studio Ghibli's My Neighbor Totoro released?",
+      "tool_calls": 1,
+      "tool_used": true,
+      "expected_tool": "lookup_film_year",
+      "tool_name_ok": true,
+      "arguments": "{\"title\": \"My Neighbor Totoro\", \"studio\": \"Studio Ghibli\"}",
+      "args_parsed": {
+        "title": "My Neighbor Totoro",
+        "studio": "Studio Ghibli"
+      },
+      "expected_args": {
+        "title": "My Neighbor Totoro",
+        "studio": "Studio Ghibli"
+      },
+      "args_ok": true,
+      "pythonic": "lookup_film_year(title='My Neighbor Totoro', studio='Studio Ghibli')",
+      "syntax_ok": true,
+      "round_trip": null,
+      "round_trip_ok": false,
+      "final_answer": null,
+      "reasoning": "The user is asking about the release year of Studio Ghibli's \"My Neighbor Totoro\". I need to look up this information. There's a tool called `lookup_film_year` that can help with this - it requires a title and optionally a studio. The required parameter is \"title\", so I should use that.\n\nLet me call the lookup_film_year function with:\n- title: \"My Neighbor Totoro\"\n- studio: \"Studio Ghibli\" (option...",
+      "cache_regime": "litellm-redis-miss",
+      "timings": {
+        "prompt_n": null,
+        "cache_n": null,
+        "predicted_n": null
+      },
+      "seconds": 1.417,
+      "usage": {
+        "prompt_tokens": 294,
+        "completion_tokens": 138,
+        "total_tokens": 432
+      }
+    },
+    {
+      "scenario": "weather-prague",
+      "prompt": "What is the weather in Prague right now?",
+      "tool_calls": 1,
+      "tool_used": true,
+      "expected_tool": "get_weather",
+      "tool_name_ok": true,
+      "arguments": "{\"location\": \"Prague\"}",
+      "args_parsed": {
+        "location": "Prague"
+      },
+      "expected_args": {
+        "location": "Prague"
+      },
+      "args_ok": true,
+      "pythonic": "get_weather(location='Prague')",
+      "syntax_ok": true,
+      "round_trip": null,
+      "round_trip_ok": false,
+      "final_answer": null,
+      "reasoning": "The user is asking for the current weather in Prague. I have access to a `get_weather` function that can provide this information. The function requires a \"location\" parameter, which should be the city name. In this case, the location is \"Prague\".\n\nLet me call the get_weather function with Prague as the location.",
+      "cache_regime": "litellm-redis-miss",
+      "timings": {
+        "prompt_n": null,
+        "cache_n": null,
+        "predicted_n": null
+      },
+      "seconds": 2.48,
+      "usage": {
+        "prompt_tokens": 287,
+        "completion_tokens": 84,
+        "total_tokens": 371
+      }
+    },
+    {
+      "scenario": "weather-tokyo",
+      "prompt": "Can you tell me the current weather in Tokyo?",
+      "tool_calls": 1,
+      "tool_used": true,
+      "expected_tool": "get_weather",
+      "tool_name_ok": true,
+      "arguments": "{\"location\": \"Tokyo\"}",
+      "args_parsed": {
+        "location": "Tokyo"
+      },
+      "expected_args": {
+        "location": "Tokyo"
+      },
+      "args_ok": true,
+      "pythonic": "get_weather(location='Tokyo')",
+      "syntax_ok": true,
+      "round_trip": null,
+      "round_trip_ok": false,
+      "final_answer": null,
+      "reasoning": "The user is asking for the current weather in Tokyo. I have access to a `get_weather` function that can provide this information. The function requires a \"location\" parameter, which should be a city name. In this case, the location is \"Tokyo\".\n\nI'll call the get_weather function with location set to \"Tokyo\".",
+      "cache_regime": "litellm-redis-miss",
+      "timings": {
+        "prompt_n": null,
+        "cache_n": null,
+        "predicted_n": null
+      },
+      "seconds": 2.477,
+      "usage": {
+        "prompt_tokens": 288,
+        "completion_tokens": 84,
+        "total_tokens": 372
+      }
+    }
+  ]
+}

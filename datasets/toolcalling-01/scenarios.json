@@ -1,0 +1,92 @@
+{
+  "description": "toolcalling-01: tool-requiring Q/A pairs for the LFM2.5-2.6B native tool-calling path. Mock tools only, no external APIs.",
+  "tools": [
+    {
+      "type": "function",
+      "function": {
+        "name": "get_weather",
+        "description": "Get the current weather for a location.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "location": {"type": "string", "description": "City name"}
+          },
+          "required": ["location"]
+        }
+      }
+    },
+    {
+      "type": "function",
+      "function": {
+        "name": "calculate",
+        "description": "Evaluate an arithmetic expression and return the result.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "expression": {"type": "string", "description": "Arithmetic expression, e.g. 12 * 34"}
+          },
+          "required": ["expression"]
+        }
+      }
+    },
+    {
+      "type": "function",
+      "function": {
+        "name": "lookup_film_year",
+        "description": "Look up the release year of a film by studio.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "title": {"type": "string", "description": "Film title"},
+            "studio": {"type": "string", "description": "Production studio"}
+          },
+          "required": ["title"]
+        }
+      }
+    }
+  ],
+  "scenarios": [
+    {
+      "id": "weather-prague",
+      "prompt": "What is the weather in Prague right now?",
+      "tool": "get_weather",
+      "args": {"location": "Prague"},
+      "expect_tool": true
+    },
+    {
+      "id": "weather-tokyo",
+      "prompt": "Can you tell me the current weather in Tokyo?",
+      "tool": "get_weather",
+      "args": {"location": "Tokyo"},
+      "expect_tool": true
+    },
+    {
+      "id": "calc-bill",
+      "prompt": "Calculate 15% of a $120 bill.",
+      "tool": "calculate",
+      "args": {"expression": "0.15 * 120"},
+      "expect_tool": true
+    },
+    {
+      "id": "calc-multiply",
+      "prompt": "Work out 12 times 7.",
+      "tool": "calculate",
+      "args": {"expression": "12 * 7"},
+      "expect_tool": true
+    },
+    {
+      "id": "film-totoro",
+      "prompt": "In what year was Studio Ghibli's My Neighbor Totoro released?",
+      "tool": "lookup_film_year",
+      "args": {"title": "My Neighbor Totoro", "studio": "Studio Ghibli"},
+      "expect_tool": true
+    },
+    {
+      "id": "film-inception",
+      "prompt": "What was the release year of Inception from Warner Bros.?",
+      "tool": "lookup_film_year",
+      "args": {"title": "Inception", "studio": "Warner Bros."},
+      "expect_tool": true
+    }
+  ]
+}

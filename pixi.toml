@@ -16,6 +16,8 @@ default = "mkdir -p /run/user/$UID/pixi_tmp/$PIXI_PROJECT_NAME"
 cinematic-01-generate = "python smoketests/cinematic-01/generate.py"
 cinematic-01-test = "python smoketests/cinematic-01/test.py"
 cinematic-01-report = "python smoketests/cinematic-01/report.py"
+toolcalling-01-test = "python smoketests/toolcalling-01/test.py"
+toolcalling-01-report = "python smoketests/toolcalling-01/report.py"
 
 [dependencies]
 python = "3.12.*"

@@ -1,0 +1,36 @@
+{
+  "meta": {
+    "name": "toolcalling-01",
+    "test": "smoketests/toolcalling-01/test.py",
+    "run_id": "run-20260823-125512-local-sglang",
+    "run_at": "2026-08-23T12:55:16+0200",
+    "model_alias": "local-sglang",
+    "base_url": "http://localhost:4000",
+    "dataset": "/home/roro/Workspaces/localai-isnot-cheap/datasets/toolcalling-01/scenarios.json",
+    "scenarios": 6,
+    "temperature": 0.1,
+    "workers": 4
+  },
+  "tool_calls_emitted": {
+    "score": "6/6 (100%)",
+    "fraction": 1.0
+  },
+  "correct_tool_name": {
+    "score": "6/6 (100%)",
+    "fraction": 1.0
+  },
+  "correct_arguments": {
+    "score": "6/6 (100%)",
+    "fraction": 1.0
+  },
+  "pythonic_syntax": {
+    "score": "6/6 (100%)",
+    "fraction": 1.0,
+    "check": "ast Call with keyword args"
+  },
+  "round_trip": {
+    "score": "6/6 (100%)",
+    "fraction": 1.0,
+    "enabled": true
+  }
+}

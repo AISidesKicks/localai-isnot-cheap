@@ -9,7 +9,7 @@
     },
     "victoriametrics": {
       "type": "remote",
-      "url": "http://localhost:8000/mcp",
+      "url": "http://localhost:8008/mcp",
       "enabled": true,
       "timeout": 15000
     },

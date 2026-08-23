@@ -373,7 +373,7 @@ services:
       VM_INSTANCE_TYPE: single
       MCP_DISABLED_TOOLS: "export,flags,metric_relabel_debug,downsampling_filters_debug,retention_filters_debug,test_rules,documentation"
     ports:
-      - "8000:8000"
+      - "8008:8000"
     depends_on:
       cheap-victoriametrics:
         condition: service_started

@@ -127,8 +127,7 @@ docker compose -f docker/docker-compose.yml --profile vllm up -d cheap-vllm
 `cheap-vllm` runs with `--enable-prefix-caching` (set in
 `docker/docker-compose.yml`), so shared prompt prefixes reuse KV blocks — watch
 `vllm:prefix_cache_hits_total` / `vllm:prefix_cache_queries_total` in
-VictoriaMetrics. Note the vLLM profile binds host port 8000, which conflicts
-with the optional `vm-mcp` container — stop `vm-mcp` first if it is running.
+VictoriaMetrics. Note the vLLM profile binds host port 8000.
 
 Stop / tear down:
 
@@ -338,7 +337,7 @@ metrics behind those scrapes: `redis_connected_clients`,
 | 6006 | Phoenix        | UI + OTLP HTTP + MCP           |
 | 4317 | Phoenix        | OTLP gRPC                      |
 | 8428 | VictoriaMetrics| metrics UI / query API         |
-| 8000 | VM MCP         | MCP server for VictoriaMetrics (conflicts with vllm profile) |
+| 8008 | VM MCP         | MCP server for VictoriaMetrics |
 | 4001 | LiteLLM MCP    | MCP admin tools for LiteLLM (external server) |
 
 All admin MCP servers (Phoenix, VictoriaMetrics, LiteLLM) also aggregate behind

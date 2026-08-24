@@ -22,7 +22,7 @@ servers behind a single MCP gateway at `http://localhost:4000/mcp`.
    ```
 
    The stack runs out of the box with defaults; edit keys only if you want
-   the external model fallbacks (gpt-4o / claude / deepseek) to work.
+   the external model fallback (gpt-4o / OpenRouter) to work.
 
 2. Download the GGUF checkpoint into `docker/models/Q8/` (llamasrv profile;
    the container mounts `./models:/models:ro`, so it lands at `/models/Q8/`):
@@ -403,9 +403,7 @@ the Postgres volume.
 | `local-vllm` | vLLM           | `vllm`         |
 | `local-sglang`| SGLang        | `sglang`       |
 | `nomic-embed-llama` | llama.cpp (nomic-embed, 768-dim) | `embed-cpu` (F16) or `embed-gpu` (Q8) |
-| `gpt-4o`     | OpenAI         | external       |
-| `claude-sonnet-4-20250514` | Anthropic | external |
-| `deepseek-chat` | DeepSeek    | external       |
+| `gpt-4o`     | OpenRouter     | external       |
 
 All three engines serve the same logical model id `LiquidAI/LFM2.5-2.6B`;
 vLLM and SGLang run the AutoRound W8A16 quantization, llama.cpp the Q8_0 GGUF.

@@ -34,6 +34,12 @@ model_list:
       model: openrouter/deepseek/deepseek-v4-flash
       api_key: os.environ["OPENROUTER_API_KEY"]
 
+  - model_name: neocloud
+    litellm_params:
+      model: openai/minimax-m3
+      api_base: https://a1b2c3d4e5f6-usr9482.deployments.verda.com/v1
+      api_key: os.environ["NEO_API_KEY"]
+
 litellm_settings:
   drop_params: true
   set_verbose: true

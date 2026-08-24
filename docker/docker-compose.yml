@@ -93,6 +93,7 @@ services:
       ANTHROPIC_API_KEY: ${ANTHROPIC_API_KEY:-}
       DEEPSEEK_API_KEY: ${DEEPSEEK_API_KEY:-}
       OPENROUTER_API_KEY: ${OPENROUTER_API_KEY:-}
+      NEO_API_KEY: ${NEO_API_KEY:-}
       HF_TOKEN: ${HF_TOKEN:-}
       OTEL_EXPORTER_OTLP_ENDPOINT: http://cheap-phoenix:6006/v1/traces
       OTEL_EXPORTER_OTLP_PROTOCOL: http/protobuf

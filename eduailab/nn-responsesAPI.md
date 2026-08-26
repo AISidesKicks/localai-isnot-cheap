@@ -123,8 +123,16 @@ curl -sS http://localhost:6644/prometheus  # Prometheus-format scrape
 - `/metrics` registers `gen_ai.client.*` meters lazily — they only appear after a
   request actually reaches an upstream, so a cold container with no reachable
   peer won't show them.
-- `/prometheus` is VictoriaMetrics-scrapable and currently ships
-  `jvm_memory_used_bytes` and `logback_events_total`.
+- `/prometheus` ships `jvm_memory_used_bytes` and `logback_events_total`, and
+  **is scraped by VictoriaMetrics** every 15s (`rapi-memproxy` job in
+  `docker/prometheus.yml`, target `cheap-rAPI-memproxy:6644`).
+- **OpenTelemetry traces are exported to Phoenix** (OTLP over HTTP, service name
+  `cheap-rAPI-memproxy`): the rAPI HTTP/`gen_ai.*` client spans land in the
+  default project alongside LiteLLM's. Two gotchas wired in compose: the OTLP
+  endpoint must be the **base** URL (`http://cheap-phoenix:6006`) — the Java SDK
+  appends `/v1/traces` itself, and a full `/v1/traces` path causes the
+  `...v1/traces/v1/traces` 405 — and `OTEL_LOGS_EXPORTER=none` is set because
+  Phoenix rejects the `/v1/logs` signal.
 
 ## Live smoke test
 

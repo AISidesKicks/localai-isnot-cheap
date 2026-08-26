@@ -461,6 +461,11 @@ services:
       OPEN_RESPONSES_ROUTING_PROVIDERS_SGLANG: http://cheap-sglang:30000/v1
       OPEN_RESPONSES_ROUTING_PROVIDERS_OPENROUTER: https://openrouter.example/v1
       OPEN_RESPONSES_ROUTING_PROVIDERS_NEOCLOUD: https://neocloud.example/v1
+      OTEL_SDK_DISABLED: "false"
+      OTEL_EXPORTER_OTLP_ENDPOINT: http://cheap-phoenix:6006
+      OTEL_EXPORTER_OTLP_PROTOCOL: http/protobuf
+      OTEL_SERVICE_NAME: cheap-rAPI-memproxy
+      OTEL_LOGS_EXPORTER: none
     ports:
       - "6644:6644"
     healthcheck:

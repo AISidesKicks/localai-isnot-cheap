@@ -25,3 +25,10 @@ scrape_configs:
       - targets: ['cheap-postgres-exporter:9187']
         labels:
           db_type: 'postgres'
+  - job_name: 'rapi-memproxy'
+    metrics_path: '/prometheus'
+    scrape_interval: 15s
+    static_configs:
+      - targets: ['cheap-rAPI-memproxy:6644']
+        labels:
+          component_type: 'rapi-memproxy'

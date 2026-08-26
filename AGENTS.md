@@ -38,7 +38,7 @@ Don't stop any other containers or delete any resources without explicit HITL ap
 
 ## Commit conventions
 
-Auto-commit locally, so we can keep track, using these rules:
+Auto-commit locally - don't push, so we can keep track of development, using these rules:
 
 - Small granular conventional commits.
 - Format: lowercase `type(scope): subject`

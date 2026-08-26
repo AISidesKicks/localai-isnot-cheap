@@ -9,6 +9,8 @@ demonstrates how to meter and bill AI tokens for local inference in a small
 lab environment (LiteLLM gateway, llama.ui, Redis caching, and llama.cpp,
 vLLM, SGLang engines, Arize Phoenix observability, VictoriaMetrics).
 
+Due to limited GPU resources - only single engine aka (llamasrv, vLLM, SGLang) can be up!
+
 The tone for documenting steps is informal.
 
 Main programming language is Python 3.12, use PEP conventions with condensed naming.

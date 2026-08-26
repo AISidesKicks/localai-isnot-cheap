@@ -71,7 +71,8 @@ the in-memory approximation we actually run for the caching/routing lesson.
 
 ## Routing to LiteLLM + the three engines
 
-Requests identify a provider with `provider@model` (e.g. `litellm@LiquidAI/LFM2.5-2.6B`)
+Requests identify a provider with `provider@model` (e.g. `litellm@local-vllm`
+for the gateway leg, `vllm@LiquidAI/LFM2.5-2.6B` for the direct engine leg)
 or the `x-model-provider` header; the alias selects the upstream base URL and the
 part after `@` is sent as the model name. Compose registers six aliases:
 
@@ -128,12 +129,15 @@ curl -sS http://localhost:6644/prometheus  # Prometheus-format scrape
 ## Live smoke test
 
 With vLLM up (the current single-engine) we can route through the memproxy to
-LiteLLM and watch the store fill:
+LiteLLM and watch the store fill. Note the **alias gotcha**: LiteLLM only routes
+by its `model_list` aliases, so this leg must use `litellm@local-vllm` (which
+backs onto vLLM), not a raw model id like `litellm@LiquidAI/LFM2.5-2.6B` — that
+form 404s. The direct-engine leg uses the raw id `vllm@LiquidAI/LFM2.5-2.6B`:
 
 ```bash
 RESP=$(curl -sS http://localhost:6644/v1/responses \
   -H 'Content-Type: application/json' -H 'Authorization: Bearer sk-1234-master-key-4321' \
-  -d '{"model":"litellm@LiquidAI/LFM2.5-2.6B","input":"What is a weighted cache?","store":true}')
+  -d '{"model":"litellm@local-vllm","input":"What is a weighted cache?","store":true}')
 printf '%s' "$RESP" | jq '{id, status, text: .output[0].content[0].text}'
 ```
 
@@ -142,6 +146,17 @@ with `GET /v1/responses/{id}`. After traffic, `/stats` shows `requests.total` an
 `responseStore.entries` climbing past zero and `/prometheus` exposes
 `gen_ai.client.token.usage` — the proof that tokens moved end-to-end through the
 proxy.
+
+The automated version of this is the **`responsesapi-01` smoke test**
+(`smoketests/responsesapi-01/`), which covers the gateway + direct legs,
+streaming, retrieve/continue/input-items, a bad-alias 400, and `/stats` +
+`/metrics` + `/prometheus` assertions, and writes artifacts under
+`datasets/responsesapi-01/`:
+
+```bash
+# make sure the gateway leg is up (LiteLLM + postgres + redis + phoenix)
+pixi run responsesapi-01-test && pixi run responsesapi-01-report
+```
 
 ## Cross-ref
 

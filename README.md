@@ -128,22 +128,22 @@ We can also try Google's [embeddinggemma](https://ai.google.dev/gemma/docs/embed
 =============================================================================================
 
                            [ Users / Teams / Apps ]
-                                      │
-                                      │ (1. API Request + Virtual Key)
-                                      ▼
-       ┌─.─.─.─ ┌──────────────────────────────────────────────────────────┐ ┌─.─.─.─.─.─.─┐
+       .                               │
+       .                               │ (1. API Request + Virtual Key)
+       .                               ▼
+       .        ┌──────────────────────────────────────────────────────────┐ ┌─.─.─.─.─.─.─┐
        ▽        │          LITELLM (AI GATEWAY)                            │ │  LLAMA.UI   │
 ┌─.─.─.─.─.─.─┐ │ • Request Interception & Quota Checks (Users/Teams/Apps) │ ◁             │
 │OpenResponses│ │ • Cache Layer: Exact / Semantic Response Matching        │ │ • manual    │
-│             │ │ • Rate Limiting (TPM/RPM) & Dynamic Cost Calculation     │ │  debugging  │
-│ • API Sim   │ │ • OTLP Trace Export to Phoenix                           │ │  (point to  │
-│   (MongoDB) │ │ • MCP Gateway: MCP and namespaced tools                  │ │   srv API)  │
-│             │ │ • Skills HUB: Set of useful skills                       │ │             │
-└─.┬.─.─.─.─.┬┘ └─┬──────────────────────────┬─────────────────────────┬───┘ └─.┬.─.─.─.─.─┘
-   │         └ ─ ─│ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─┬── │ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ │ ─ ─ ─ ─┘
-   │ (9. Session) │ (2. Cache Lookup     │   │ (3. Cache Miss:         │ (4. OTLP Trace &)
-   │     Lookup   │     Auth Key Check)  │   │     Inference Request)  │     Usage Events)
-   ▽              ▼                      ▽   ▼                         ▼
+│             ▷ │ • Rate Limiting (TPM/RPM) & Dynamic Cost Calculation     │ │  debugging  │
+│ • rAPI      │ │ • OTLP Trace Export to Phoenix                           │ │  (point to  │
+│  (memproxy  │ │ • MCP Gateway: MCP and namespaced tools                  │ │   srv API)  │
+│   in RAM)   │ │ • Skills HUB: Set of useful skills                       │ │             │
+└─.─.─.─.─.─.┬┘ └─┬──────────────────────────┬─────────────────────────┬───┘ └─.┬.─.─.─.─.─┘
+             └ ─ ─│ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─┬── │ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ │ ─ ─ ─ ─┘
+  (9. Sessions)   │ (2. Cache Lookup     │   │ (3. Cache Miss:         │ (4. OTLP Trace &)
+       Lookup     │     Auth Key Check)  │   │     Inference Request)  │     Usage Events)
+                  ▼                      ▽   ▼                         ▼
 ┌───────────────────────┐ ┌───────────────────────────────┐ ┌────────────────────────────────┐
 │        REDIS          │ │   LOCAL AI INFERENCE ENGINE   │ │    PHOENIX (OBSERVABILITY)     │
 │ LiteLLM Cache:        │ │ [ llama.cpp | vLLM | SGLang ] │ │ • OTLP Trace Ingestion         │
@@ -203,11 +203,12 @@ Custom report scripts query the persisted trace and spend data to build per-team
       - **Managed (Toolsets):** curated, named subsets of tools pulled from across the servers, so each team only gets the slice of the lab they're meant to see.
 
 9. **Responses API simulation (OPTIONAL):**
-   - A session-aware cache layer that remembers conversation flow and state across turns
-   - **MongoDB-backed**: every session stores accumulated messages, tool call results, and conversation branches in a document store — survives restarts and supports concurrent sessions
-   - **Mock API server**: a lightweight Flask/FastAPI server that mirrors the Open Responses `/responses` endpoint contract locally. Returns plausible-but-simulated completions when no engine is running, so client code can be developed and tested without GPU access
+   - An **optional proxy** (rAPI) between LiteLLM and the inference engines that adds session-aware conversation state — every virtual key gets an isolated session accumulating messages, tool results, and branches across turns
+   - **MongoDB-backed sessions**: session documents store the full history, survive restarts, and support concurrent sessions
+   - **Two cache layers, same Redis**: layer 1 — LiteLLM exact/semantic response cache (no GPU wakeup on repeats); layer 2 — rAPI session-aware TTL cache for fast reads, with MongoDB as the durable backing store
+   - **Mock API server**: a lightweight Flask/FastAPI server that mirrors the Open Responses `/responses` endpoint contract locally. Returns plausible simulated completions when no engine is running, so client code can be developed and tested without GPU access
    - **Session isolation**: each virtual key maps to an isolated session namespace; no data leaks between teams or test runs
-   - See [Open Responses](https://github.com/open-responses/open-responses)
+   - See [Open Responses](https://github.com/open-responses/open-responses) and the design note: [nn-responsesAPI.md](eduailab/nn-responsesAPI.md)
 ---
 
 ### Will it RUN considerations

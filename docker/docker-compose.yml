@@ -437,6 +437,41 @@ services:
     networks:
       - cheap-net
 
+  cheap-rAPI-memproxy:
+    image: cheap-rapi-memproxy:latest
+    build:
+      context: ${SCRATCH:-./scratch}/open-responses-memproxy
+      dockerfile: Dockerfile
+    container_name: cheap-rAPI-memproxy
+    profiles: ["rAPI"]
+    restart: unless-stopped
+    mem_limit: 4g
+    environment:
+      JAVA_TOOL_OPTIONS: -Xms512m -Xmx3g
+      OPEN_RESPONSES_STORE_TYPE: in-memory
+      OPEN_RESPONSES_STORE_MAXIMUM_WEIGHT: "2147483648"
+      OPEN_RESPONSES_STORE_SOFT_THRESHOLD: "0.80"
+      OPEN_RESPONSES_STORE_CLEANUP_INTERVAL_MS: "60000"
+      OPEN_RESPONSES_STORE_FLOW_IDLE_TIMEOUT_MS: "600000"
+      OPEN_RESPONSES_UPSTREAM_CACHE: on
+      OPEN_RESPONSES_ROUTING_DEFAULT_PROVIDER: litellm
+      OPEN_RESPONSES_ROUTING_PROVIDERS_LITELLM: http://cheap-litellm:4000/v1
+      OPEN_RESPONSES_ROUTING_PROVIDERS_LLAMA: http://cheap-llamasrv:8080/v1
+      OPEN_RESPONSES_ROUTING_PROVIDERS_VLLM: http://cheap-vllm:8000/v1
+      OPEN_RESPONSES_ROUTING_PROVIDERS_SGLANG: http://cheap-sglang:30000/v1
+      OPEN_RESPONSES_ROUTING_PROVIDERS_OPENROUTER: https://openrouter.example/v1
+      OPEN_RESPONSES_ROUTING_PROVIDERS_NEOCLOUD: https://neocloud.example/v1
+    ports:
+      - "6644:6644"
+    healthcheck:
+      test: ["CMD", "curl", "--fail", "--silent", "http://localhost:6644/health"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 30s
+    networks:
+      - cheap-net
+
 networks:
   cheap-net:
     name: cheap-net

@@ -1,0 +1,74 @@
+{
+  "meta": {
+    "name": "responsesapi-01",
+    "test": "smoketests/responsesapi-01/test.py",
+    "run_id": "run-20260826-172244-responsesapi",
+    "run_at": "2026-08-26T17:22:46+0200",
+    "base_url": "http://localhost:6644",
+    "litellm_alias": "local-vllm",
+    "vllm_model": "LiquidAI/LFM2.5-2.6B",
+    "scenarios": 10
+  },
+  "rows": [
+    {
+      "scenario": "litellm_route",
+      "http_status": 200,
+      "ok": true,
+      "detail": "model=local-vllm"
+    },
+    {
+      "scenario": "vllm_route",
+      "http_status": 200,
+      "ok": true,
+      "detail": "model=LiquidAI/LFM2.5-2.6B"
+    },
+    {
+      "scenario": "header_route",
+      "http_status": 200,
+      "ok": true,
+      "detail": "model=LiquidAI/LFM2.5-2.6B"
+    },
+    {
+      "scenario": "stream_route",
+      "http_status": 200,
+      "ok": true,
+      "detail": "deltas=1 completed=True"
+    },
+    {
+      "scenario": "retrieve",
+      "http_status": 200,
+      "ok": true,
+      "detail": "id=chatcmpl-8b67371cf3ad87cd"
+    },
+    {
+      "scenario": "continue_flow",
+      "http_status": 200,
+      "ok": true,
+      "detail": "prev=chatcmpl-8b67371cf3ad87cd"
+    },
+    {
+      "scenario": "input_items",
+      "http_status": 200,
+      "ok": true,
+      "detail": "object=list"
+    },
+    {
+      "scenario": "bad_alias",
+      "http_status": 400,
+      "ok": true,
+      "detail": "expect 400 got 400"
+    },
+    {
+      "scenario": "stats",
+      "http_status": 200,
+      "ok": true,
+      "detail": "{\"service\": true, \"requests.total>0\": true, \"responseStore.entries>0\": true, \"cache.mode==on\": true, \"memory.maxBytes==3221225472\": true, \"maximumWeightBytes==2147483648\": true}"
+    },
+    {
+      "scenario": "metrics",
+      "http_status": 200,
+      "ok": true,
+      "detail": "http.server.requests=Y jvm_memory_used_bytes=Y"
+    }
+  ]
+}

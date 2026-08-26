@@ -1,0 +1,25 @@
+{
+  "meta": {
+    "name": "responsesapi-01",
+    "test": "smoketests/responsesapi-01/test.py",
+    "run_id": "run-20260826-172244-responsesapi",
+    "run_at": "2026-08-26T17:22:46+0200",
+    "base_url": "http://localhost:6644",
+    "litellm_alias": "local-vllm",
+    "vllm_model": "LiquidAI/LFM2.5-2.6B",
+    "scenarios": 10
+  },
+  "scenarios_passed": "10/10",
+  "rows": {
+    "litellm_route": true,
+    "vllm_route": true,
+    "header_route": true,
+    "stream_route": true,
+    "retrieve": true,
+    "continue_flow": true,
+    "input_items": true,
+    "bad_alias": true,
+    "stats": true,
+    "metrics": true
+  }
+}

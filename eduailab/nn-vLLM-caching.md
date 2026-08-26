@@ -29,12 +29,16 @@ game:
 The L2 tier is the `OffloadingConnector` (`kv_connector: "OffloadingConnector"`),
 which pushes completed KV blocks into **pinned host RAM** with async DMA
 (`cudaMemcpyAsync`) so the transfer overlaps with model compute instead of stalling
-it. Its spec controls the rest:
+it. **Enabled in this repo's compose** on `cheap-vllm` at the house standard
+**3 GB** (`"cpu_bytes_to_use": 3221225472`). Its spec controls the rest:
 
 - `CPUOffloadingSpec` (default) — one CPU tier, `cpu_bytes_to_use` caps the pinned
-  buffer. House standard: **3 GB** → `"cpu_bytes_to_use": 3221225472` (bytes).
+  buffer.
 - Hits promote blocks back GPU-side on demand (LRU with `eviction_policy: lru`).
 - `kv_role: "kv_both"` means the instance reads and writes the shared cache.
+- Preflight: the connector maps the pool as an mmap in `/dev/shm`, so `shm_size: 4g`
+  (compose) matters — a 1g `/dev/shm` kills it with
+  `OSError: [Errno 14] Bad address` from `madvise` on a 3.22 GB region.
 
 ### L3 — disk: TieringOffloadingSpec
 
@@ -90,13 +94,12 @@ vLLM serves `/metrics` on the API port (8000); VictoriaMetrics scrapes it as
 | `vllm:kv_cache_usage_perc` | Gauge | KV block pool utilization % |
 | `vllm:prefix_cache_queries` / `vllm:prefix_cache_hits` | Counter | global prefix cache hits vs lookup queries |
 | `vllm:external_prefix_cache_queries` / `vllm:external_prefix_cache_hits` | Counter | hits coming from the offload connector's cache |
-| `vllm:kv_offload_store_bytes` / `vllm:kv_offload_store_time` | Counter | bytes+time pushed GPU → offload tiers |
-| `vllm:kv_offload_load_bytes` / `vllm:kv_offload_load_time` | Counter | bytes+time fetched back offload → GPU |
-| `vllm:kv_offload_load_size` / `vllm:kv_offload_store_size` | Histogram | per-op transfer sizes |
-| `vllm:kv_offload_allocation_failure` | Counter | offload store allocation failures (tune down `cpu_bytes_to_use`) |
+| `vllm:kv_offload_store_bytes_total` / `vllm:kv_offload_store_time_total` | Counter | bytes+time pushed GPU → offload tiers |
+| `vllm:kv_offload_total_bytes_total` / `vllm:kv_offload_total_time_total` | Counter | same, split by `transfer_type="GPU_to_CPU"\|"CPU_to_GPU"` label |
 
 Legacy labels still emitted: `vllm:kv_offload_total_bytes`, `vllm:kv_offload_total_time`
-(with `transfer_type` label). Response-level: `/v1/chat/completions` returns
+(with `transfer_type` label), plus `vllm:kv_offload_size`, `vllm:kv_offload_store_size`
+histograms. Response-level: `/v1/chat/completions` returns
 `usage.prompt_tokens_details.cached_tokens` — the count you want to watch go up as the
 cache warms.
 
@@ -108,13 +111,20 @@ sum(rate(vllm:prefix_cache_queries[5m]))` and the offload pressure is
 
 ### L2 — single-tier CPU offload (3 GB standard)
 
-*Optional / manual reconfig* — edit the `cheap-vllm` command in `docker-compose.yml`:
+**Already on in this repo's compose** — `cheap-vllm` ships the exact blob below, plus
+`shm_size: 4g` so the 3.22 GB offload pool fits in `/dev/shm`:
 
 ```yaml
-# add to the vllm command list:
 - "--kv-transfer-config"
 - '{"kv_connector":"OffloadingConnector","kv_role":"kv_both","kv_connector_extra_config":{"cpu_bytes_to_use":3221225472}}'
 ```
+
+Verify after `up` — `docker logs cheap-vllm` shows:
+`Creating v1 connector with name: OffloadingConnector` and
+`Created mmap file /dev/shm/vllm_offload_*.mmap (3.22 GB)` with **no JSON parse
+error**. Then warm a prompt and watch `vllm:kv_offload_store_bytes_total` (with
+`transfer_type="GPU_to_CPU"`) climb; a re-run of the same prompt answers in ~0.1 s at
+0% GPU KV usage, proving the fetch was served from the pinned host pool.
 
 ```sh
 docker compose -f docker/docker-compose.yml --profile vllm up -d

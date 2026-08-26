@@ -26,7 +26,7 @@ L1/L2 private per instance, L3 shared (optionally) across instances.
 - `--hicache-size 3` (GiB, overrides ratio) or `--hicache-ratio 2.0`. House
   standard: **3 GB** — `--hicache-size 3`. The host pool must be **larger than the
   GPU KV pool** (ratio must be > 1), because host RAM is the buffering layer between
-  GPU and disk.
+  GPU and disk. **Enabled in this repo's compose** on `cheap-sglang`.
 - `--hicache-host-memory-mode cache` (default) treats the host pool as a persistent
   tier; `buffer_only` downgrades it to a staging buffer for L3 (`--hicache-write-policy
   write_back|write_through|write_through_selective` governs when data demotes).
@@ -99,14 +99,20 @@ VM one-liner: `sglang:cache_hit_rate`, and prove L3 is doing work with
 
 ### L2 — HiCache host pool (3 GB standard)
 
-*Optional / manual reconfig* — edit the `cheap-sglang` command in `docker-compose.yml`:
+**Already on in this repo's compose** — `cheap-sglang` ships the flags below:
 
 ```yaml
-# add to the sglang command list:
 - "--enable-hierarchical-cache"
 - "--hicache-size"
 - "3"
 ```
+
+Verify after `up` — `docker logs cheap-sglang` dumps `server_args=` with
+`enable_hierarchical_cache=True, hicache_size=3`, then allocates
+`HiCache kv host pool ... host memory` and ends with
+`Tree cache initialized: ... hierarchical=True`. Watch the pool fill at
+`localhost:30000/metrics`: `sglang:hicache_host_used_tokens` /
+`sglang:hicache_host_total_tokens`.
 
 ```sh
 docker compose -f docker/docker-compose.yml --profile sglang up -d

@@ -44,14 +44,19 @@ Two mechanisms share the same RAM budget:
 - **Unified KV spill** — with a single unified KV buffer (`--kv-unified`; enabled by
   default when the slot count is auto) and `--kv-offload` (**on by default**), KV that
   does not fit in VRAM overflows into host RAM instead of erroring. The llama.cpp
-  profile in this repo starts with `--no-kv-unified` + an explicit `--parallel 4`, so
-  the spill path is currently off — dropping `--no-kv-unified` restores it (see the
-  recipe below).
+  profile in this repo keeps `--no-kv-unified` + an explicit `--parallel 4`, so this
+  spill path stays off — the RAM prompt cache below is the live L2; dropping
+  `--no-kv-unified` restores the spill (see the recipe below).
 - **Prompt cache in RAM** — `--cache-ram N` sizes a hot prompt cache for repeated
   prefixes (**default 8192 MiB**; `-1` = no limit, `0` = disabled), and
   `--cache-idle-slots` (on by default) saves idle slots into it on new tasks and
-  clears them under unified KV. Our house standard is **3 GB (`--cache-ram 3072`)** —
-  keep the rest of the 32 GB for the stack, your agents, and the L3 ramdisk.
+  clears them under unified KV. **Enabled in this repo's compose** at the house
+  standard **3 GB (`--cache-ram 3072`)** — keep the rest of the 32 GB for the stack,
+  your agents, and the L3 ramdisk. Verify after `up`: the flag is accepted with **no**
+  `--cache-ram` warning/error in `docker logs cheap-llamasrv`, and a repeat prompt
+  returns `timings.cache_n > 0` (log line
+  `selected slot by LCP similarity, f_sim_best = 1.000`), while
+  `llamacpp:prompt_tokens_cached_total` climbs.
 
 ### L3 — disk: slot save/restore
 
@@ -119,14 +124,20 @@ VM query to watch reuse: `llamacpp:n_busy_slots_per_decode` over `rate`, and
 
 ### L2 spill demo — unified KV overflow to CPU RAM
 
-*Optional / manual reconfig* — edits `docker-compose.yml` (`cheap-llamasrv` command):
+Half of this recipe is already on: **this repo's compose ships `--cache-ram 3072`** on
+`cheap-llamasrv` (3 GiB prompt cache). Only the unified-KV overflow half is still a
+manual reconfig:
 
 ```yaml
 # remove: --no-kv-unified
 # add:    --kv-offload            (default on; spill KV to CPU when VRAM is full)
-# add:    --cache-ram 3072        (3 GiB prompt cache per house standard)
 # add:    --ctx-size 200000       (blow past the card's KV capacity on purpose)
 ```
+
+Verify the shipped L2 half after `up` — `docker logs cheap-llamasrv` shows the flag
+accepted with **no `--cache-ram` warning/error**, and a second identical
+`/v1/chat/completions` returns `timings.cache_n > 0` while the log prints
+`selected slot by LCP similarity, f_sim_best = 1.000`.
 
 ```sh
 docker compose -f docker/docker-compose.yml --profile llamasrv up -d

@@ -203,12 +203,12 @@ Custom report scripts query the persisted trace and spend data to build per-team
       - **Managed (Toolsets):** curated, named subsets of tools pulled from across the servers, so each team only gets the slice of the lab they're meant to see.
 
 9. **Responses API simulation (OPTIONAL):**
-   - An **optional proxy** (rAPI) between LiteLLM and the inference engines that adds session-aware conversation state — every virtual key gets an isolated session accumulating messages, tool results, and branches across turns
-   - **MongoDB-backed sessions**: session documents store the full history, survive restarts, and support concurrent sessions
-   - **Two cache layers, same Redis**: layer 1 — LiteLLM exact/semantic response cache (no GPU wakeup on repeats); layer 2 — rAPI session-aware TTL cache for fast reads, with MongoDB as the durable backing store
+   - An **optional proxy** (rAPI) between LiteLLM and the inference engines, an OpenResponses-compatible cache/proxy that adds session-aware conversation state, accumulating messages, tool results, and branches across turns
+   - **Ephemeral in-memory store**: responses live in a weighted in-memory cache (~2 GiB, 80% soft threshold, 60s cleanup, 10-min idle timeout). No persistence; every restart, container replacement, or OOM kill clears active flows, so it must not be treated as durable storage
+   - **Proxy-level upstream caching**: `OPEN_RESPONSES_UPSTREAM_CACHE` asks LiteLLM to cache (`cache: {"no-cache": false}`); a separate layer from the in-memory store
    - **Mock API server**: a lightweight Flask/FastAPI server that mirrors the Open Responses `/responses` endpoint contract locally. Returns plausible simulated completions when no engine is running, so client code can be developed and tested without GPU access
    - **Session isolation**: each virtual key maps to an isolated session namespace; no data leaks between teams or test runs
-   - See [Open Responses](https://github.com/open-responses/open-responses) and the design note: [nn-responsesAPI.md](eduailab/nn-responsesAPI.md)
+   - See [Open Responses](https://github.com/open-responses/open-responses), the [open-responses-memproxy](https://github.com/AISidesKicks/open-responses-memproxy) component, and the design note: [nn-responsesAPI.md](eduailab/nn-responsesAPI.md)
 ---
 
 ### Will it RUN considerations

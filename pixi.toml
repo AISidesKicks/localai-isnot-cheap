@@ -1,9 +1,9 @@
 [workspace]
-authors = ["HOT AIcoder <198066858+AISidesKicks@users.noreply.github.com>"]
-channels = ["conda-forge", "main", "r", "msys2"]
 name = "cheap"
-platforms = ["linux-64"]
 version = "0.1.0"
+channels = ["conda-forge", "main", "r", "msys2"]
+platforms = ["linux-64"]
+authors = ["AISidesKicks <198066858+AISidesKicks@users.noreply.github.com>"]
 
 [activation]
 

@@ -65,8 +65,34 @@ records whether deltas were observed and whether the stream terminated cleanly.
 
 Only one engine (llamasrv / vllm / sglang) is up at a time; vLLM is the active
 engine for this lab, so `vllm@` (and the `litellm@local-vllm` gateway alias that
-backs onto it) are the only reachable routes. `llama@` / `sglang@` would 500,
-so they are not in the scenario set.
+backs onto it) are the only reachable routes. `sglang@` is therefore an
+unreachable-route probe: since the memproxy fix set, a connection-level failure
+to a down engine is reported as **502 `upstream_error`** (no misleading 500),
+which makes the down engine a cheap negative-path assertion (`engine_down_502`),
+distinct from the unknown-provider case (`bad_alias` -> 400).
+
+## Regression assertions (memproxy fix set)
+
+The run also locks in the wire/config behavior delivered by the upstream fix set
+(`6824e5f..3520743` of `open-responses-memproxy`):
+
+- `payload_wire` / `stream_wire` — the SDK-internal `isValid` and
+  `sequence_number` fields are stripped from both the response JSON and every SSE
+  data event, and stream termination still arrives via `response.completed`.
+- `created_at` is epoch **millis** (13-digit) on the non-streaming response.
+- `engine_down_502` — `sglang@LiquidAI/LFM2.5-2.6B` (engine down) returns
+  502 `upstream_error`.
+- `stats` — `requests.failedBy` breaks failures down by
+  client/upstream/internal/timeout/exception, and the run asserts the two causes
+  it provokes (down-engine 502 -> upstream, bogus alias 400 -> client).
+- `metrics` — `/prometheus` exposes the store/cache gauges
+  `openresponses_store_entries` / `openresponses_store_evictions` /
+  `openresponses_cache_mode`.
+
+Ignored-client-hint behavior (`caching` WARN) is exercised in the lab but not as
+a test scenario — it needs container-log inspection, which would make the
+stdlib-only client depend on `docker`.
+<br>(also see `memproxy-fix.md` + `docs/stats.md` in the upstream repo).
 
 ## Layout
 

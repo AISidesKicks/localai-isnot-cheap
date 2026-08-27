@@ -30,14 +30,17 @@ RUNS_DIR = os.path.join(REPO_ROOT, "datasets", "responsesapi-01", "runs")
 SCENARIO_LABELS = {
     "litellm_route": "POST /v1/responses litellm@local-vllm (gateway leg)",
     "vllm_route": "POST /v1/responses vllm@LiquidAI/LFM2.5-2.6B (direct leg)",
+    "payload_wire": "payload cleanliness: no isValid/sequence_number, millis created_at",
     "header_route": "POST with x-model-provider: vllm",
     "stream_route": "SSE stream:true on vllm route",
+    "stream_wire": "SSE cleanliness: no leaked sequence_number/isValid",
     "retrieve": "GET /v1/responses/{id}",
     "continue_flow": "POST previous_response_id continuation",
     "input_items": "GET /v1/responses/{id}/input_items",
+    "engine_down_502": "POST sglang@LiquidAI/LFM2.5-2.6B (engine down) -> expect 502 upstream_error",
     "bad_alias": "POST nope@bogus -> expect HTTP 400",
-    "stats": "GET /stats field assertions",
-    "metrics": "GET /metrics + /prometheus meter names",
+    "stats": "GET /stats field + requests.failedBy assertions",
+    "metrics": "GET /metrics + /prometheus meter + store gauge names",
 }
 
 

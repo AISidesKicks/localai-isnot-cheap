@@ -8,14 +8,17 @@ it probes /health up front, then runs one row per scenario:
 
   - litellm_route   POST /v1/responses `litellm@local-vllm`, store:true
   - vllm_route      POST /v1/responses `vllm@LiquidAI/LFM2.5-2.6B`, store:true
+  - payload_wire    response cleanliness: no isValid/sequence_number, millis created_at
   - header_route    POST with `x-model-provider: vllm` header instead of model@
   - stream_route    POST stream:true on the vllm route (SSE body)
+  - stream_wire     SSE cleanliness: no leaked sequence_number/isValid, completed seen
   - retrieve        GET /v1/responses/{id} for a stored response
   - continue_flow   POST with previous_response_id to extend the same flow
   - input_items     GET /v1/responses/{id}/input_items for the stored response
+  - engine_down_502 POST `sglang@LiquidAI/LFM2.5-2.6B` (engine down) -> expect 502 upstream_error
   - bad_alias       POST `nope@bogus` -> expect HTTP 400
-  - stats           GET /stats, assert service/requests/responseStore/cache/memory
-  - metrics         GET /metrics + /prometheus, assert meter names
+  - stats           GET /stats, assert service/requests/failedBy/store/cache/memory
+  - metrics         GET /metrics + /prometheus, assert meter + store gauge names
 
 Writes per-run datasets/responsesapi-01/runs/<run-id>/results.json (raw rows)
 and eval.json (pass/fail summary), plus refreshed "latest" copies.
@@ -96,17 +99,33 @@ def health(url):
     return status == 200
 
 
+def find_key_paths(node, key, path=""):
+    """Return JSON paths under node where key appears (recursive)."""
+    hits = []
+    if isinstance(node, dict):
+        for k, v in node.items():
+            p = f"{path}.{k}" if path else k
+            if k == key:
+                hits.append(p)
+            hits.extend(find_key_paths(v, key, p))
+    elif isinstance(node, list):
+        for i, v in enumerate(node):
+            hits.extend(find_key_paths(v, key, f"{path}[{i}]"))
+    return hits
+
+
 def stream_payload(base, payload, key):
     """POST a streaming request and consume the SSE body.
 
-    Returns dict with collected deltas, whether response.completed was seen,
-    and the tail of the raw body.
+    Returns dict with collected deltas, parsed data chunks, whether
+    response.completed was seen, and the tail of the raw body.
     """
     url = base + "/v1/responses"
     req_headers = {"Content-Type": "application/json", "Authorization": f"Bearer {key}"}
     data = json.dumps(payload).encode("utf-8")
     req = urllib.request.Request(url, data=data, method="POST", headers=req_headers)
     deltas = []
+    chunks = []
     done = False
     tail = ""
     try:
@@ -127,9 +146,20 @@ def stream_payload(base, payload, key):
                     deltas.append(obj.get("delta", ""))
                 elif obj.get("type") == "response.completed":
                     done = True
+                chunks.append(obj)
     except (OSError, urllib.error.URLError) as exc:
-        return {"deltas": deltas, "completed": done, "error": f"transport error: {exc}"}
-    return {"deltas": deltas, "completed": done, "tail": tail[:200]}
+        return {
+            "deltas": deltas,
+            "chunks": chunks,
+            "completed": done,
+            "error": f"transport error: {exc}",
+        }
+    return {
+        "deltas": deltas,
+        "chunks": chunks,
+        "completed": done,
+        "tail": tail[:200],
+    }
 
 
 def main():
@@ -202,6 +232,23 @@ def main():
     ok = status == 200 and isinstance(body, dict) and body.get("object") == "response"
     row("vllm_route", status, ok, f"model={body.get('model') if body else raw}")
 
+    # --- payload_wire ----------------------------------------------------
+    leaked = []
+    created_ok = False
+    if isinstance(body, dict):
+        leaked = find_key_paths(body, "isValid") + find_key_paths(
+            body, "sequence_number"
+        )
+        created = body.get("created_at")
+        created_ok = isinstance(created, (int, float)) and len(str(int(created))) == 13
+    ok = not leaked and created_ok
+    row(
+        "payload_wire",
+        status,
+        ok,
+        f"created_at_millis={created_ok} leaked={len(leaked)}",
+    )
+
     stored_id = body.get("id") if isinstance(body, dict) else None
 
     # --- header_route ----------------------------------------------------
@@ -231,6 +278,20 @@ def main():
         200,
         ok,
         f"deltas={len(sres.get('deltas', []))} completed={sres.get('completed')}",
+    )
+
+    # --- stream_wire -----------------------------------------------------
+    leaked = [
+        p
+        for c in sres.get("chunks", [])
+        for p in find_key_paths(c, "isValid") + find_key_paths(c, "sequence_number")
+    ]
+    ok = not leaked and sres.get("completed")
+    row(
+        "stream_wire",
+        200,
+        ok,
+        f"leaked={len(leaked)} completed={sres.get('completed')}",
     )
 
     # --- retrieve --------------------------------------------------------
@@ -285,6 +346,19 @@ def main():
         f"object={body.get('object') if isinstance(body, dict) else raw}",
     )
 
+    # --- engine_down_502 -------------------------------------------------
+    status, body, raw = http_json(
+        responses_url,
+        method="POST",
+        key=key,
+        payload={"model": f"sglang@{VLLM_MODEL}", "input": "hi"},
+    )
+    err_type = None
+    if isinstance(body, dict):
+        err_type = body.get("type") or (body.get("error") or {}).get("type")
+    ok = status == 502 and err_type == "upstream_error"
+    row("engine_down_502", status, ok, f"type={err_type} expect 502 upstream_error")
+
     # --- bad_alias -------------------------------------------------------
     status, body, raw = http_json(
         responses_url,
@@ -300,9 +374,11 @@ def main():
     s_ok = status == 200 and isinstance(stats, dict)
     checks = {}
     if s_ok:
+        reqs = stats.get("requests") or {}
+        failed_by = reqs.get("failedBy") or {}
         checks = {
             "service": stats.get("service") == "open-responses-memproxy",
-            "requests.total>0": int(stats.get("requests", {}).get("total", 0)) > 0,
+            "requests.total>0": int(reqs.get("total", 0)) > 0,
             "responseStore.entries>0": int(
                 stats.get("responseStore", {}).get("entries", 0)
             )
@@ -314,19 +390,24 @@ def main():
                 "maximumWeightBytes"
             )
             == 2147483648,
+            "failedBy.causes>=5": set(failed_by)
+            >= {"client", "upstream", "internal", "timeout", "exception"},
+            "failedBy.upstream>=1": int(failed_by.get("upstream", 0)) > 0,
+            "failedBy.client>=1": int(failed_by.get("client", 0)) > 0,
         }
     else:
-        checks = {
-            k: False
-            for k in (
-                "service",
-                "requests.total>0",
-                "responseStore.entries>0",
-                "cache.mode==on",
-                "memory.maxBytes==3221225472",
-                "maximumWeightBytes==2147483648",
-            )
-        }
+        keys = (
+            "service",
+            "requests.total>0",
+            "responseStore.entries>0",
+            "cache.mode==on",
+            "memory.maxBytes==3221225472",
+            "maximumWeightBytes==2147483648",
+            "failedBy.causes>=5",
+            "failedBy.upstream>=1",
+            "failedBy.client>=1",
+        )
+        checks = {k: False for k in keys}
     ok = s_ok and all(checks.values())
     row("stats", status, ok, json.dumps(checks) if checks else raw)
 
@@ -338,12 +419,20 @@ def main():
     )
     pstatus, _, pbody = http_json(base + "/prometheus", key=key)
     p_ok = pstatus == 200 and "jvm_memory_used_bytes" in pbody
-    ok = m_ok and p_ok
+    store_gauges_ok = (
+        pstatus == 200
+        and "openresponses_store_entries" in pbody
+        and "openresponses_store_evictions" in pbody
+        and "openresponses_cache_mode" in pbody
+    )
+    ok = m_ok and p_ok and store_gauges_ok
     row(
         "metrics",
         status,
         ok,
-        f"http.server.requests={'Y' if 'http.server.requests' in names else 'n'} jvm_memory_used_bytes={'Y' if p_ok else 'n'}",
+        f"http.server.requests={'Y' if 'http.server.requests' in names else 'n'} "
+        f"jvm_memory_used_bytes={'Y' if p_ok else 'n'} "
+        f"store_gauges={'Y' if store_gauges_ok else 'n'}",
     )
 
     # --- meta + artifacts ------------------------------------------------

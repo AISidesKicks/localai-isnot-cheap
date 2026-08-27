@@ -157,8 +157,10 @@ proxy.
 
 The automated version of this is the **`responsesapi-01` smoke test**
 (`smoketests/responsesapi-01/`), which covers the gateway + direct legs,
-streaming, retrieve/continue/input-items, a bad-alias 400, and `/stats` +
-`/metrics` + `/prometheus` assertions, and writes artifacts under
+streaming, retrieve/continue/input-items, a bad-alias 400, a down-engine 502
+`upstream_error`, wire-cleanliness checks (no `isValid`/`sequence_number`,
+millis `created_at`), and `/stats` `requests.failedBy` + `/prometheus`
+store-gauge assertions. It writes artifacts under
 `datasets/responsesapi-01/`:
 
 ```bash

@@ -208,6 +208,11 @@ Custom report scripts query the persisted trace and spend data to build per-team
    - **Proxy-level upstream caching**: `OPEN_RESPONSES_UPSTREAM_CACHE` asks LiteLLM to cache (`cache: {"no-cache": false}`); a separate layer from the in-memory store
    - **Smoke test**: `responsesapi-01` drives POST `/v1/responses` over the `litellm@local-vllm` (gateway) and `vllm@LiquidAI/LFM2.5-2.6B` (direct) legs, plus streaming, retrieve/continue/input-items, a bad-alias 400, a down-engine 502 `upstream_error`, wire-cleanliness checks (no `isValid`/`sequence_number`, millis `created_at`), and `/stats` `requests.failedBy` + `/prometheus` store-gauge assertions. Run `pixi run responsesapi-01-test && pixi run responsesapi-01-report` (LiteLLM + postgres + redis + phoenix must be up for the gateway leg). See [nn-responsesAPI.md](eduailab/nn-responsesAPI.md)
    - See [Open Responses](https://github.com/open-responses/open-responses), the [open-responses-memproxy](https://github.com/AISidesKicks/open-responses-memproxy) component, and the design note: [nn-responsesAPI.md](eduailab/nn-responsesAPI.md)
+
+10. **External KV-Cache (OPTIONAL):**
+   - Demonstration 3 layers L1 L2 L3
+   - CacheBlend as different caching paradigm
+
 ---
 
 ### Will it RUN considerations

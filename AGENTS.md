@@ -45,7 +45,7 @@ Auto-commit locally - don't push, so we can keep track of development, using the
 - Small granular conventional commits.
 - Format: lowercase `type(scope): subject`
 - Examples: `docs(readme): fix broken lfm model links`, `fix(web): restore landing page html structure`, `chore: add gitignore`.
-- Typos fixing: submit merrit of changge, not then you just 'clean it'
+- Typos fixing: only use `fix(scope):` for text corrections (typos, grammar, broken links). Do NOT use `fix:` for semantic additions (new sections, features, renumbering) — use `docs(scope):` with a meaningful subject instead.
 
 ## Task completion notification
 

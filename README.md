@@ -131,16 +131,16 @@ We can also try Google's [embeddinggemma](https://ai.google.dev/gemma/docs/embed
        .                               │
        .                               │ (1. API Request + Virtual Key)
        .                               ▼
-       .        ┌──────────────────────────────────────────────────────────┐ ┌─.─.─.─.─.─.─┐
-       ▽        │          LITELLM (AI GATEWAY)                            │ │  LLAMA.UI   │
-┌─.─.─.─.─.─.─┐ │ • Request Interception & Quota Checks (Users/Teams/Apps) │ ◁             │
-│OpenResponses│ │ • Cache Layer: Exact / Semantic Response Matching        │ │ • manual    │
-│             ▷ │ • Rate Limiting (TPM/RPM) & Dynamic Cost Calculation     │ │  debugging  │
-│ • rAPI      │ │ • OTLP Trace Export to Phoenix                           │ │  (point to  │
-│  (memproxy  │ │ • MCP Gateway: MCP and namespaced tools                  │ │   srv API)  │
-│   in RAM)   │ │ • Skills HUB: Set of useful skills                       │ │             │
-└─.─.─.─.─.─.┬┘ └─┬──────────────────────────┬─────────────────────────┬───┘ └─.┬.─.─.─.─.─┘
-             └ ─ ─│ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─┬── │ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ │ ─ ─ ─ ─┘
+       .        ┌────────────────────────────────────────────────────────────┐ ┌─.─.─.─.─.─.─┐
+       ▽        │          LITELLM (AI GATEWAY)                              │ │  LLAMA.UI   │
+┌─.─.─.─.─.─.─┐ │ • Request Interception & Quota Checks (Users/Teams/Apps)   │ ◁             │
+│OpenResponses│ │ • Cache Layer: Exact / Semantic Response Matching          │ │ • manual    │
+│             ▷ │ • Rate Limiting (TPM/RPM) & Dynamic Cost Calculation       │ │  debugging  │
+│ • rAPI      │ │ • OTLP Trace Export to Phoenix                             │ │  (point to  │
+│  (memproxy  │ │ • MCP Gateway: MCP and namespaced tools                    │ │   srv API)  │
+│   in RAM)   │ │ • Skills HUB: Set of useful skills                         │ │             │
+└─.─.─.─.─.─.┬┘ └─┬──────────────────────────┬─────────────────────────┬─────┘ └─.┬.─.─.─.─.─┘
+             └ ─ ─│ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─┬── │ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ │─ ─ ─ ─ ─┘
   (9. Sessions)   │ (2. Cache Lookup     │   │ (3. Cache Miss:         │ (4. OTLP Trace &)
        Lookup     │     Auth Key Check)  │   │     Inference Request)  │     Usage Events)
                   ▼                      ▽   ▼                         ▼
@@ -150,23 +150,23 @@ We can also try Google's [embeddinggemma](https://ai.google.dev/gemma/docs/embed
 │ • Response Cache Hit  │ │ • GPU / CPU Acceleration      │ │ • Token Counting & Model Costs │
 │ • Auth Key Validation │ │ • Model Prefill & Decode      │ │ • Runtime / Latency Metrics    │
 │ • TPM / RPM Counters  │ │ • Prefix / KV-Cache Hit       │ │ • MCP Server (/mcp)            │
-└───────────────────────┘ └────────────┬──────────────────┘ └────────┬───────────────────────┘
-                                       │                             │
-    (8. MCP Tools)                     │ (5. Prometheus              │ (6. Spans, Token
-                                       │     /metrics Scrape)        │     Counts & Costs)
-                                       ▼                             ▼
-┌───────────────────────┐ ┌───────────────────────────┐ ┌────────────────────────────────────┐
-│   ADMIN MCP SERVERS   │ │     VICTORIAMETRICS       │ │         POSTGRESQL (SHARED)        │
-│ • LiteLLM Admin MCP   │ │ • Engine Metrics Store    │ │ • LiteLLM DB: Spend Logs, Budgets  │
-│ • VictoriaMetrics MCP │ │ • GPU / Host Utilization  │ │ • Phoenix DB: Traces, Spans, Cost  │
-│ • Phoenix MCP         │ └───────────────┬───────────┘ └───────────────────┬────────────────┘
-│                       │                 │                                 │
-│  LiteLLM  MCP Gateway │                 │       (7. Query & Insights)     │
-│ • all Admin MCPs      │                 ▼                                 ▼
-│                       │         ┌─────────────────────────────────────────────────────┐
-│  LiteLLM  MCP custom  │         │            CUSTOM REPORT SCRIPTS (API/MCP)          │
-│ • NameSpaced tools    │         │       (per-team cost / size / latency reports)      │
-└───────────────────────┘         └─────────────────────────────────────────────────────┘
+└───────────────────────┘ └──────┬─────┬──────────────────┘ └────────┬───────────────────────┘
+                                 •     │                             │
+    (8. MCP Tools)               •     │ (5. Prometheus              │ (6. Spans, Token
+                           • • • •     │     /metrics Scrape)        │     Counts & Costs)
+                           •           ▼                             ▼
+┌───────────────────────┐  •   ┌───────────────────────────┐ ┌────────────────────────────────┐
+│   ADMIN MCP SERVERS   │  •   │     VICTORIAMETRICS       │ │         POSTGRESQL (SHARED)    │
+│ • LiteLLM Admin MCP   │  •   │   Engine Metrics Store    │ │ • LiteLLM: Spend Logs, Budgets │
+│ • VictoriaMetrics MCP │  •   │ • GPU / Host Utilization  │ │ • Phoenix: Traces, Spans, Cost │
+│ • Phoenix MCP         │  •   └───────────────┬───────────┘ └───────────────────┬────────────┘
+│                       │  •                   │                                 │
+│  LiteLLM  MCP Gateway │  •  (10. Ext cache)  │       (7. Query & Insights)     │
+│ • all Admin MCPs      │  ▼                   ▼                                 ▼
+│                       │ ┌──────────────┐ ┌─────────────────────────────────────────────────┐
+│  LiteLLM  MCP custom  │ │   LMCache    │ │          CUSTOM REPORT SCRIPTS (API/MCP)        │
+│ • NameSpaced tools    │ │• CacheBlend  │ │     (per-team cost / size / latency reports)    │
+└───────────────────────┘ └──────────────┘ └─────────────────────────────────────────────────┘
 ```
 ---
 

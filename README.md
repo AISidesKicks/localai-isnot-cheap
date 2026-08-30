@@ -85,6 +85,20 @@ Full SmolLM3-3B model is 6.17 GB in bf16, we can easily run 8bit quantizations:
   - code (programming languages)
   - have fine-tuned variants for special domains
 
+### MTP (Multi Token Prediction)
+
+Small model with built-in speculative decoding (MTP head and vision):
+
+ **Qwen3.5 2B MTP** - MTP is sensitive to quantization and need an additional VRAM (will 8bit fit) in 12GB VRAM???
+
+ We will focus on single slot config only:
+
+ - [unsloth/Qwen3.5-2B-MTP-GGUF (8-bit UD-Q8_K_XL - 3GB)](https://huggingface.co/unsloth/Qwen3.5-2B-MTP-GGUF)
+ - [surogate/Qwen3.5-2B-FP8 (8-bit - 3GB)](https://huggingface.co/surogate/Qwen3.5-2B-FP8)
+ - [cyankiwi/Qwen3.5-2B-AWQ-BF16-INT8](https://huggingface.co/cyankiwi/Qwen3.5-2B-AWQ-BF16-INT8)
+
+PS: This model is also multi-modal, we can test CacheBlend with it too.
+
 ### Primary embedder
 
 **nomic-embed-text-v1.5 by Nomic**

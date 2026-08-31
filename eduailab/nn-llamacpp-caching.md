@@ -188,7 +188,7 @@ gets tight, drop `--cache-ram` to 2048 while the ramdisk is up.
 ### KV dtype
 
 ```sh
--ctk q8_0 -ctv q8_0   # 2x tokens per KV budget (see nn-KV-cache-quantization.md)
+-ctk q8_0 -ctv q8_0   # 2x tokens per KV budget (see nn-extreme-quantizations.md)
 ```
 
 ## 5. Comparison table
@@ -201,7 +201,7 @@ gets tight, drop `--cache-ram` to 2048 while the ramdisk is up.
 | KV dtype flags | `-ctk/-ctv q8_0\|q4_0\|f16…` | `--kv-cache-dtype fp8_e5m2\|fp8_e4m3` + `--kv-cache-dtype-skip-layers` | `--kv-cache-dtype fp8_e4m3\|fp8_e5m2` (+ scale path via `--quantization-param-path`) |
 | Hybrid note | GGUF conv-state cached too | hybrid KV cache manager | LFM = FULL/SWA/MAMBA in one radix tree (`SGLANG_ENABLE_UNIFIED_RADIX_TREE=1`), `--mamba-full-memory-ratio` |
 
-Quantization tradeoffs and engine flags: [nn-KV-cache-quantization.md](nn-KV-cache-quantization.md).
+Quantization tradeoffs and engine flags: [nn-extreme-quantizations.md](nn-extreme-quantizations.md).
 Sibling engine docs: [vLLM](nn-vLLM-caching.md), [SGLang](nn-SGLang-caching.md).
 
 ## 6. Sources

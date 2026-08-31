@@ -81,7 +81,7 @@ batch actually uses.
 The KV cache is quantized to `q8_0` (`-ctk q8_0 -ctv q8_0` in the
 `cheap-llamasrv` command), which drops the KV buffer from ~1.95 GiB f16 to
 ~1 GiB q8_0 (half the memory for the same 4×32K seats). This matches the
-`eduailab/nn-KV-cache-quantization.md` recipe: LFM2.5 is a small hybrid
+`eduailab/nn-extreme-quantizations.md` recipe: LFM2.5 is a small hybrid
 (GQA full-attn, 8 of 30 layers carry K/V), so 8-bit is the sweet spot —
 4-bit is risky, and q8_0 V needs FlashAttention (auto-enabled via
 `--flash-attn auto`). After the q8_0 change the post-load footprint is

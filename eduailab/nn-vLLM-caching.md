@@ -160,7 +160,7 @@ ramdisk is mounted.
 ### KV dtype
 
 ```sh
---kv-cache-dtype fp8_e4m3     # 8-bit KV, 2x tokens per budget (see nn-KV-cache-quantization.md)
+--kv-cache-dtype fp8_e4m3     # 8-bit KV, 2x tokens per budget (see nn-extreme-quantizations.md)
 ```
 
 ## 5. Comparison table
@@ -173,7 +173,7 @@ ramdisk is mounted.
 | KV dtype flags | `-ctk/-ctv q8_0\|q4_0\|f16…` | `--kv-cache-dtype fp8_e5m2\|fp8_e4m3` + `--kv-cache-dtype-skip-layers` | `--kv-cache-dtype fp8_e4m3\|fp8_e5m2` (+ scale path via `--quantization-param-path`) |
 | Hybrid note | GGUF conv-state cached too | hybrid KV cache manager | LFM = FULL/SWA/MAMBA in one radix tree (`SGLANG_ENABLE_UNIFIED_RADIX_TREE=1`), `--mamba-full-memory-ratio` |
 
-Quantization tradeoffs and engine flags: [nn-KV-cache-quantization.md](nn-KV-cache-quantization.md).
+Quantization tradeoffs and engine flags: [nn-extreme-quantizations.md](nn-extreme-quantizations.md).
 Sibling engine docs: [llama.cpp](nn-llamacpp-caching.md), [SGLang](nn-SGLang-caching.md).
 
 ## 6. Sources

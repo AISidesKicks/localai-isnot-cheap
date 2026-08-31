@@ -153,7 +153,7 @@ is the approved squeeze.
 
 ```sh
 --kv-cache-dtype fp8_e4m3     # 8-bit KV; note the Mamba conv_state is NOT quantized by this flag:
---mamba-ssm-dtype float16     # SSM state keeps its own precision (see nn-KV-cache-quantization.md)
+--mamba-ssm-dtype float16     # SSM state keeps its own precision (see nn-extreme-quantizations.md)
 ```
 
 ## 5. Comparison table
@@ -166,7 +166,7 @@ is the approved squeeze.
 | KV dtype flags | `-ctk/-ctv q8_0\|q4_0\|f16…` | `--kv-cache-dtype fp8_e5m2\|fp8_e4m3` + `--kv-cache-dtype-skip-layers` | `--kv-cache-dtype fp8_e4m3\|fp8_e5m2` (+ scale path via `--quantization-param-path`) |
 | Hybrid note | GGUF conv-state cached too | hybrid KV cache manager | LFM = FULL/SWA/MAMBA in one radix tree (`SGLANG_ENABLE_UNIFIED_RADIX_TREE=1`), `--mamba-full-memory-ratio` |
 
-Quantization tradeoffs and engine flags: [nn-KV-cache-quantization.md](nn-KV-cache-quantization.md).
+Quantization tradeoffs and engine flags: [nn-extreme-quantizations.md](nn-extreme-quantizations.md).
 Sibling engine docs: [llama.cpp](nn-llamacpp-caching.md), [vLLM](nn-vLLM-caching.md).
 
 ## 6. Sources

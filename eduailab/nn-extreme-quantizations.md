@@ -12,7 +12,7 @@ We are targeting Qwen3.8-27B on a 12 GB GPU (RTX 4070) with 32K+ context using
 [unsloth/Qwen3.8-27B-GGUF](https://huggingface.co/unsloth/Qwen3.8-27B-GGUF) - specifically
 the **IQ3_XXS** (10.9 GB) and **IQ4_XS** (14.3 GB) quants.
 
-[Run Qwen3.8-27B on ANY GPU (8GB to 32GB): Here's How](https://www.youtube.com/watch?v=0xUxO_9zqTU)
+[![Run Qwen3.8-27B on ANY GPU (8GB to 32GB): Here's How](https://img.youtube.com/vi/0xUxO_9zqTU/maxresdefault.jpg)](https://www.youtube.com/watch?v=0xUxO_9zqTU)
 
 Qwen3.8-27B takes roughly 54 GB in full precision - but with the right quantization,
 KV-cache settings, and CPU offloading strategy, you can run it on consumer GPUs with

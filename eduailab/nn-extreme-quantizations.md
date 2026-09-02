@@ -36,22 +36,22 @@ The video also covers example configurations for GPUs such as the RTX 3070, RTX 
 and RX 7900 XTX.
 
 Chapters:
-00:00 - Overview & Unquantized Footprint
-00:19 - Hybrid DeltaNet Architecture Explained
-01:04 - KV Cache & Context Memory Costs
-01:33 - Total VRAM Budgeting Breakdown
-01:54 - Control 1: Weight Quantization & GSQ-RCO
-02:35 - Control 2: KV Cache Precision
-02:51 - Control 3: CPU Offloading & RAM Speed
-03:24 - 8 GB GPUs (RTX 3070 / 4060 / RX 5700 XT)
-05:12 - 12 GB GPUs (RTX 3060 / RTX 4070)
-06:26 - Question for the Comments
-06:48 - 16 GB GPUs (RTX 4060 Ti / 4080 / RX 7800 XT)
-07:52 - llama.cpp CUDA Context Caveat (27623)
-08:21 - 24 GB GPUs (RTX 3090 / 4090 / RX 7900 XTX)
-09:41 - 32 GB Cards & RTX 5090 NVFP4
-10:23 - Advanced Speculative Drafting (D-Flash 2)
-10:45 - Open-Weight Strategy & Final Takeaways
+ - [00:00](https://www.youtube.com/watch?v=0xUxO_9zqTU&t=0s) - Overview & Unquantized Footprint
+ - [00:19](https://www.youtube.com/watch?v=0xUxO_9zqTU&t=19s) - Hybrid DeltaNet Architecture Explained
+ - [01:04](https://www.youtube.com/watch?v=0xUxO_9zqTU&t=64s) - KV Cache & Context Memory Costs
+ - [01:33](https://www.youtube.com/watch?v=0xUxO_9zqTU&t=93s) - Total VRAM Budgeting Breakdown
+ - [01:54](https://www.youtube.com/watch?v=0xUxO_9zqTU&t=114s) - Control 1: Weight Quantization & GSQ-RCO
+ - [02:35](https://www.youtube.com/watch?v=0xUxO_9zqTU&t=155s) - Control 2: KV Cache Precision
+ - [02:51](https://www.youtube.com/watch?v=0xUxO_9zqTU&t=171s) - Control 3: CPU Offloading & RAM Speed
+ - [03:24](https://www.youtube.com/watch?v=0xUxO_9zqTU&t=204s) - 8 GB GPUs (RTX 3070 / 4060 / RX 5700 XT)
+ - [05:12](https://www.youtube.com/watch?v=0xUxO_9zqTU&t=312s) - 12 GB GPUs (RTX 3060 / RTX 4070)
+ - [06:26](https://www.youtube.com/watch?v=0xUxO_9zqTU&t=386s) - Question for the Comments
+ - [06:48](https://www.youtube.com/watch?v=0xUxO_9zqTU&t=408s) - 16 GB GPUs (RTX 4060 Ti / 4080 / RX 7800 XT)
+ - [07:52](https://www.youtube.com/watch?v=0xUxO_9zqTU&t=472s) - llama.cpp CUDA Context Caveat (27623)
+ - [08:21](https://www.youtube.com/watch?v=0xUxO_9zqTU&t=501s) - 24 GB GPUs (RTX 3090 / 4090 / RX 7900 XTX)
+ - [09:41](https://www.youtube.com/watch?v=0xUxO_9zqTU&t=581s) - 32 GB Cards & RTX 5090 NVFP4
+ - [10:23](https://www.youtube.com/watch?v=0xUxO_9zqTU&t=623s) - Advanced Speculative Drafting (D-Flash 2)
+ - [10:45](https://www.youtube.com/watch?v=0xUxO_9zqTU&t=645s) - Open-Weight Strategy & Final Takeaways
 
 ## Qwen3.8-27B Architectural Advantages
 
